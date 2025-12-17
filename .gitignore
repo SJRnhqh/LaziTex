@@ -1,0 +1,24 @@
+# 编译产物
+bin/
+*.exe
+
+# Go 相关
+*.test
+*.out
+*.prof
+
+# 操作系统相关
+.DS_Store
+Thumbs.db
+
+# IDE 相关
+.idea/
+.vscode/
+.cursor/
+*.swp
+*.swo
+*~
+
+# 临时文件
+*.tmp
+*.log
