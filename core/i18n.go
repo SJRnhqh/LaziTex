@@ -136,6 +136,7 @@ func init() {
 		"category.utility":         "🔧 实用工具",
 
 		// 提示消息
+		"msg.unknown_command":    "未知命令: %s",
 		"msg.no_compilers":       "⚠️  警告: 未检测到任何核心 LaTeX 编译器",
 		"msg.partial_install":    "💡 提示: 部分核心工具未安装，但基本功能可用",
 		"msg.all_installed":      "🎉 太棒了！所有核心编译器都已安装",
@@ -144,6 +145,7 @@ func init() {
 		"msg.tip":                "💡 提示",
 		"msg.warning":            "⚠️  警告",
 		"msg.unsupported_os":     "错误: 不支持的操作系统 '%s'",
+		"msg.build_usage":        "用法: lazitex -b <文件名.tex>",
 		"msg.checking_env":       "正在检查 LaTeX 环境...",
 		"msg.install_failed":     "安装失败",
 		"msg.install_success":    "✅ LaTeX 环境安装成功",
@@ -294,6 +296,7 @@ func init() {
 		"category.utility":         "🔧 Utilities",
 
 		// Messages
+		"msg.unknown_command":    "Unknown command: %s",
 		"msg.no_compilers":       "⚠️  Warning: No core LaTeX compilers detected",
 		"msg.partial_install":    "💡 Note: Some core tools are missing, but basic functionality is available",
 		"msg.all_installed":      "🎉 Excellent! All core compilers are installed",
@@ -302,6 +305,7 @@ func init() {
 		"msg.tip":                "💡 Tip",
 		"msg.warning":            "⚠️  Warning",
 		"msg.unsupported_os":     "Error: Unsupported operating system '%s'",
+		"msg.build_usage":        "Usage: lazitex -b <file.tex>",
 		"msg.checking_env":       "Checking LaTeX environment...",
 		"msg.install_failed":     "Installation failed",
 		"msg.install_success":    "✅ LaTeX environment installed successfully",

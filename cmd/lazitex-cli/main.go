@@ -45,12 +45,12 @@ func main() {
 		uninstallLaTeXEnvironment()
 	case "-b", "--build":
 		if len(args) < 2 {
-			fmt.Println("Usage: lazitex -b <file.tex>")
+			fmt.Println(core.T("msg.build_usage"))
 			return
 		}
 		buildLaTeX(args[1])
 	default:
-		fmt.Printf("Unknown command: %s\n", args[0])
+		fmt.Printf(core.T("msg.unknown_command")+"\n", args[0])
 		showHelp()
 	}
 }
@@ -238,7 +238,7 @@ func buildLaTeX(filePath string) {
 		InputPath: filePath,
 	}
 	if err := core.Build(opts); err != nil {
-		fmt.Printf("Error: %v\n", err)
+		fmt.Printf(core.T("msg.build_failed")+": %v\n", err)
 		os.Exit(1)
 	}
 }
