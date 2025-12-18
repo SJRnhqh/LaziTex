@@ -3,9 +3,9 @@
 package modes
 
 import (
-	"bufio"
 	"fmt"
 	"os"
+	"path/filepath"
 	"runtime"
 	"strings"
 
@@ -13,27 +13,128 @@ import (
 	linux "github.com/SJRnhqh/lazitex/target/linux"
 	mac "github.com/SJRnhqh/lazitex/target/mac"
 	win "github.com/SJRnhqh/lazitex/target/win"
+	readline "github.com/chzyer/readline"
 )
+
+// 创建补全器
+var replCompleter = readline.NewPrefixCompleter(
+	// 1. 核心命令补全
+	readline.PcItem("help"),
+	readline.PcItem("version"),
+	readline.PcItem("check"),
+	readline.PcItem("install"),
+	readline.PcItem("uninstall"),
+	readline.PcItem("exit"),
+	readline.PcItem("quit"),
+
+	// 2. 语言补全
+	readline.PcItem("lang",
+		readline.PcItem("zh"),
+		readline.PcItem("en"),
+	),
+
+	// 3. 带路径补全的命令
+	readline.PcItem("build"), // 后面我们会动态处理
+	readline.PcItem("cd"),
+	readline.PcItem("ls"),
+	readline.PcItem("pwd"),
+	readline.PcItem("clear"),
+	readline.PcItem("cat"),
+)
+
+type LaTexCompleter struct{}
+
+// Do 实现 readline.AutoCompleter 接口
+func (c *LaTexCompleter) Do(line []rune, pos int) (newLine [][]rune, length int) {
+	strLine := string(line[:pos])
+	parts := strings.Fields(strLine)
+
+	// 如果还没有输入完第一个单词，或者是在输入第一个单词
+	if len(parts) == 0 || (len(parts) == 1 && !strings.HasSuffix(strLine, " ")) {
+		return replCompleter.Do(line, pos)
+	}
+
+	// 如果第一个单词是 build, cd, ls 或 cat，则进行文件/目录补全
+	cmd := strings.ToLower(parts[0])
+	if cmd == "build" || cmd == "cd" || cmd == "ls" || cmd == "cat" {
+		// 拿到用户正在输入的参数部分
+		var prefix string
+		if strings.HasSuffix(strLine, " ") {
+			prefix = ""
+		} else {
+			prefix = parts[len(parts)-1]
+		}
+
+		// 扫描当前目录
+		files, _ := os.ReadDir(".")
+		var suggestions [][]rune
+		for _, f := range files {
+			name := f.Name()
+			// 1. 对于 cd 命令，只补全文件夹
+			if cmd == "cd" {
+				if !f.IsDir() {
+					continue
+				}
+			}
+			// 2. 对于 build 命令，只补全 .tex 文件和文件夹
+			if cmd == "build" {
+				if !f.IsDir() && !strings.HasSuffix(strings.ToLower(name), ".tex") {
+					continue
+				}
+			}
+			// 3. 对于 cat 命令，补全 .tex, .log, .aux 文件和文件夹
+			if cmd == "cat" {
+				ext := strings.ToLower(filepath.Ext(name))
+				if !f.IsDir() && ext != ".tex" && ext != ".log" && ext != ".aux" {
+					continue
+				}
+			}
+
+			// 简单的匹配过滤
+			if strings.HasPrefix(name, prefix) {
+				suffix := name[len(prefix):]
+				if f.IsDir() {
+					suffix += "/" // 文件夹加斜杠
+				}
+				suggestions = append(suggestions, []rune(suffix))
+			}
+		}
+		return suggestions, len(prefix)
+	}
+
+	return replCompleter.Do(line, pos)
+}
 
 // StartREPL 启动 REPL 模式
 func StartREPL() {
 	printREPLWelcome()
 
-	scanner := bufio.NewScanner(os.Stdin)
+	// 1. 配置历史记录文件的路径
+	homeDir, _ := os.UserHomeDir()
+	historyFile := filepath.Join(homeDir, ".lazitex_history")
+
+	// 2. 初始化 readline 实例
+	rl, err := readline.NewEx(&readline.Config{
+		Prompt:          core.T("repl.prompt"),
+		HistoryFile:     historyFile,
+		AutoComplete:    &LaTexCompleter{},
+		InterruptPrompt: "^C",
+		EOFPrompt:       "exit",
+	})
+	if err != nil {
+		fmt.Printf(core.T("repl.err_init")+"\n", err)
+		return
+	}
+	defer rl.Close()
 
 	for {
-		// 显示提示符
-		fmt.Print(core.T("repl.prompt"))
-
-		// 读取用户输入
-		if !scanner.Scan() {
-			// 扫描结束
+		// 3. 使用 readline 读取输入
+		line, err := rl.Readline()
+		if err != nil { // 处理 Ctrl+C 或 Ctrl+D
 			break
 		}
 
-		input := strings.TrimSpace(scanner.Text())
-
-		// 处理空输入
+		input := strings.TrimSpace(line)
 		if input == "" {
 			continue
 		}
@@ -166,6 +267,7 @@ func showREPLHelp() {
 	fmt.Println("  ls [path]       - " + core.T("repl.help_ls"))
 	fmt.Println("  pwd             - " + core.T("repl.help_pwd"))
 	fmt.Println("  clear           - " + core.T("repl.help_clear"))
+	fmt.Println("  cat [file]      - " + core.T("repl.help_cat"))
 }
 
 // 检查 LaTeX 环境
@@ -260,7 +362,7 @@ func handleShellLikeCommands(parts []string) bool {
 			if home, err := os.UserHomeDir(); err == nil {
 				target = home
 			} else {
-				fmt.Printf("cd: %v\n", err)
+				fmt.Printf(core.T("repl.err_cd")+"\n", err)
 				return true
 			}
 		} else {
@@ -268,7 +370,7 @@ func handleShellLikeCommands(parts []string) bool {
 		}
 
 		if err := os.Chdir(target); err != nil {
-			fmt.Printf("cd: %v\n", err)
+			fmt.Printf(core.T("repl.err_cd")+"\n", err)
 		}
 		return true
 
@@ -276,7 +378,7 @@ func handleShellLikeCommands(parts []string) bool {
 		if cwd, err := os.Getwd(); err == nil {
 			fmt.Println(cwd)
 		} else {
-			fmt.Printf("pwd: %v\n", err)
+			fmt.Printf(core.T("repl.err_pwd")+"\n", err)
 		}
 		return true
 
@@ -287,7 +389,7 @@ func handleShellLikeCommands(parts []string) bool {
 		}
 		entries, err := os.ReadDir(dir)
 		if err != nil {
-			fmt.Printf("ls: %v\n", err)
+			fmt.Printf(core.T("repl.err_ls")+"\n", err)
 			return true
 		}
 		for _, e := range entries {
@@ -302,6 +404,22 @@ func handleShellLikeCommands(parts []string) bool {
 	case "clear":
 		// ANSI 清屏：移动到左上并清空屏幕
 		fmt.Print("\033[H\033[2J")
+		return true
+
+	case "cat":
+		if len(parts) < 2 {
+			fmt.Println(core.T("repl.cat_usage"))
+			return true
+		}
+		content, err := os.ReadFile(parts[1])
+		if err != nil {
+			fmt.Printf(core.T("repl.err_cat")+"\n", err)
+		} else {
+			fmt.Print(string(content))
+			if !strings.HasSuffix(string(content), "\n") {
+				fmt.Println()
+			}
+		}
 		return true
 	}
 

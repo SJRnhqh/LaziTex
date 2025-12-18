@@ -261,6 +261,13 @@ func init() {
 		"repl.help_ls":          "列出当前/指定目录内容",
 		"repl.help_pwd":         "显示当前工作目录",
 		"repl.help_clear":       "清屏",
+		"repl.help_cat":         "查看文件内容",
+		"repl.err_init":         "初始化 REPL 失败: %v",
+		"repl.err_cd":           "cd 切换目录失败: %v",
+		"repl.err_pwd":          "获取当前目录失败: %v",
+		"repl.err_ls":           "列出目录失败: %v",
+		"repl.err_cat":          "读取文件失败: %v",
+		"repl.cat_usage":        "用法: cat <文件名>",
 	})
 
 	// 注册英文翻译
@@ -412,5 +419,12 @@ func init() {
 		"repl.help_ls":          "List current/specified directory",
 		"repl.help_pwd":         "Print working directory",
 		"repl.help_clear":       "Clear screen",
+		"repl.help_cat":         "Display file content",
+		"repl.err_init":         "Error initializing REPL: %v",
+		"repl.err_cd":           "cd failed: %v",
+		"repl.err_pwd":          "pwd failed: %v",
+		"repl.err_ls":           "ls failed: %v",
+		"repl.err_cat":          "cat failed: %v",
+		"repl.cat_usage":        "Usage: cat <filename>",
 	})
 }

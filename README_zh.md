@@ -391,14 +391,24 @@ lazitex> uninstall         # 卸载 LaTeX 环境
 lazitex> build main.tex     # 构建 LaTeX 文档为 PDF
 lazitex> lang zh           # 切换到中文
 lazitex> lang en           # 切换到英文
-lazitex> lang              # 显示当前语言
+lazitex> lang              # 查看当前语言
 lazitex> version           # 显示版本号
 lazitex> exit              # 退出 REPL
 lazitex> cd /tmp           # 切换目录（不带参数回到用户主目录）
-lazitex> ls                # 列出当前目录（ls <path> 可列出指定目录）
-lazitex> pwd               # 显示当前工作目录
+lazitex> ls                # 列出当前内容（支持参数）
+lazitex> pwd               # 显示当前路径
 lazitex> clear             # 清屏
+lazitex> cat file.log      # 查看文件内容（支持 .tex, .log, .aux）
 ```
+
+**现代化的 REPL 体验：**
+
+- 🕒 **命令历史** - 支持上下方向键翻找历史执行过的命令
+- ⌨️ **光标移动** - 支持左右方向键、Home/End、Ctrl+A/E 等标准光标操作
+- 🎯 **智能补全** - 强大的 Tab 自动补全功能：
+  - **命令补全**：自动补全内置命令
+  - **上下文感知**：`cd` 只补全文件夹；`build` 只补全 `.tex`；`cat` 补全 `.tex/.log/.aux`
+- 🌐 **全方位国际化** - 所有命令帮助、错误提示、用法说明均支持中英文切换
 
 REPL 中的语言切换即时生效，并且会保存偏好设置供下次使用！
 
@@ -515,11 +525,11 @@ LaziTex 可以检测 **23 个 LaTeX 工具**，涵盖 7 大类别：
 - [x] 全面的 LaTeX 工具检查（23 个工具）
 - [x] macOS LaTeX 环境自动安装/更新
 - [x] macOS LaTeX 环境自动卸载
-- [x] REPL 交互模式（支持检查、安装、卸载、语言切换）
+- [x] 现代化的 REPL 交互模式（支持历史记录、Tab 补全、Shell 快捷命令、全语言国际化）
+- [x] LaTeX 编译引擎（基础功能：支持 .tex 到 PDF 的一键转换，自动处理工作目录）
 
 ### 进行中 🚧
 
-- [x] LaTeX 编译引擎（基础功能：支持 .tex 到 PDF 的一键转换，自动处理工作目录）
 - [ ] 自动宏包补全（检测缺失宏包并提示自动安装）
 - [ ] 多轮编译支持（自动处理交叉引用和参考文献）
 - [ ] Linux LaTeX 环境自动安装/更新

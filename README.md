@@ -358,11 +358,21 @@ lazitex> lang en           # Switch to English
 lazitex> lang              # Show current language
 lazitex> version           # Show version
 lazitex> exit              # Exit REPL
-lazitex> cd /tmp           # Change directory (default to home if omitted)
-lazitex> ls                # List current directory (ls <path> to list another)
+lazitex> cd /tmp           # Change directory (default to home)
+lazitex> ls                # List contents (supports path arg)
 lazitex> pwd               # Print working directory
 lazitex> clear             # Clear the screen
+lazitex> cat file.log      # View file content (supports .tex, .log, .aux)
 ```
+
+**Modern REPL Experience:**
+
+- 🕒 **Command History** - Use Up/Down arrows to navigate through previous commands
+- ⌨️ **Cursor Control** - Full support for Left/Right arrows, Home/End, Ctrl+A/E, etc.
+- 🎯 **Smart Completion** - Context-aware Tab completion:
+  - **Command Completion**: Auto-completes built-in commands
+  - **Context-Aware Pathing**: `cd` suggests directories; `build` suggests `.tex` files; `cat` suggests `.tex/.log/.aux`
+- 🌐 **Full i18n Support** - All command help, error messages, and usage tips support instant language switching
 
 Language switching in REPL is instant and persists for future sessions!
 
@@ -467,11 +477,11 @@ LaziTex can detect **23 LaTeX tools** across 7 categories:
 - [x] Comprehensive LaTeX tool checking (23 tools)
 - [x] macOS LaTeX environment auto-install/update
 - [x] macOS LaTeX environment auto-uninstall
-- [x] REPL interactive mode (check, install, uninstall, language switching)
+- [x] Modern REPL interactive mode (History, Tab completion, Shell shortcuts, Full i18n)
+- [x] LaTeX Build Engine (Basic: One-click .tex to PDF, smart working directory)
 
 ### In Progress 🚧
 
-- [x] LaTeX Build Engine (Basic: One-click .tex to PDF, smart working directory)
 - [ ] Auto-Package Completion (Detect missing packages and install automatically)
 - [ ] Multi-pass Compilation (Handle cross-references and bibliographies)
 - [ ] Linux LaTeX environment auto-install/update
