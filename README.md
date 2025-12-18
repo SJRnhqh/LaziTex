@@ -520,15 +520,19 @@ LaziTex can detect **23 LaTeX tools** across 7 categories:
 
 ### Planned 📋
 
-- [ ] TUI mode with live preview
 - [ ] Local AI integration for LaTeX assistance
 - [ ] Multi-document project support
 - [ ] Custom compilation profiles
 
 ### Future 🔮
 
+- [ ] `lazitex init` Project Initialization - Minimalist startup experience similar to `uv init`, supporting fast fetching of high-quality LaTeX templates from Gitee/GitHub
+- [ ] TUI mode with live preview
+- [ ] Modern GUI support
 - [ ] Windows LaTeX environment auto-install/update (Windows installation is complex, lower priority)
 - [ ] Windows LaTeX environment auto-uninstall
+- [ ] **AI-Native Authoring Flow**: Bridging human creativity and AI intelligence with high-efficiency interaction and instantaneous feedback, realizing a "DocuGen-style Prompt2PDF" experience. Supporting end-to-end real-time PDF generation from natural language prompts, powered by Multi-Agent workflows for literature retrieval, outline planning, and content refinement
+- [ ] **LaziTex Server & Cloud Vertical Ecosystem**: Exploring server-side deployment solutions to provide "Prompt2PDF" online interactive generation services for vertical sectors such as finance, medical, and research. Supporting multi-modal recognition (e.g., hand-written formulas/charts to LaTeX), bridging unstructured intents to professional PDF documents, and building a distributed document platform that is "Free at Local, Intelligent in Cloud".
 
 ---
 
