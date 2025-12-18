@@ -367,6 +367,10 @@ lazitex> lang en           # 切换到英文
 lazitex> lang              # 显示当前语言
 lazitex> version           # 显示版本号
 lazitex> exit              # 退出 REPL
+lazitex> cd /tmp           # 切换目录（不带参数回到用户主目录）
+lazitex> ls                # 列出当前目录（ls <path> 可列出指定目录）
+lazitex> pwd               # 显示当前工作目录
+lazitex> clear             # 清屏
 ```
 
 REPL 中的语言切换即时生效，并且会保存偏好设置供下次使用！

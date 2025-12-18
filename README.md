@@ -331,6 +331,10 @@ lazitex> lang en           # Switch to English
 lazitex> lang              # Show current language
 lazitex> version           # Show version
 lazitex> exit              # Exit REPL
+lazitex> cd /tmp           # Change directory (default to home if omitted)
+lazitex> ls                # List current directory (ls <path> to list another)
+lazitex> pwd               # Print working directory
+lazitex> clear             # Clear the screen
 ```
 
 Language switching in REPL is instant and persists for future sessions!

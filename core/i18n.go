@@ -247,6 +247,11 @@ func init() {
 		"repl.lang_switched":    "✓ 语言已切换并保存",
 		"repl.lang_unsupported": "不支持的语言: %s",
 		"repl.lang_available":   "可用语言: zh (中文), en (English)",
+		"repl.shell_title":      "REPL 内置快捷命令",
+		"repl.help_cd":          "切换当前目录，默认回到用户主目录",
+		"repl.help_ls":          "列出当前/指定目录内容",
+		"repl.help_pwd":         "显示当前工作目录",
+		"repl.help_clear":       "清屏",
 	})
 
 	// 注册英文翻译
@@ -384,5 +389,10 @@ func init() {
 		"repl.lang_switched":    "✓ Language switched and saved",
 		"repl.lang_unsupported": "Unsupported language: %s",
 		"repl.lang_available":   "Available: zh (中文), en (English)",
+		"repl.shell_title":      "Shell-like shortcuts",
+		"repl.help_cd":          "Change directory (default to home)",
+		"repl.help_ls":          "List current/specified directory",
+		"repl.help_pwd":         "Print working directory",
+		"repl.help_clear":       "Clear screen",
 	})
 }

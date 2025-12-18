@@ -55,6 +55,11 @@ func handleREPLCommand(input string) bool {
 	}
 	command := strings.ToLower(parts[0])
 
+	// 先尝试处理 REPL 内置的 shell 类命令
+	if handled := handleShellLikeCommands(parts); handled {
+		return false
+	}
+
 	switch command {
 	case "quit", "exit":
 		return true // 返回 true 表示退出 REPL
@@ -141,6 +146,12 @@ func showREPLHelp() {
 	fmt.Println("  uninstall       - " + core.T("repl.uninstall_desc"))
 	fmt.Println("  lang <zh|en>    - " + core.T("repl.lang_desc"))
 	fmt.Println("  quit/exit       - " + core.T("repl.quit_desc"))
+	fmt.Println()
+	fmt.Println("  // " + core.T("repl.shell_title"))
+	fmt.Println("  cd [path]       - " + core.T("repl.help_cd"))
+	fmt.Println("  ls [path]       - " + core.T("repl.help_ls"))
+	fmt.Println("  pwd             - " + core.T("repl.help_pwd"))
+	fmt.Println("  clear           - " + core.T("repl.help_clear"))
 }
 
 // 检查 LaTeX 环境
@@ -218,4 +229,67 @@ func UninstallLaTeXEnvironment() {
 		return
 	}
 	// 注意：成功消息由卸载器内部输出，这里不需要再输出
+}
+
+// handleShellLikeCommands 处理 REPL 内置的简单 shell 类命令
+func handleShellLikeCommands(parts []string) bool {
+	if len(parts) == 0 {
+		return false
+	}
+
+	cmd := strings.ToLower(parts[0])
+
+	switch cmd {
+	case "cd":
+		target := ""
+		if len(parts) < 2 {
+			if home, err := os.UserHomeDir(); err == nil {
+				target = home
+			} else {
+				fmt.Printf("cd: %v\n", err)
+				return true
+			}
+		} else {
+			target = parts[1]
+		}
+
+		if err := os.Chdir(target); err != nil {
+			fmt.Printf("cd: %v\n", err)
+		}
+		return true
+
+	case "pwd":
+		if cwd, err := os.Getwd(); err == nil {
+			fmt.Println(cwd)
+		} else {
+			fmt.Printf("pwd: %v\n", err)
+		}
+		return true
+
+	case "ls":
+		dir := "."
+		if len(parts) > 1 {
+			dir = parts[1]
+		}
+		entries, err := os.ReadDir(dir)
+		if err != nil {
+			fmt.Printf("ls: %v\n", err)
+			return true
+		}
+		for _, e := range entries {
+			name := e.Name()
+			if e.IsDir() {
+				name += "/"
+			}
+			fmt.Println(name)
+		}
+		return true
+
+	case "clear":
+		// ANSI 清屏：移动到左上并清空屏幕
+		fmt.Print("\033[H\033[2J")
+		return true
+	}
+
+	return false
 }
