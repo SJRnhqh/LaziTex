@@ -51,14 +51,14 @@ func main() {
 
 		var filePath string
 		var outputPath string
-		preview := false
+		show := false
 		pendingOutput := false // 标记是否正在等待输出路径值
 
 		// 灵活解析：遍历 -b 之后的所有参数
 		for i := 1; i < len(args); i++ {
 			arg := args[i]
-			if arg == "-p" || arg == "--preview" {
-				preview = true
+			if arg == "-s" || arg == "--show" {
+				show = true
 			} else if arg == "-o" || arg == "--output" {
 				pendingOutput = true
 			} else if strings.HasPrefix(arg, "-") {
@@ -87,7 +87,7 @@ func main() {
 			return
 		}
 
-		modes.BuildLaTeX(filePath, outputPath, preview)
+		modes.BuildLaTeX(filePath, outputPath, show)
 	default:
 		fmt.Printf(core.T("msg.unknown_command")+"\n", args[0])
 		showHelp()
@@ -146,7 +146,7 @@ func showHelp() {
 	fmt.Printf("  %-38s %s\n", "-t, --tui", core.T("help.start_tui"))
 	fmt.Printf("  %-38s %s\n", "-i, --install", core.T("help.install_latex"))
 	fmt.Printf("  %-38s %s\n", "-u, --uninstall", core.T("help.uninstall_latex"))
-	fmt.Printf("  %-38s %s\n", "-b, --build <file> [-o path] [-p]", core.T("help.build_latex"))
+	fmt.Printf("  %-38s %s\n", "-b, --build <file> [-o path] [-s]", core.T("help.build_latex"))
 	fmt.Printf("  %-38s %s\n", "-l, --lang <lang>", core.T("help.set_language"))
 }
 

@@ -69,7 +69,7 @@ go build -o lazitex ./cmd/lazitex-cli
 | `-c, --check` | 检查 LaTeX 环境 | `lazitex -c` |
 | `-i, --install` | 安装/更新 LaTeX | `lazitex -i` |
 | `-u, --uninstall` | 卸载 LaTeX | `lazitex -u` |
-| `-b, --build` | 构建 LaTeX 文档 (支持 `-o` 输出, `-p` 预览) | `lazitex -b main.tex [-o out/] [-p]` |
+| `-b, --build` | 构建 LaTeX 文档 (支持 `-o` 输出, `-s` 编译后展示) | `lazitex -b main.tex [-o out/] [-s]` |
 | `-r, --repl` | 启动 REPL 模式 | `lazitex -r` |
 | `-l, --lang` | 设置语言 | `lazitex -l zh` |
 | `-h, --help` | 显示帮助 | `lazitex -h` |
@@ -371,7 +371,7 @@ LaziTex 支持一键将 LaTeX 文档编译为 PDF，并提供智能预览功能�
 
 ```bash
 lazitex -b main.tex          # 仅构建 LaTeX 文档
-lazitex -b main.tex -p       # 构建后自动打开预览
+lazitex -b main.tex -s       # 构建后自动打开展示
 lazitex -b main.tex -o out/  # 指定输出目录
 lazitex -b main.tex -o res.pdf # 指定输出完整路径
 ```
@@ -379,7 +379,7 @@ lazitex -b main.tex -o res.pdf # 指定输出完整路径
 **功能特点：**
 
 - 🚀 **一键构建** - 自动调用编译器（XeLaTeX）并配置最优参数
-- 👁️ **智能预览 (`-p`)** - 构建成功后自动打开 PDF。
+- 👁️ **智能展示 (`-s`)** - 构建成功后自动打开 PDF。
   - **macOS**: 优先检测并使用 **Skim.app**（支持静默刷新），若未安装则自动回退至系统默认浏览器或预览程序。
   - **Windows**: 优先检测并使用 **SumatraPDF**（支持静默刷新与实例复用），若未安装则自动回退至系统默认关联程序。
 - 📁 **自定义输出 (`-o`)** - 支持指定输出目录（若路径不存在将自动递归创建）或指定完整的输出文件名
@@ -391,12 +391,12 @@ lazitex -b main.tex -o res.pdf # 指定输出完整路径
 **构建示例：**
 
 ```bash
-$ lazitex -b report.tex -p
+$ lazitex -b report.tex -s
 🚀 正在构建 LaTeX 文档: report.tex
 📁 工作目录: /Users/user/projects/paper
 ... (编译器输出) ...
 ✨ 构建成功！
-(自动打开预览窗口)
+(自动打开展示窗口)
 ```
 
 ### 其他命令
@@ -416,7 +416,7 @@ lazitex> help                      # 显示可用命令
 lazitex> check                     # 检查 LaTeX 环境
 lazitex> install                   # 安装或更新 LaTeX 环境
 lazitex> uninstall                 # 卸载 LaTeX 环境
-lazitex> build main.tex -o out/ -p # 构建 LaTeX 文档，指定输出目录并带预览
+lazitex> build main.tex -o out/ -s # 构建 LaTeX 文档，指定输出目录并带展示
 lazitex> lang zh                   # 切换到中文
 lazitex> lang en                   # 切换到英文
 lazitex> lang                      # 查看当前语言

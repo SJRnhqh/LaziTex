@@ -69,7 +69,7 @@ Download pre-built binaries from [Releases](https://github.com/SJRnhqh/lazitex/r
 | `-c, --check` | Check LaTeX environment | `lazitex -c` |
 | `-i, --install` | Install/update LaTeX | `lazitex -i` |
 | `-u, --uninstall` | Uninstall LaTeX | `lazitex -u` |
-| `-b, --build` | Build LaTeX document (supports `-o` output, `-p` preview) | `lazitex -b main.tex [-o out/] [-p]` |
+| `-b, --build` | Build LaTeX document (supports `-o` output, `-s` show) | `lazitex -b main.tex [-o out/] [-s]` |
 | `-r, --repl` | Start REPL mode | `lazitex -r` |
 | `-l, --lang` | Set language | `lazitex -l zh` |
 | `-h, --help` | Show help | `lazitex -h` |
@@ -335,7 +335,7 @@ LaziTex supports one-click compilation of LaTeX documents into PDF with smart pr
 
 ```bash
 lazitex -b main.tex             # Build LaTeX document only
-lazitex -b main.tex -p          # Build and open preview automatically
+lazitex -b main.tex -s             # Build LaTeX document and show
 lazitex -b main.tex -o out/     # Specify output directory
 lazitex -b main.tex -o res.pdf  # Specify custom output filename
 ```
@@ -343,7 +343,7 @@ lazitex -b main.tex -o res.pdf  # Specify custom output filename
 **Features:**
 
 - 🚀 **One-Click Build** - Automatically runs the compiler (XeLaTeX) with optimal settings
-- 👁️ **Smart Preview (`-p`)** - Opens the PDF automatically upon successful build.
+- 👁️ **Smart Show (`-s`)** - Opens the PDF automatically upon successful build.
   - **macOS**: Prioritizes **Skim.app** (supporting silent refresh) if installed; otherwise, falls back to the system default browser or viewer.
   - **Windows**: Prioritizes **SumatraPDF** (supporting silent refresh and instance reuse) if installed; otherwise, falls back to the system default viewer.
 - 📁 **Custom Output (`-o`)** - Supports specifying an output directory (automatically and recursively created if missing) or a complete output filename
@@ -355,12 +355,12 @@ lazitex -b main.tex -o res.pdf  # Specify custom output filename
 **Build Example:**
 
 ```bash
-$ lazitex -b report.tex -p
+$ lazitex -b report.tex -s
 🚀 Building LaTeX document: report.tex
 📁 Working directory: /Users/user/projects/paper
 ... (compiler output) ...
 ✨ Build successful!
-(Automatically opening preview window)
+(Automatically opening show window)
 ```
 
 ### Other Commands
@@ -380,7 +380,7 @@ lazitex> help                      # Show available commands
 lazitex> check                     # Check LaTeX environment
 lazitex> install                   # Install or update LaTeX environment
 lazitex> uninstall                 # Uninstall LaTeX environment
-lazitex> build main.tex -o out/ -p # Build LaTeX document with preview and output path
+lazitex> build main.tex -o out/ -s # Build LaTeX document with show and output path
 lazitex> lang zh                   # Switch to Chinese
 lazitex> lang en                   # Switch to English
 lazitex> lang                      # Show current language

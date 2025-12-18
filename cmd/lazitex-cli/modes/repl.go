@@ -217,14 +217,14 @@ func handleREPLCommand(input string) bool {
 
 		filePath := ""
 		outputPath := ""
-		preview := false
+		show := false
 		pendingOutput := false
 
-		// 解析参数：build <file> [-p] [-o output_path]
+		// 解析参数：build <file> [-s] [-o output_path]
 		for i := 1; i < len(parts); i++ {
 			arg := parts[i]
-			if arg == "-p" || arg == "--preview" {
-				preview = true
+			if arg == "-s" || arg == "--show" {
+				show = true
 			} else if arg == "-o" || arg == "--output" {
 				pendingOutput = true
 			} else if strings.HasPrefix(arg, "-") {
@@ -248,7 +248,7 @@ func handleREPLCommand(input string) bool {
 		}
 
 		// 调用统一的构建入口
-		BuildLaTeX(filePath, outputPath, preview)
+		BuildLaTeX(filePath, outputPath, show)
 
 	case "lang", "language":
 		// 语言切换命令
@@ -315,7 +315,7 @@ func showREPLHelp() {
 	fmt.Printf("  %-30s - %s\n", "check", core.T("repl.check_desc"))
 	fmt.Printf("  %-30s - %s\n", "install", core.T("repl.install_desc"))
 	fmt.Printf("  %-30s - %s\n", "uninstall", core.T("repl.uninstall_desc"))
-	fmt.Printf("  %-30s - %s\n", "build <file> [-o path] [-p]", core.T("repl.build_desc"))
+	fmt.Printf("  %-30s - %s\n", "build <file> [-o path] [-s]", core.T("repl.build_desc"))
 	fmt.Printf("  %-30s - %s\n", "lang <zh|en>", core.T("repl.lang_desc"))
 	fmt.Printf("  %-30s - %s\n", "lang", core.T("repl.lang_current")+getCurrentLanguageName())
 	fmt.Printf("  %-30s - %s\n", "quit / exit", core.T("repl.quit_desc"))
