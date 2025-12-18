@@ -2,13 +2,30 @@
 
 package mac
 
-import "os/exec"
+import (
+	"os"
+	"os/exec"
+)
+
+// isSkimInstalled 检查 macOS 上是否安装了 Skim.app
+func isSkimInstalled() bool {
+	// 方式 1：检查标准应用路径 (最快)
+	if _, err := os.Stat("/Applications/Skim.app"); err == nil {
+		return true
+	}
+	// 方式 2：使用 mdfind 查找 Bundle ID (更准，能找到安装在非标准目录的 Skim)
+	cmd := exec.Command("mdfind", "kMDItemCFBundleIdentifier == 'net.sourceforge.skim-app.skim'")
+	output, err := cmd.Output()
+	return err == nil && len(output) > 0
+}
 
 // PreviewPDF 在 macOS 上打开 PDF 预览
 // 目前使用系统默认程序（open 命令），后续可扩展为优先调用 Skim
 func PreviewPDF(pdfPath string) error {
-	// macOS 的 open 命令非常强大：
-	// 1. 如果 PDF 没打开，它会用默认程序（通常是预览.app 或浏览器）打开
-	// 2. 如果 PDF 已经打开，它会将对应窗口提到最前
+	if isSkimInstalled() {
+		return exec.Command("open", "-a", "Skim.app", pdfPath).Run()
+	}
+
+	// 如果 Skim 未安装，则使用系统默认程序打开
 	return exec.Command("open", pdfPath).Run()
 }

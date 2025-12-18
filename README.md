@@ -29,6 +29,25 @@ Instant LaTeX compilation across platforms — powered by Go with local AI to he
 
 ### From Source
 
+#### Method 1: Using Build Scripts (Recommended)
+
+The project provides multi-platform build scripts that automatically generate binaries for all platforms in the `bin/` directory:
+
+- **Linux/macOS**:
+
+  ```bash
+  chmod +x build.sh
+  ./build.sh
+  ```
+
+- **Windows**:
+
+  ```batch
+  build.bat
+  ```
+
+#### Method 2: Manual Build
+
 ```bash
 git clone https://github.com/SJRnhqh/lazitex.git
 cd lazitex
@@ -50,6 +69,7 @@ Download pre-built binaries from [Releases](https://github.com/SJRnhqh/lazitex/r
 | `-c, --check` | Check LaTeX environment | `lazitex -c` |
 | `-i, --install` | Install/update LaTeX | `lazitex -i` |
 | `-u, --uninstall` | Uninstall LaTeX | `lazitex -u` |
+| `-b, --build` | Build LaTeX document (supports `-p` preview) | `lazitex -b main.tex [-p]` |
 | `-r, --repl` | Start REPL mode | `lazitex -r` |
 | `-l, --lang` | Set language | `lazitex -l zh` |
 | `-h, --help` | Show help | `lazitex -h` |
@@ -309,30 +329,33 @@ LaTeX environment not detected
 Tip: You can use 'lazitex -i' to install LaTeX environment with one click
 ```
 
-### Build LaTeX Document
+### Build & Preview LaTeX Document
 
-LaziTex supports one-click compilation of LaTeX documents into PDF:
+LaziTex supports one-click compilation of LaTeX documents into PDF with smart previewing:
 
 ```bash
-lazitex --build main.tex  # Build LaTeX document
-lazitex -b main.tex       # Short form
+lazitex -b main.tex       # Build LaTeX document only
+lazitex -b main.tex -p    # Build and open preview automatically
 ```
 
 **Features:**
 
 - 🚀 **One-Click Build** - Automatically runs the compiler (XeLaTeX) with optimal settings
+- 👁️ **Smart Preview (`-p`)** - Opens the PDF automatically upon successful build. On macOS, LaziTex prioritizes **Skim.app** (supporting silent refresh) if installed; otherwise, it falls back to the system default browser or viewer
 - 📁 **Smart Output** - Automatically places PDF and log files in the same directory as the source `.tex` file
 - 📍 **Path Support** - Supports both filenames in current directory and absolute/relative paths
 - 🔍 **Type Safety** - Automatically validates file extensions and ensures source existence
+- 🔄 **Consistent Logic** - Preview behavior is identical across CLI and REPL modes, laying the groundwork for future live-watch features
 
 **Build Example:**
 
 ```bash
-$ lazitex -b report.tex
+$ lazitex -b report.tex -p
 🚀 Building LaTeX document: report.tex
 📁 Working directory: /Users/user/projects/paper
 ... (compiler output) ...
 ✨ Build successful!
+(Automatically opening preview window)
 ```
 
 ### Other Commands
@@ -386,6 +409,9 @@ LaziTex is built with a clean, modular architecture — making it easy to extend
 lazitex/
 ├── 📦 go.mod                      # Go module definition
 ├── 📦 go.sum                      # Go dependencies
+├── 🛠️  build.sh                   # Linux/macOS build script
+├── 🛠️  build.bat                  # Windows build script
+├── 📁 bin/                        # Build output directory
 │
 ├── 🧠 core/                       # Core logic - the brain of LaziTex
 │   ├── 🔍 checker.go              # Environment detection engine
@@ -405,7 +431,7 @@ lazitex/
 │   └── 🍏 mac/                    # macOS-specific detection
 │       ├── 🔍 checker.go          # Detects MacTeX, Homebrew, MacPorts
 │       ├── 📦 installer.go        # macOS installer (✅ Implemented)
-│       └── 🛠️  builder.go         # macOS compilation logic (Coming Soon)
+│       └── 🛠️  builder.go         # macOS build & preview logic (✅ Implemented)
 │
 ├── 🖥️  cmd/                       # Command-line interface
 │   └── 🚀 lazitex-cli/
@@ -479,9 +505,11 @@ LaziTex can detect **23 LaTeX tools** across 7 categories:
 - [x] macOS LaTeX environment auto-uninstall
 - [x] Modern REPL interactive mode (History, Tab completion, Shell shortcuts, Full i18n)
 - [x] LaTeX Build Engine (Basic: One-click .tex to PDF, smart working directory)
+- [x] Smart Preview System (macOS Skim/Web auto-adapter with one-click preview)
 
 ### In Progress 🚧
 
+- [ ] Live Preview Watcher (Watch Mode) - Implementation in progress
 - [ ] Auto-Package Completion (Detect missing packages and install automatically)
 - [ ] Multi-pass Compilation (Handle cross-references and bibliographies)
 - [ ] Linux LaTeX environment auto-install/update

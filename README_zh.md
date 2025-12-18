@@ -29,6 +29,25 @@
 
 ### 从源码编译
 
+#### 方式一：使用一键编译脚本（推荐）
+
+项目提供了多平台一键编译脚本，会自动在 `bin/` 目录下生成各平台的二进制文件：
+
+- **Linux/macOS**:
+
+  ```bash
+  chmod +x build.sh
+  ./build.sh
+  ```
+  
+- **Windows**:
+
+  ```batch
+  build.bat
+  ```
+
+#### 方式二：手动编译
+
 ```bash
 git clone https://github.com/SJRnhqh/lazitex.git
 cd lazitex
@@ -50,6 +69,7 @@ go build -o lazitex ./cmd/lazitex-cli
 | `-c, --check` | 检查 LaTeX 环境 | `lazitex -c` |
 | `-i, --install` | 安装/更新 LaTeX | `lazitex -i` |
 | `-u, --uninstall` | 卸载 LaTeX | `lazitex -u` |
+| `-b, --build` | 构建 LaTeX 文档 (支持 `-p` 预览) | `lazitex -b main.tex [-p]` |
 | `-r, --repl` | 启动 REPL 模式 | `lazitex -r` |
 | `-l, --lang` | 设置语言 | `lazitex -l zh` |
 | `-h, --help` | 显示帮助 | `lazitex -h` |
@@ -345,30 +365,33 @@ $ lazitex -u
 提示: 可以使用 'lazitex -i' 一键安装 LaTeX 环境
 ```
 
-### 构建 LaTeX 文档
+### 构建与预览 LaTeX 文档
 
-LaziTex 支持一键将 LaTeX 文档编译为 PDF：
+LaziTex 支持一键将 LaTeX 文档编译为 PDF，并提供智能预览功能：
 
 ```bash
-lazitex --build main.tex  # 构建 LaTeX 文档
-lazitex -b main.tex       # 简短命令
+lazitex -b main.tex       # 仅构建 LaTeX 文档
+lazitex -b main.tex -p    # 构建后自动打开预览
 ```
 
 **功能特点：**
 
 - 🚀 **一键构建** - 自动调用编译器（XeLaTeX）并配置最优参数
+- 👁️ **智能预览 (`-p`)** - 构建成功后自动打开 PDF。在 macOS 上，LaziTex 会优先检测并使用 **Skim.app**（支持静默刷新），若未安装则自动回退至系统默认浏览器或预览程序
 - 📁 **智能输出** - 自动将生成的 PDF 和日志文件存放在与 `.tex` 源文件相同的目录下
 - 📍 **路径支持** - 支持当前目录下的文件名，也支持绝对路径或相对路径
 - 🔍 **类型安全** - 自动校验文件后缀，确保源文件存在
+- 🔄 **逻辑复用** - 预览逻辑在 CLI 和 REPL 模式下完全一致，并为未来的实时监听模式打下了基础
 
 **构建示例：**
 
 ```bash
-$ lazitex -b report.tex
+$ lazitex -b report.tex -p
 🚀 正在构建 LaTeX 文档: report.tex
 📁 工作目录: /Users/user/projects/paper
 ... (编译器输出) ...
 ✨ 构建成功！
+(自动打开预览窗口)
 ```
 
 ### 其他命令
@@ -422,6 +445,9 @@ LaziTex 采用清晰的模块化架构设计，易于扩展和维护。
 lazitex/
 ├── 📦 go.mod                      # Go 模块定义
 ├── 📦 go.sum                      # Go 依赖锁定
+├── 🛠️  build.sh                   # Linux/macOS 一键编译脚本
+├── 🛠️  build.bat                  # Windows 一键编译脚本
+├── 📁 bin/                        # 编译产物目录
 │
 ├── 🧠 core/                       # 核心逻辑 - LaziTex 的大脑
 │   ├── 🔍 checker.go              # 环境检测引擎
@@ -441,7 +467,7 @@ lazitex/
 │   └── 🍏 mac/                    # macOS 平台
 │       ├── 🔍 checker.go          # 检测 MacTeX、Homebrew、MacPorts
 │       ├── 📦 installer.go        # macOS 安装器（✅ 已实现）
-│       └── 🛠️  builder.go         # macOS 编译逻辑（即将推出）
+│       └── 🛠️  builder.go         # macOS 编译与预览逻辑（✅ 已实现）
 │
 ├── 🖥️  cmd/                       # 命令行界面
 │   └── 🚀 lazitex-cli/
@@ -527,9 +553,11 @@ LaziTex 可以检测 **23 个 LaTeX 工具**，涵盖 7 大类别：
 - [x] macOS LaTeX 环境自动卸载
 - [x] 现代化的 REPL 交互模式（支持历史记录、Tab 补全、Shell 快捷命令、全语言国际化）
 - [x] LaTeX 编译引擎（基础功能：支持 .tex 到 PDF 的一键转换，自动处理工作目录）
+- [x] 智能预览系统（macOS 平台 Skim/Web 自动适配，支持一键打开预览）
 
 ### 进行中 🚧
 
+- [ ] 实时预览监听 (Watch Mode) - 正在实现中
 - [ ] 自动宏包补全（检测缺失宏包并提示自动安装）
 - [ ] 多轮编译支持（自动处理交叉引用和参考文献）
 - [ ] Linux LaTeX 环境自动安装/更新
