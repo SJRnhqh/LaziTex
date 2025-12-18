@@ -343,7 +343,9 @@ lazitex -b main.tex -o res.pdf  # Specify custom output filename
 **Features:**
 
 - 🚀 **One-Click Build** - Automatically runs the compiler (XeLaTeX) with optimal settings
-- 👁️ **Smart Preview (`-p`)** - Opens the PDF automatically upon successful build. On macOS, LaziTex prioritizes **Skim.app** (supporting silent refresh) if installed; otherwise, it falls back to the system default browser or viewer
+- 👁️ **Smart Preview (`-p`)** - Opens the PDF automatically upon successful build.
+  - **macOS**: Prioritizes **Skim.app** (supporting silent refresh) if installed; otherwise, falls back to the system default browser or viewer.
+  - **Windows**: Prioritizes **SumatraPDF** (supporting silent refresh and instance reuse) if installed; otherwise, falls back to the system default viewer.
 - 📁 **Custom Output (`-o`)** - Supports specifying an output directory (automatically and recursively created if missing) or a complete output filename
 - 📁 **Smart Default** - If `-o` is not specified, it automatically places PDF and log files in the same directory as the source `.tex` file
 - 📍 **Path Support** - Supports both filenames in current directory and absolute/relative paths
@@ -479,6 +481,8 @@ LaziTex can detect **23 LaTeX tools** across 7 categories:
 - Detects **TeX Live** and **MiKTeX** installations
 - Searches common install paths (C:\texlive, C:\Program Files\MiKTeX, etc.)
 - Checks user-specific installations in AppData
+- **Auto Preview Support** - Automatically invokes the system default PDF viewer after a successful build
+- **Smart Preview Enhancement** - Prioritizes detection and invocation of **SumatraPDF** (supporting silent refresh with -reuse-instance), falling back to the system default if not found
 
 ### Linux
 
