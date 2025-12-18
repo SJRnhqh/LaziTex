@@ -48,7 +48,28 @@ func main() {
 			fmt.Println(core.T("msg.build_usage"))
 			return
 		}
-		buildLaTeX(args[1])
+
+		var filePath string
+		preview := false
+
+		// 灵活解析：遍历 -b 之后的所有参数
+		// 支持 lazitex -b file.tex -p 和 lazitex -b -p file.tex
+		for i := 1; i < len(args); i++ {
+			arg := args[i]
+			if arg == "-p" || arg == "--preview" {
+				preview = true
+			} else if !strings.HasPrefix(arg, "-") && filePath == "" {
+				// 第一个不以 - 开头的参数被视为文件路径
+				filePath = arg
+			}
+		}
+
+		if filePath == "" {
+			fmt.Println(core.T("msg.build_usage"))
+			return
+		}
+
+		modes.BuildLaTeX(filePath, preview)
 	default:
 		fmt.Printf(core.T("msg.unknown_command")+"\n", args[0])
 		showHelp()
@@ -100,15 +121,15 @@ func showHelp() {
 	fmt.Println("  lazitex [command]")
 	fmt.Println()
 	fmt.Println(core.T("help.commands"))
-	fmt.Println("  -h, --help       " + core.T("help.show_help"))
-	fmt.Println("  -v, --version    " + core.T("help.show_version"))
-	fmt.Println("  -c, --check      " + core.T("help.check_env"))
-	fmt.Println("  -r, --repl       " + core.T("help.start_repl"))
-	fmt.Println("  -t, --tui        " + core.T("help.start_tui"))
-	fmt.Println("  -i, --install    " + core.T("help.install_latex"))
-	fmt.Println("  -u, --uninstall  " + core.T("help.uninstall_latex"))
-	fmt.Println("  -b, --build <file> " + core.T("help.build_latex"))
-	fmt.Println("  -l, --lang <lang> " + core.T("help.set_language"))
+	fmt.Println("  -h, --help           " + core.T("help.show_help"))
+	fmt.Println("  -v, --version        " + core.T("help.show_version"))
+	fmt.Println("  -c, --check          " + core.T("help.check_env"))
+	fmt.Println("  -r, --repl           " + core.T("help.start_repl"))
+	fmt.Println("  -t, --tui            " + core.T("help.start_tui"))
+	fmt.Println("  -i, --install        " + core.T("help.install_latex"))
+	fmt.Println("  -u, --uninstall      " + core.T("help.uninstall_latex"))
+	fmt.Println("  -b, --build <file> [-p]  " + core.T("help.build_latex"))
+	fmt.Println("  -l, --lang <lang>    " + core.T("help.set_language"))
 }
 
 // 打印Logo
@@ -230,15 +251,4 @@ func installLaTeXEnvironment() {
 // 卸载 LaTeX 环境
 func uninstallLaTeXEnvironment() {
 	modes.UninstallLaTeXEnvironment()
-}
-
-// 构建 LaTeX 文档
-func buildLaTeX(filePath string) {
-	opts := core.BuildOptions{
-		InputPath: filePath,
-	}
-	if err := core.Build(opts); err != nil {
-		fmt.Printf(core.T("msg.build_failed")+": %v\n", err)
-		os.Exit(1)
-	}
 }

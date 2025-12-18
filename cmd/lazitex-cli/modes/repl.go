@@ -183,15 +183,28 @@ func handleREPLCommand(input string) bool {
 	case "build":
 		if len(parts) < 2 {
 			fmt.Println(core.T("repl.build_usage"))
-		} else {
-			// 直接调用 core.Build
-			opts := core.BuildOptions{
-				InputPath: parts[1],
-			}
-			if err := core.Build(opts); err != nil {
-				fmt.Printf(core.T("msg.build_failed")+": %v\n", err)
+			return false
+		}
+
+		filePath := ""
+		preview := false
+		// 解析参数：build <file> [-p]
+		for i := 1; i < len(parts); i++ {
+			arg := parts[i]
+			if arg == "-p" || arg == "--preview" {
+				preview = true
+			} else if filePath == "" {
+				filePath = arg
 			}
 		}
+
+		if filePath == "" {
+			fmt.Println(core.T("repl.build_usage"))
+			return false
+		}
+
+		// 执行构建
+		BuildLaTeX(filePath, preview)
 
 	case "lang", "language":
 		// 语言切换命令
@@ -253,21 +266,21 @@ func handleLanguageSwitch(lang string) {
 // showREPLHelp 显示帮助信息
 func showREPLHelp() {
 	fmt.Println(core.T("repl.help_title"))
-	fmt.Println("  help            - " + core.T("repl.help_desc"))
-	fmt.Println("  version         - " + core.T("repl.version_desc"))
-	fmt.Println("  check           - " + core.T("repl.check_desc"))
-	fmt.Println("  install         - " + core.T("repl.install_desc"))
-	fmt.Println("  uninstall       - " + core.T("repl.uninstall_desc"))
-	fmt.Println("  build <file>    - " + core.T("repl.build_desc"))
-	fmt.Println("  lang <zh|en>    - " + core.T("repl.lang_desc"))
-	fmt.Println("  quit/exit       - " + core.T("repl.quit_desc"))
+	fmt.Println("  help                - " + core.T("repl.help_desc"))
+	fmt.Println("  version             - " + core.T("repl.version_desc"))
+	fmt.Println("  check               - " + core.T("repl.check_desc"))
+	fmt.Println("  install             - " + core.T("repl.install_desc"))
+	fmt.Println("  uninstall           - " + core.T("repl.uninstall_desc"))
+	fmt.Println("  build <file> [-p]   - " + core.T("repl.build_desc"))
+	fmt.Println("  lang <zh|en>        - " + core.T("repl.lang_desc"))
+	fmt.Println("  quit/exit           - " + core.T("repl.quit_desc"))
 	fmt.Println()
 	fmt.Println("  // " + core.T("repl.shell_title"))
-	fmt.Println("  cd [path]       - " + core.T("repl.help_cd"))
-	fmt.Println("  ls [path]       - " + core.T("repl.help_ls"))
-	fmt.Println("  pwd             - " + core.T("repl.help_pwd"))
-	fmt.Println("  clear           - " + core.T("repl.help_clear"))
-	fmt.Println("  cat [file]      - " + core.T("repl.help_cat"))
+	fmt.Println("  cd [path]           - " + core.T("repl.help_cd"))
+	fmt.Println("  ls [path]           - " + core.T("repl.help_ls"))
+	fmt.Println("  pwd                 - " + core.T("repl.help_pwd"))
+	fmt.Println("  clear               - " + core.T("repl.help_clear"))
+	fmt.Println("  cat [file]          - " + core.T("repl.help_cat"))
 }
 
 // 检查 LaTeX 环境
@@ -424,4 +437,43 @@ func handleShellLikeCommands(parts []string) bool {
 	}
 
 	return false
+}
+
+// 构建 LaTeX 文档
+func BuildLaTeX(filePath string, preview bool) {
+	opts := core.BuildOptions{
+		InputPath: filePath,
+		Preview:   preview,
+	}
+
+	pdfPath, err := core.Build(opts)
+	if err != nil {
+		fmt.Printf(core.T("msg.build_failed")+": %v\n", err)
+		os.Exit(1)
+	}
+
+	if preview && pdfPath != "" {
+		OpenPDF(pdfPath)
+	}
+}
+
+// OpenPDF 根据平台分发预览任务
+func OpenPDF(pdfPath string) {
+	var err error
+	switch runtime.GOOS {
+	case "darwin":
+		err = mac.PreviewPDF(pdfPath) // macOS 预览 PDF
+	case "windows":
+		fmt.Printf(core.T("msg.unsupported_os")+"\n", runtime.GOOS)
+	case "linux":
+		fmt.Printf(core.T("msg.unsupported_os")+"\n", runtime.GOOS)
+	default:
+		// 如果不支持，就打印个提示，不强求
+		fmt.Printf(core.T("msg.unsupported_os")+"\n", runtime.GOOS)
+		return
+	}
+
+	if err != nil {
+		fmt.Printf("Warning: Failed to open preview: %v\n", err)
+	}
 }
