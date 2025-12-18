@@ -2,7 +2,7 @@
 
 跨平台即时 LaTeX 编译工具 - 基于 Go 构建，集成本地 AI 助力写作与优化
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Go Version](https://img.shields.io/badge/Go-1.25%2B-00ADD8)](https://go.dev/)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey)](https://github.com/SJRnhqh/lazitex)
 [![Status](https://img.shields.io/badge/Status-Active%20Development-brightgreen)](https://github.com/SJRnhqh/lazitex)
@@ -605,7 +605,7 @@ LaziTex 可以检测 **23 个 LaTeX 工具**，涵盖 7 大类别：
 
 ## 📄 许可证
 
-MIT 许可证 - 自由使用、修改和分享。
+Apache License 2.0 - 包含明确的专利授权，保护开发者与用户。
 
 详见 [LICENSE](LICENSE) 文件。
 

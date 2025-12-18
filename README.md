@@ -2,7 +2,7 @@
 
 Instant LaTeX compilation across platforms — powered by Go with local AI to help you write and refine.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Go Version](https://img.shields.io/badge/Go-1.25%2B-00ADD8)](https://go.dev/)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey)](https://github.com/SJRnhqh/lazitex)
 [![Status](https://img.shields.io/badge/Status-Active%20Development-brightgreen)](https://github.com/SJRnhqh/lazitex)
@@ -550,7 +550,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📄 License
 
-MIT License - Feel free to use, modify, and share.
+Apache License 2.0 - Includes explicit patent grants to protect developers and users.
 
 See [LICENSE](LICENSE) file for details.
 
