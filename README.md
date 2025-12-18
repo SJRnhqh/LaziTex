@@ -281,13 +281,14 @@ lazitex -u           # Short form
 - 🗑️ **Auto Uninstall** - Automatically detects installation method and performs appropriate uninstallation
 - 💬 **Interactive Confirmation** - Asks for confirmation before uninstalling to prevent accidental removal
 - 📋 **Friendly Hints** - Suggests using `-i` to install when LaTeX is not installed
+- 🧹 **Residual Cleanup** - Attempts to remove common leftover paths after successful uninstall
 
 **Supported Uninstallation Methods:**
 
 - ✅ Homebrew BasicTeX - Automatic uninstallation
 - ✅ Homebrew MacTeX - Automatic uninstallation
-- ✅ MacPorts - Automatic uninstallation
-- ℹ️ MacTeX Official Installation - Provides manual uninstallation guide
+- ✅ MacPorts (texlive*, including basic/latex/full) - Automatic uninstallation
+- ✅ MacTeX Official Installation - Attempts the official uninstall script; if missing, provides manual paths to remove
 
 **macOS Uninstall Example:**
 

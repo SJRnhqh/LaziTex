@@ -2,8 +2,6 @@
 
 package mac
 
-// cspell:ignore texlive tlmgr pdflatex mactex TeXShop BasicTeX MacPorts MacTeX
-
 import (
 	"bufio"
 	"errors"
@@ -269,39 +267,63 @@ func (i *Installer) findTlmgrPath() (string, error) {
 func (i *Installer) detectInstallationMethod() string {
 	// 检查是否通过 Homebrew 安装
 	if _, err := exec.LookPath("brew"); err == nil {
-		// 检查是否是 Homebrew cask 安装的 basictex
-		cmd := exec.Command("brew", "list", "--cask", "basictex")
-		output, err := cmd.Output()
-		if err == nil && len(output) > 0 {
+		if out, _ := exec.Command("brew", "list", "--cask", "basictex").Output(); len(out) > 0 {
 			return "homebrew_basictex"
 		}
-		// 检查是否是 Homebrew cask 安装的 mactex
-		cmd = exec.Command("brew", "list", "--cask", "mactex")
-		output, err = cmd.Output()
-		if err == nil && len(output) > 0 {
+		if out, _ := exec.Command("brew", "list", "--cask", "mactex").Output(); len(out) > 0 {
 			return "homebrew_mactex"
 		}
 	}
 
 	// 检查是否是 MacTeX 官方安装（标准路径）
 	if _, err := os.Stat("/Library/TeX/texbin"); err == nil {
-		// 检查是否有 GUI 应用（MacTeX 完整版）
 		if _, err := os.Stat("/Applications/TeX/TeXShop.app"); err == nil {
 			return "mactex_full"
 		}
 		return "mactex_basic"
 	}
 
-	// 检查是否是 MacPorts 安装
+	// 检查是否是 MacPorts 安装（覆盖常见端口）
 	if _, err := exec.LookPath("port"); err == nil {
-		cmd := exec.Command("port", "installed", "texlive")
-		if err := cmd.Run(); err == nil {
-			return "macports"
+		ports := []string{"texlive-full", "texlive-latex", "texlive-basic", "texlive"}
+		for _, p := range ports {
+			if err := exec.Command("port", "installed", p).Run(); err == nil {
+				return "macports"
+			}
 		}
 	}
 
 	// 默认返回未知
 	return "unknown"
+}
+
+// cleanupResidual 清理常见残留目录（尽力而为，忽略错误）
+func (i *Installer) cleanupResidual() {
+	home := os.Getenv("HOME")
+	paths := []struct {
+		path    string
+		useSudo bool
+	}{
+		{"/usr/local/texlive", true},
+		{"/Library/TeX", true},
+		{home + "/Library/TeX", false},
+		{home + "/Library/texlive", false},
+	}
+
+	for _, p := range paths {
+		if _, err := os.Stat(p.path); err == nil {
+			fmt.Printf(core.T("msg.mac.removing_residual")+"\n", p.path)
+			var cmd *exec.Cmd
+			if p.useSudo {
+				cmd = exec.Command("sudo", "rm", "-rf", p.path)
+			} else {
+				cmd = exec.Command("rm", "-rf", p.path)
+			}
+			cmd.Stdout = os.Stdout
+			cmd.Stderr = os.Stderr
+			_ = cmd.Run()
+		}
+	}
 }
 
 // Uninstall 卸载 LaTeX 环境
@@ -360,6 +382,7 @@ func (i *Installer) uninstallHomebrewBasicTeX() error {
 		return fmt.Errorf("%s: %w", core.T("msg.mac.uninstall_failed"), err)
 	}
 
+	i.cleanupResidual()
 	fmt.Println(core.T("msg.mac.uninstall_success"))
 	return nil
 }
@@ -374,40 +397,64 @@ func (i *Installer) uninstallHomebrewMacTeX() error {
 		return fmt.Errorf("%s: %w", core.T("msg.mac.uninstall_failed"), err)
 	}
 
+	i.cleanupResidual()
 	fmt.Println(core.T("msg.mac.uninstall_success"))
 	return nil
 }
 
 // uninstallMacTeX 卸载 MacTeX 官方安装
 func (i *Installer) uninstallMacTeX() error {
-	// MacTeX 官方安装需要手动删除
-	// 提示用户使用官方卸载工具或手动删除
-	fmt.Println("检测到 MacTeX 官方安装")
-	fmt.Println("请使用以下方法卸载：")
-	fmt.Println("  1. 打开 /Library/TeX/Distributions/.DefaultTeX/Contents/Library/texlive/bin/universal-darwin/")
-	fmt.Println("  2. 运行卸载脚本，或手动删除以下目录：")
-	fmt.Println("     - /Library/TeX/")
-	fmt.Println("     - /usr/local/texlive/")
-	fmt.Println("     - ~/Library/TeX/")
-	fmt.Println("     - /Applications/TeX/ (如果存在)")
-	fmt.Println()
-	fmt.Println("或者使用 Homebrew 重新安装后，可以使用 'lazitex -u' 一键卸载")
+	scriptCandidates := []string{
+		"/Library/TeX/Distributions/.DefaultTeX/Contents/Library/texlive/bin/universal-darwin/uninstall-texlive.sh",
+		"/Library/TeX/Distributions/.DefaultTeX/Contents/Library/texlive/bin/universal-darwin/uninstall-texlive",
+	}
 
-	return fmt.Errorf("MacTeX 官方安装需要手动卸载")
+	for _, p := range scriptCandidates {
+		if st, err := os.Stat(p); err == nil && !st.IsDir() {
+			fmt.Println(core.T("msg.mac.uninstall_mactex_running"))
+			cmd := exec.Command("sudo", p)
+			cmd.Stdout = os.Stdout
+			cmd.Stderr = os.Stderr
+			if err := cmd.Run(); err != nil {
+				return fmt.Errorf("%s: %w", core.T("msg.mac.uninstall_failed"), err)
+			}
+			i.cleanupResidual()
+			fmt.Println(core.T("msg.mac.uninstall_success"))
+			return nil
+		}
+	}
+
+	// 找不到脚本则提示手动卸载
+	fmt.Println(core.T("msg.mac.uninstall_mactex_manual"))
+	fmt.Println("  - /Library/TeX/")
+	fmt.Println("  - /usr/local/texlive/")
+	fmt.Println("  - ~/Library/TeX/")
+	fmt.Println("  - /Applications/TeX/ (如果存在)")
+	return fmt.Errorf("MacTeX official uninstall script not found")
 }
 
 // uninstallMacPorts 卸载 MacPorts 安装的 TeX Live
 func (i *Installer) uninstallMacPorts() error {
-	cmd := exec.Command("sudo", "port", "uninstall", "texlive")
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+	ports := []string{"texlive-full", "texlive-latex", "texlive-basic", "texlive"}
+	var lastErr error
 
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("%s: %w", core.T("msg.mac.uninstall_failed"), err)
+	for _, p := range ports {
+		cmd := exec.Command("sudo", "port", "uninstall", p)
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		if err := cmd.Run(); err != nil {
+			lastErr = err
+			continue
+		}
+		i.cleanupResidual()
+		fmt.Println(core.T("msg.mac.uninstall_success"))
+		return nil
 	}
 
-	fmt.Println(core.T("msg.mac.uninstall_success"))
-	return nil
+	if lastErr != nil {
+		return fmt.Errorf("%s: %w", core.T("msg.mac.uninstall_failed"), lastErr)
+	}
+	return fmt.Errorf("%s: no texlive-* port found", core.T("msg.mac.uninstall_failed"))
 }
 
 // uninstallGeneric 通用卸载方法（当无法确定安装方式时）
