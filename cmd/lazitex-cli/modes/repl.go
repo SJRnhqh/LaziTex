@@ -44,64 +44,93 @@ var replCompleter = readline.NewPrefixCompleter(
 
 type LaTexCompleter struct{}
 
-// Do 实现 readline.AutoCompleter 接口
+// Do 实现 readline.AutoCompleter 接口，支持跨目录的文件补全
 func (c *LaTexCompleter) Do(line []rune, pos int) (newLine [][]rune, length int) {
 	strLine := string(line[:pos])
 	parts := strings.Fields(strLine)
 
-	// 如果还没有输入完第一个单词，或者是在输入第一个单词
+	// 如果还没有输入完第一个单词，或者是在输入第一个单词，使用基础命令补全
 	if len(parts) == 0 || (len(parts) == 1 && !strings.HasSuffix(strLine, " ")) {
 		return replCompleter.Do(line, pos)
 	}
 
-	// 如果第一个单词是 build, cd, ls 或 cat，则进行文件/目录补全
+	// 解析当前命令
 	cmd := strings.ToLower(parts[0])
+
+	// 仅对需要路径参数的命令进行增强补全
 	if cmd == "build" || cmd == "cd" || cmd == "ls" || cmd == "cat" {
-		// 拿到用户正在输入的参数部分
-		var prefix string
+		var inputPath string
 		if strings.HasSuffix(strLine, " ") {
-			prefix = ""
+			inputPath = ""
 		} else {
-			prefix = parts[len(parts)-1]
+			// 获取最后一个参数作为输入路径
+			inputPath = parts[len(parts)-1]
 		}
 
-		// 扫描当前目录
-		files, _ := os.ReadDir(".")
+		// --- 核心逻辑：处理跨目录路径 ---
+		dir := "."
+		filePrefix := inputPath
+
+		// 如果包含斜杠，分离出目录部分和正在输入的文件名前缀
+		if lastSlash := strings.LastIndex(inputPath, "/"); lastSlash != -1 {
+			dir = inputPath[:lastSlash+1]
+			filePrefix = inputPath[lastSlash+1:]
+		}
+
+		// 扫描目标目录
+		entries, err := os.ReadDir(dir)
+		if err != nil {
+			return nil, 0
+		}
+
 		var suggestions [][]rune
-		for _, f := range files {
-			name := f.Name()
-			// 1. 对于 cd 命令，只补全文件夹
-			if cmd == "cd" {
-				if !f.IsDir() {
-					continue
-				}
+		for _, entry := range entries {
+			name := entry.Name()
+
+			// 排除隐藏文件
+			if strings.HasPrefix(name, ".") {
+				continue
 			}
-			// 2. 对于 build 命令，只补全 .tex 文件和文件夹
+
+			// --- 针对不同命令的智能过滤 ---
+			isDir := entry.IsDir()
+
+			// 1. cd 命令：只补全目录
+			if cmd == "cd" && !isDir {
+				continue
+			}
+
+			// 2. build 命令：只补全目录和 .tex 文件
 			if cmd == "build" {
-				if !f.IsDir() && !strings.HasSuffix(strings.ToLower(name), ".tex") {
+				if !isDir && !strings.HasSuffix(strings.ToLower(name), ".tex") {
 					continue
 				}
 			}
-			// 3. 对于 cat 命令，补全 .tex, .log, .aux 文件和文件夹
+
+			// 3. cat 命令：只补全目录和相关文本文件
 			if cmd == "cat" {
 				ext := strings.ToLower(filepath.Ext(name))
-				if !f.IsDir() && ext != ".tex" && ext != ".log" && ext != ".aux" {
+				if !isDir && ext != ".tex" && ext != ".log" && ext != ".aux" && ext != ".txt" {
 					continue
 				}
 			}
 
 			// 简单的匹配过滤
-			if strings.HasPrefix(name, prefix) {
-				suffix := name[len(prefix):]
-				if f.IsDir() {
-					suffix += "/" // 文件夹加斜杠
+			if strings.HasPrefix(name, filePrefix) {
+				// 补全部分 = 完整名字 - 已经输入的前缀
+				suffix := name[len(filePrefix):]
+				if isDir {
+					suffix += "/" // 目录自动加斜杠，方便继续 Tab 进入
 				}
 				suggestions = append(suggestions, []rune(suffix))
 			}
 		}
-		return suggestions, len(prefix)
+
+		// 返回建议列表和当前正在匹配的前缀长度
+		return suggestions, len(filePrefix)
 	}
 
+	// 其他情况回退到默认补全器
 	return replCompleter.Do(line, pos)
 }
 
