@@ -510,7 +510,7 @@ func OpenPDF(pdfPath string) {
 	case "darwin":
 		err = mac.PreviewPDF(pdfPath) // macOS 预览 PDF
 	case "windows":
-		fmt.Printf(core.T("msg.unsupported_os")+"\n", runtime.GOOS)
+		err = win.PreviewPDF(pdfPath) // Windows 预览 PDF
 	case "linux":
 		fmt.Printf(core.T("msg.unsupported_os")+"\n", runtime.GOOS)
 	default:
