@@ -22,3 +22,6 @@ Thumbs.db
 # 临时文件
 *.tmp
 *.log
+
+# 测试文件
+test/

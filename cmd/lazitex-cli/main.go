@@ -43,6 +43,12 @@ func main() {
 		installLaTeXEnvironment()
 	case "-u", "--uninstall":
 		uninstallLaTeXEnvironment()
+	case "-b", "--build":
+		if len(args) < 2 {
+			fmt.Println("Usage: lazitex -b <file.tex>")
+			return
+		}
+		buildLaTeX(args[1])
 	default:
 		fmt.Printf("Unknown command: %s\n", args[0])
 		showHelp()
@@ -101,6 +107,7 @@ func showHelp() {
 	fmt.Println("  -t, --tui        " + core.T("help.start_tui"))
 	fmt.Println("  -i, --install    " + core.T("help.install_latex"))
 	fmt.Println("  -u, --uninstall  " + core.T("help.uninstall_latex"))
+	fmt.Println("  -b, --build <file> " + core.T("help.build_latex"))
 	fmt.Println("  -l, --lang <lang> " + core.T("help.set_language"))
 }
 
@@ -223,4 +230,15 @@ func installLaTeXEnvironment() {
 // 卸载 LaTeX 环境
 func uninstallLaTeXEnvironment() {
 	modes.UninstallLaTeXEnvironment()
+}
+
+// 构建 LaTeX 文档
+func buildLaTeX(filePath string) {
+	opts := core.BuildOptions{
+		InputPath: filePath,
+	}
+	if err := core.Build(opts); err != nil {
+		fmt.Printf("Error: %v\n", err)
+		os.Exit(1)
+	}
 }

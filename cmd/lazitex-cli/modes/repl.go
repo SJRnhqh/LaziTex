@@ -79,6 +79,19 @@ func handleREPLCommand(input string) bool {
 	case "uninstall":
 		UninstallLaTeXEnvironment()
 
+	case "build":
+		if len(parts) < 2 {
+			fmt.Println(core.T("repl.build_usage"))
+		} else {
+			// 直接调用 core.Build
+			opts := core.BuildOptions{
+				InputPath: parts[1],
+			}
+			if err := core.Build(opts); err != nil {
+				fmt.Printf(core.T("msg.build_failed")+": %v\n", err)
+			}
+		}
+
 	case "lang", "language":
 		// 语言切换命令
 		if len(parts) < 2 {
@@ -144,6 +157,7 @@ func showREPLHelp() {
 	fmt.Println("  check           - " + core.T("repl.check_desc"))
 	fmt.Println("  install         - " + core.T("repl.install_desc"))
 	fmt.Println("  uninstall       - " + core.T("repl.uninstall_desc"))
+	fmt.Println("  build <file>    - " + core.T("repl.build_desc"))
 	fmt.Println("  lang <zh|en>    - " + core.T("repl.lang_desc"))
 	fmt.Println("  quit/exit       - " + core.T("repl.quit_desc"))
 	fmt.Println()

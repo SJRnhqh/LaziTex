@@ -345,6 +345,32 @@ $ lazitex -u
 提示: 可以使用 'lazitex -i' 一键安装 LaTeX 环境
 ```
 
+### 构建 LaTeX 文档
+
+LaziTex 支持一键将 LaTeX 文档编译为 PDF：
+
+```bash
+lazitex --build main.tex  # 构建 LaTeX 文档
+lazitex -b main.tex       # 简短命令
+```
+
+**功能特点：**
+
+- 🚀 **一键构建** - 自动调用编译器（XeLaTeX）并配置最优参数
+- 📁 **智能输出** - 自动将生成的 PDF 和日志文件存放在与 `.tex` 源文件相同的目录下
+- 📍 **路径支持** - 支持当前目录下的文件名，也支持绝对路径或相对路径
+- 🔍 **类型安全** - 自动校验文件后缀，确保源文件存在
+
+**构建示例：**
+
+```bash
+$ lazitex -b report.tex
+🚀 正在构建 LaTeX 文档: report.tex
+📁 工作目录: /Users/user/projects/paper
+... (编译器输出) ...
+✨ 构建成功！
+```
+
 ### 其他命令
 
 ```bash
@@ -362,6 +388,7 @@ lazitex> help              # 显示可用命令
 lazitex> check             # 检查 LaTeX 环境
 lazitex> install           # 安装或更新 LaTeX 环境
 lazitex> uninstall         # 卸载 LaTeX 环境
+lazitex> build main.tex     # 构建 LaTeX 文档为 PDF
 lazitex> lang zh           # 切换到中文
 lazitex> lang en           # 切换到英文
 lazitex> lang              # 显示当前语言
@@ -492,12 +519,14 @@ LaziTex 可以检测 **23 个 LaTeX 工具**，涵盖 7 大类别：
 
 ### 进行中 🚧
 
+- [x] LaTeX 编译引擎（基础功能：支持 .tex 到 PDF 的一键转换，自动处理工作目录）
+- [ ] 自动宏包补全（检测缺失宏包并提示自动安装）
+- [ ] 多轮编译支持（自动处理交叉引用和参考文献）
 - [ ] Linux LaTeX 环境自动安装/更新
 - [ ] Linux LaTeX 环境自动卸载
 
 ### 计划中 📋
 
-- [ ] LaTeX 编译引擎（编译 .tex 文件为 PDF，支持多轮编译、交叉引用、错误处理）
 - [ ] 带实时预览的 TUI 模式
 - [ ] 本地 AI 集成，提供 LaTeX 写作辅助
 - [ ] 多文档项目支持

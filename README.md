@@ -309,6 +309,32 @@ LaTeX environment not detected
 Tip: You can use 'lazitex -i' to install LaTeX environment with one click
 ```
 
+### Build LaTeX Document
+
+LaziTex supports one-click compilation of LaTeX documents into PDF:
+
+```bash
+lazitex --build main.tex  # Build LaTeX document
+lazitex -b main.tex       # Short form
+```
+
+**Features:**
+
+- 🚀 **One-Click Build** - Automatically runs the compiler (XeLaTeX) with optimal settings
+- 📁 **Smart Output** - Automatically places PDF and log files in the same directory as the source `.tex` file
+- 📍 **Path Support** - Supports both filenames in current directory and absolute/relative paths
+- 🔍 **Type Safety** - Automatically validates file extensions and ensures source existence
+
+**Build Example:**
+
+```bash
+$ lazitex -b report.tex
+🚀 Building LaTeX document: report.tex
+📁 Working directory: /Users/user/projects/paper
+... (compiler output) ...
+✨ Build successful!
+```
+
 ### Other Commands
 
 ```bash
@@ -326,6 +352,7 @@ lazitex> help              # Show available commands
 lazitex> check             # Check LaTeX environment
 lazitex> install           # Install or update LaTeX environment
 lazitex> uninstall         # Uninstall LaTeX environment
+lazitex> build main.tex     # Build LaTeX document to PDF
 lazitex> lang zh           # Switch to Chinese
 lazitex> lang en           # Switch to English
 lazitex> lang              # Show current language
@@ -444,12 +471,14 @@ LaziTex can detect **23 LaTeX tools** across 7 categories:
 
 ### In Progress 🚧
 
+- [x] LaTeX Build Engine (Basic: One-click .tex to PDF, smart working directory)
+- [ ] Auto-Package Completion (Detect missing packages and install automatically)
+- [ ] Multi-pass Compilation (Handle cross-references and bibliographies)
 - [ ] Linux LaTeX environment auto-install/update
 - [ ] Linux LaTeX environment auto-uninstall
 
 ### Planned 📋
 
-- [ ] LaTeX compilation engine (compile .tex files to PDF, support multi-pass compilation, cross-references, error handling)
 - [ ] TUI mode with live preview
 - [ ] Local AI integration for LaTeX assistance
 - [ ] Multi-document project support
