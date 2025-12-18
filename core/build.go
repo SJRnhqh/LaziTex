@@ -12,8 +12,9 @@ import (
 
 // BuildOptions 编译选项，方便后续扩展
 type BuildOptions struct {
-	InputPath string // 输入的 .tex 文件路径
-	Preview   bool   // 是否预览
+	InputPath  string // 输入的 .tex 文件路径
+	OutputPath string // 输出的 PDF 文件路径
+	Preview    bool   // 是否预览
 }
 
 // Build 执行 LaTeX 编译
@@ -21,7 +22,7 @@ func Build(opts BuildOptions) (string, error) {
 	// 1. 获取输入文件的绝对路径
 	absPath, err := filepath.Abs(opts.InputPath)
 	if err != nil {
-		return "", fmt.Errorf("failed to get absolute path: %w", err)
+		return "", fmt.Errorf(T("msg.err_abs_path"), opts.InputPath)
 	}
 
 	// 检查是否是 .tex 文件
@@ -37,14 +38,43 @@ func Build(opts BuildOptions) (string, error) {
 	// 3. 提取工作目录和文件名
 	workDir := filepath.Dir(absPath)
 	fileName := filepath.Base(absPath)
-	// 计算生成的 PDF 路径
-	pdfPath := strings.TrimSuffix(absPath, filepath.Ext(absPath)) + ".pdf"
 
-	// 4. 构造命令 (暂时硬编码使用 xelatex，它是中文最稳的选择)
-	// -interaction=nonstopmode 确保遇到错误不卡住
-	cmd := exec.Command("xelatex", "-interaction=nonstopmode", fileName)
+	outDir := workDir // 默认输出目录就是源文件所在目录
+	// 默认的 JobName (不带后缀的文件名)
+	jobName := strings.TrimSuffix(fileName, filepath.Ext(fileName))
+
+	if opts.OutputPath != "" {
+		outPath, _ := filepath.Abs(opts.OutputPath)
+		// 简单的逻辑：如果路径不包含 .pdf，视为目录
+		if !strings.HasSuffix(strings.ToLower(outPath), ".pdf") {
+			outDir = outPath
+			// 确保目录存在
+			if err := os.MkdirAll(outDir, 0755); err != nil {
+				return "", fmt.Errorf(T("msg.err_mkdir"), outDir)
+			}
+		} else {
+			// 如果是完整 PDF 路径
+			outDir = filepath.Dir(outPath)
+			// 从自定义路径中提取 JobName
+			jobName = strings.TrimSuffix(filepath.Base(outPath), ".pdf")
+			if err := os.MkdirAll(outDir, 0755); err != nil {
+				return "", fmt.Errorf(T("msg.err_mkdir"), outDir)
+			}
+		}
+	}
+
+	// 4. 构造命令
+	// -jobname 指定输出文件的主名称
+	// -output-directory 指定输出目录
+	args := []string{
+		"-interaction=nonstopmode",
+		"-jobname=" + jobName,
+		"-output-directory=" + outDir,
+		fileName,
+	}
+	cmd := exec.Command("xelatex", args...)
 	cmd.Dir = workDir
-	cmd.Stdout = os.Stdout // 将编译进度直接打印到控制台
+	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
 	fmt.Printf(T("msg.building_doc")+"\n", fileName)
@@ -57,5 +87,6 @@ func Build(opts BuildOptions) (string, error) {
 
 	fmt.Println(T("msg.build_success"))
 
-	return pdfPath, nil
+	// 返回生成的 PDF 完整路径
+	return filepath.Join(outDir, jobName+".pdf"), nil
 }

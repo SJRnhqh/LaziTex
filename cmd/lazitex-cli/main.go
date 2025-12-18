@@ -50,18 +50,36 @@ func main() {
 		}
 
 		var filePath string
+		var outputPath string
 		preview := false
+		pendingOutput := false // 标记是否正在等待输出路径值
 
 		// 灵活解析：遍历 -b 之后的所有参数
-		// 支持 lazitex -b file.tex -p 和 lazitex -b -p file.tex
 		for i := 1; i < len(args); i++ {
 			arg := args[i]
 			if arg == "-p" || arg == "--preview" {
 				preview = true
-			} else if !strings.HasPrefix(arg, "-") && filePath == "" {
-				// 第一个不以 - 开头的参数被视为文件路径
-				filePath = arg
+			} else if arg == "-o" || arg == "--output" {
+				pendingOutput = true
+			} else if strings.HasPrefix(arg, "-") {
+				// 严谨处理：未知的标志位直接报错，防止静默错误
+				fmt.Printf(core.T("msg.unknown_command")+"\n", arg)
+				return
+			} else {
+				// 遇到不以 - 开头的参数
+				if pendingOutput && outputPath == "" {
+					outputPath = arg
+					pendingOutput = false
+				} else if filePath == "" {
+					filePath = arg
+				}
 			}
+		}
+
+		// 检查：如果开启了 -o 但没拿到路径，或者没提供输入文件
+		if pendingOutput && outputPath == "" {
+			fmt.Println(core.T("msg.build_usage"))
+			return
 		}
 
 		if filePath == "" {
@@ -69,7 +87,7 @@ func main() {
 			return
 		}
 
-		modes.BuildLaTeX(filePath, preview)
+		modes.BuildLaTeX(filePath, outputPath, preview)
 	default:
 		fmt.Printf(core.T("msg.unknown_command")+"\n", args[0])
 		showHelp()
@@ -121,15 +139,15 @@ func showHelp() {
 	fmt.Println("  lazitex [command]")
 	fmt.Println()
 	fmt.Println(core.T("help.commands"))
-	fmt.Println("  -h, --help           " + core.T("help.show_help"))
-	fmt.Println("  -v, --version        " + core.T("help.show_version"))
-	fmt.Println("  -c, --check          " + core.T("help.check_env"))
-	fmt.Println("  -r, --repl           " + core.T("help.start_repl"))
-	fmt.Println("  -t, --tui            " + core.T("help.start_tui"))
-	fmt.Println("  -i, --install        " + core.T("help.install_latex"))
-	fmt.Println("  -u, --uninstall      " + core.T("help.uninstall_latex"))
-	fmt.Println("  -b, --build <file> [-p]  " + core.T("help.build_latex"))
-	fmt.Println("  -l, --lang <lang>    " + core.T("help.set_language"))
+	fmt.Printf("  %-38s %s\n", "-h, --help", core.T("help.show_help"))
+	fmt.Printf("  %-38s %s\n", "-v, --version", core.T("help.show_version"))
+	fmt.Printf("  %-38s %s\n", "-c, --check", core.T("help.check_env"))
+	fmt.Printf("  %-38s %s\n", "-r, --repl", core.T("help.start_repl"))
+	fmt.Printf("  %-38s %s\n", "-t, --tui", core.T("help.start_tui"))
+	fmt.Printf("  %-38s %s\n", "-i, --install", core.T("help.install_latex"))
+	fmt.Printf("  %-38s %s\n", "-u, --uninstall", core.T("help.uninstall_latex"))
+	fmt.Printf("  %-38s %s\n", "-b, --build <file> [-o path] [-p]", core.T("help.build_latex"))
+	fmt.Printf("  %-38s %s\n", "-l, --lang <lang>", core.T("help.set_language"))
 }
 
 // 打印Logo

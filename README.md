@@ -69,7 +69,7 @@ Download pre-built binaries from [Releases](https://github.com/SJRnhqh/lazitex/r
 | `-c, --check` | Check LaTeX environment | `lazitex -c` |
 | `-i, --install` | Install/update LaTeX | `lazitex -i` |
 | `-u, --uninstall` | Uninstall LaTeX | `lazitex -u` |
-| `-b, --build` | Build LaTeX document (supports `-p` preview) | `lazitex -b main.tex [-p]` |
+| `-b, --build` | Build LaTeX document (supports `-o` output, `-p` preview) | `lazitex -b main.tex [-o out/] [-p]` |
 | `-r, --repl` | Start REPL mode | `lazitex -r` |
 | `-l, --lang` | Set language | `lazitex -l zh` |
 | `-h, --help` | Show help | `lazitex -h` |
@@ -334,15 +334,18 @@ Tip: You can use 'lazitex -i' to install LaTeX environment with one click
 LaziTex supports one-click compilation of LaTeX documents into PDF with smart previewing:
 
 ```bash
-lazitex -b main.tex       # Build LaTeX document only
-lazitex -b main.tex -p    # Build and open preview automatically
+lazitex -b main.tex             # Build LaTeX document only
+lazitex -b main.tex -p          # Build and open preview automatically
+lazitex -b main.tex -o out/     # Specify output directory
+lazitex -b main.tex -o res.pdf  # Specify custom output filename
 ```
 
 **Features:**
 
 - 🚀 **One-Click Build** - Automatically runs the compiler (XeLaTeX) with optimal settings
 - 👁️ **Smart Preview (`-p`)** - Opens the PDF automatically upon successful build. On macOS, LaziTex prioritizes **Skim.app** (supporting silent refresh) if installed; otherwise, it falls back to the system default browser or viewer
-- 📁 **Smart Output** - Automatically places PDF and log files in the same directory as the source `.tex` file
+- 📁 **Custom Output (`-o`)** - Supports specifying an output directory (automatically and recursively created if missing) or a complete output filename
+- 📁 **Smart Default** - If `-o` is not specified, it automatically places PDF and log files in the same directory as the source `.tex` file
 - 📍 **Path Support** - Supports both filenames in current directory and absolute/relative paths
 - 🔍 **Type Safety** - Automatically validates file extensions and ensures source existence
 - 🔄 **Consistent Logic** - Preview behavior is identical across CLI and REPL modes, laying the groundwork for future live-watch features
@@ -371,21 +374,21 @@ lazitex --tui      # Terminal UI mode (Coming Soon)
 **REPL Mode** - Interactive commands:
 
 ```bash
-lazitex> help              # Show available commands
-lazitex> check             # Check LaTeX environment
-lazitex> install           # Install or update LaTeX environment
-lazitex> uninstall         # Uninstall LaTeX environment
-lazitex> build main.tex     # Build LaTeX document to PDF
-lazitex> lang zh           # Switch to Chinese
-lazitex> lang en           # Switch to English
-lazitex> lang              # Show current language
-lazitex> version           # Show version
-lazitex> exit              # Exit REPL
-lazitex> cd /tmp           # Change directory (default to home)
-lazitex> ls                # List contents (supports path arg)
-lazitex> pwd               # Print working directory
-lazitex> clear             # Clear the screen
-lazitex> cat file.log      # View file content (supports .tex, .log, .aux)
+lazitex> help                      # Show available commands
+lazitex> check                     # Check LaTeX environment
+lazitex> install                   # Install or update LaTeX environment
+lazitex> uninstall                 # Uninstall LaTeX environment
+lazitex> build main.tex -o out/ -p # Build LaTeX document with preview and output path
+lazitex> lang zh                   # Switch to Chinese
+lazitex> lang en                   # Switch to English
+lazitex> lang                      # Show current language
+lazitex> version                   # Show version
+lazitex> exit                      # Exit REPL
+lazitex> cd /tmp                   # Change directory (default to home)
+lazitex> ls                        # List contents (supports path arg)
+lazitex> pwd                       # Print working directory
+lazitex> clear                     # Clear the screen
+lazitex> cat file.log              # View file content (supports .tex, .log, .aux)
 ```
 
 **Modern REPL Experience:**

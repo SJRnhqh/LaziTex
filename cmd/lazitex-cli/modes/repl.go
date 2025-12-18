@@ -216,24 +216,39 @@ func handleREPLCommand(input string) bool {
 		}
 
 		filePath := ""
+		outputPath := ""
 		preview := false
-		// 解析参数：build <file> [-p]
+		pendingOutput := false
+
+		// 解析参数：build <file> [-p] [-o output_path]
 		for i := 1; i < len(parts); i++ {
 			arg := parts[i]
 			if arg == "-p" || arg == "--preview" {
 				preview = true
-			} else if filePath == "" {
-				filePath = arg
+			} else if arg == "-o" || arg == "--output" {
+				pendingOutput = true
+			} else if strings.HasPrefix(arg, "-") {
+				// 严谨处理：未知标志位报错
+				fmt.Printf(core.T("repl.unknown_command")+"\n", arg)
+				return false
+			} else {
+				if pendingOutput && outputPath == "" {
+					outputPath = arg
+					pendingOutput = false
+				} else if filePath == "" {
+					filePath = arg
+				}
 			}
 		}
 
-		if filePath == "" {
+		// 检查：如果开启了 -o 但没拿到路径，或者没提供输入文件
+		if (pendingOutput && outputPath == "") || filePath == "" {
 			fmt.Println(core.T("repl.build_usage"))
 			return false
 		}
 
-		// 执行构建
-		BuildLaTeX(filePath, preview)
+		// 调用统一的构建入口
+		BuildLaTeX(filePath, outputPath, preview)
 
 	case "lang", "language":
 		// 语言切换命令
@@ -295,21 +310,22 @@ func handleLanguageSwitch(lang string) {
 // showREPLHelp 显示帮助信息
 func showREPLHelp() {
 	fmt.Println(core.T("repl.help_title"))
-	fmt.Println("  help                - " + core.T("repl.help_desc"))
-	fmt.Println("  version             - " + core.T("repl.version_desc"))
-	fmt.Println("  check               - " + core.T("repl.check_desc"))
-	fmt.Println("  install             - " + core.T("repl.install_desc"))
-	fmt.Println("  uninstall           - " + core.T("repl.uninstall_desc"))
-	fmt.Println("  build <file> [-p]   - " + core.T("repl.build_desc"))
-	fmt.Println("  lang <zh|en>        - " + core.T("repl.lang_desc"))
-	fmt.Println("  quit/exit           - " + core.T("repl.quit_desc"))
+	fmt.Printf("  %-30s - %s\n", "help", core.T("repl.help_desc"))
+	fmt.Printf("  %-30s - %s\n", "version", core.T("repl.version_desc"))
+	fmt.Printf("  %-30s - %s\n", "check", core.T("repl.check_desc"))
+	fmt.Printf("  %-30s - %s\n", "install", core.T("repl.install_desc"))
+	fmt.Printf("  %-30s - %s\n", "uninstall", core.T("repl.uninstall_desc"))
+	fmt.Printf("  %-30s - %s\n", "build <file> [-o path] [-p]", core.T("repl.build_desc"))
+	fmt.Printf("  %-30s - %s\n", "lang <zh|en>", core.T("repl.lang_desc"))
+	fmt.Printf("  %-30s - %s\n", "lang", core.T("repl.lang_current")+getCurrentLanguageName())
+	fmt.Printf("  %-30s - %s\n", "quit / exit", core.T("repl.quit_desc"))
 	fmt.Println()
-	fmt.Println("  // " + core.T("repl.shell_title"))
-	fmt.Println("  cd [path]           - " + core.T("repl.help_cd"))
-	fmt.Println("  ls [path]           - " + core.T("repl.help_ls"))
-	fmt.Println("  pwd                 - " + core.T("repl.help_pwd"))
-	fmt.Println("  clear               - " + core.T("repl.help_clear"))
-	fmt.Println("  cat [file]          - " + core.T("repl.help_cat"))
+	fmt.Println(core.T("repl.shell_title") + ":")
+	fmt.Printf("  %-30s - %s\n", "cd [path]", core.T("repl.help_cd"))
+	fmt.Printf("  %-30s - %s\n", "ls [path]", core.T("repl.help_ls"))
+	fmt.Printf("  %-30s - %s\n", "pwd", core.T("repl.help_pwd"))
+	fmt.Printf("  %-30s - %s\n", "clear", core.T("repl.help_clear"))
+	fmt.Printf("  %-30s - %s\n", "cat <file>", core.T("repl.help_cat"))
 }
 
 // 检查 LaTeX 环境
@@ -469,16 +485,17 @@ func handleShellLikeCommands(parts []string) bool {
 }
 
 // 构建 LaTeX 文档
-func BuildLaTeX(filePath string, preview bool) {
+func BuildLaTeX(filePath string, outputPath string, preview bool) {
 	opts := core.BuildOptions{
-		InputPath: filePath,
-		Preview:   preview,
+		InputPath:  filePath,
+		OutputPath: outputPath,
+		Preview:    preview,
 	}
 
 	pdfPath, err := core.Build(opts)
 	if err != nil {
 		fmt.Printf(core.T("msg.build_failed")+": %v\n", err)
-		os.Exit(1)
+		return
 	}
 
 	if preview && pdfPath != "" {

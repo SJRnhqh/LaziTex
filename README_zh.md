@@ -69,7 +69,7 @@ go build -o lazitex ./cmd/lazitex-cli
 | `-c, --check` | 检查 LaTeX 环境 | `lazitex -c` |
 | `-i, --install` | 安装/更新 LaTeX | `lazitex -i` |
 | `-u, --uninstall` | 卸载 LaTeX | `lazitex -u` |
-| `-b, --build` | 构建 LaTeX 文档 (支持 `-p` 预览) | `lazitex -b main.tex [-p]` |
+| `-b, --build` | 构建 LaTeX 文档 (支持 `-o` 输出, `-p` 预览) | `lazitex -b main.tex [-o out/] [-p]` |
 | `-r, --repl` | 启动 REPL 模式 | `lazitex -r` |
 | `-l, --lang` | 设置语言 | `lazitex -l zh` |
 | `-h, --help` | 显示帮助 | `lazitex -h` |
@@ -370,15 +370,18 @@ $ lazitex -u
 LaziTex 支持一键将 LaTeX 文档编译为 PDF，并提供智能预览功能：
 
 ```bash
-lazitex -b main.tex       # 仅构建 LaTeX 文档
-lazitex -b main.tex -p    # 构建后自动打开预览
+lazitex -b main.tex          # 仅构建 LaTeX 文档
+lazitex -b main.tex -p       # 构建后自动打开预览
+lazitex -b main.tex -o out/  # 指定输出目录
+lazitex -b main.tex -o res.pdf # 指定输出完整路径
 ```
 
 **功能特点：**
 
 - 🚀 **一键构建** - 自动调用编译器（XeLaTeX）并配置最优参数
 - 👁️ **智能预览 (`-p`)** - 构建成功后自动打开 PDF。在 macOS 上，LaziTex 会优先检测并使用 **Skim.app**（支持静默刷新），若未安装则自动回退至系统默认浏览器或预览程序
-- 📁 **智能输出** - 自动将生成的 PDF 和日志文件存放在与 `.tex` 源文件相同的目录下
+- 📁 **自定义输出 (`-o`)** - 支持指定输出目录（若路径不存在将自动递归创建）或指定完整的输出文件名
+- 📁 **智能默认** - 若未指定 `-o`，则自动将生成的 PDF 和日志文件存放在与 `.tex` 源文件相同的目录下
 - 📍 **路径支持** - 支持当前目录下的文件名，也支持绝对路径或相对路径
 - 🔍 **类型安全** - 自动校验文件后缀，确保源文件存在
 - 🔄 **逻辑复用** - 预览逻辑在 CLI 和 REPL 模式下完全一致，并为未来的实时监听模式打下了基础
@@ -407,21 +410,21 @@ lazitex --tui      # 终端界面模式（即将推出）
 **REPL 模式** - 交互式命令：
 
 ```bash
-lazitex> help              # 显示可用命令
-lazitex> check             # 检查 LaTeX 环境
-lazitex> install           # 安装或更新 LaTeX 环境
-lazitex> uninstall         # 卸载 LaTeX 环境
-lazitex> build main.tex     # 构建 LaTeX 文档为 PDF
-lazitex> lang zh           # 切换到中文
-lazitex> lang en           # 切换到英文
-lazitex> lang              # 查看当前语言
-lazitex> version           # 显示版本号
-lazitex> exit              # 退出 REPL
-lazitex> cd /tmp           # 切换目录（不带参数回到用户主目录）
-lazitex> ls                # 列出当前内容（支持参数）
-lazitex> pwd               # 显示当前路径
-lazitex> clear             # 清屏
-lazitex> cat file.log      # 查看文件内容（支持 .tex, .log, .aux）
+lazitex> help                      # 显示可用命令
+lazitex> check                     # 检查 LaTeX 环境
+lazitex> install                   # 安装或更新 LaTeX 环境
+lazitex> uninstall                 # 卸载 LaTeX 环境
+lazitex> build main.tex -o out/ -p # 构建 LaTeX 文档，指定输出目录并带预览
+lazitex> lang zh                   # 切换到中文
+lazitex> lang en                   # 切换到英文
+lazitex> lang                      # 查看当前语言
+lazitex> version                   # 显示版本号
+lazitex> exit                      # 退出 REPL
+lazitex> cd /tmp                   # 切换目录（不带参数回到用户主目录）
+lazitex> ls                        # 列出当前内容（支持参数）
+lazitex> pwd                       # 显示当前路径
+lazitex> clear                     # 清屏
+lazitex> cat file.log              # 查看文件内容（支持 .tex, .log, .aux）
 ```
 
 **现代化的 REPL 体验：**
