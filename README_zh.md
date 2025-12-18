@@ -484,7 +484,7 @@ lazitex/
 │
 ├── 📖 README.md                   # 英文文档
 ├── 📖 README_zh.md                # 中文文档（当前文件）
-└── 📄 LICENSE                     # MIT 许可证
+└── 📄 LICENSE                     # Apache 许可证 2.0
 ```
 
 ### 架构亮点

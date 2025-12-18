@@ -448,7 +448,7 @@ lazitex/
 │
 ├── 📖 README.md                   # English documentation (You're reading it!)
 ├── 📖 README_zh.md                # Chinese documentation
-└── 📄 LICENSE                     # MIT License
+└── 📄 LICENSE                     # Apache License 2.0
 ```
 
 ### Architecture Highlights
