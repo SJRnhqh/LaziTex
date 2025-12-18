@@ -2,6 +2,8 @@
 
 package core
 
+// cspell:ignore updmap biber xindy texindy dvipdfmx dvips dvisvgm texhash
+
 import (
 	"os"
 	"strings"
@@ -164,7 +166,9 @@ func init() {
 		"msg.mac.install_success":         "✅ BasicTeX 安装成功！",
 		"msg.mac.next_steps":              "提示: 你可能需要重启终端或运行: eval $(/usr/libexec/path_helper)",
 		"msg.mac.updating_tlmgr_self":     "正在更新 tlmgr 自身...",
-		"msg.mac.updating_packages":       "正在更新所有包（这可能需要较长时间）...",
+		"msg.mac.updating_packages":       "正在更新包（这可能需要较长时间）...",
+		"msg.mac.all_up_to_date":          "所有包都是最新的。",
+		"msg.mac.updated_packages":        "已更新的包: %s",
 		"msg.mac.invalid_input":           "无效输入，请输入 y (是) 或 n (否)",
 		"msg.mac.cannot_list_packages":    "无法列出可更新的包列表",
 		"msg.mac.updatable_packages":      "以下包可以更新:",
@@ -296,7 +300,9 @@ func init() {
 		"msg.mac.install_success":         "✅ BasicTeX installed successfully!",
 		"msg.mac.next_steps":              "Note: You may need to restart your terminal or run: eval $(/usr/libexec/path_helper)",
 		"msg.mac.updating_tlmgr_self":     "Updating tlmgr itself...",
-		"msg.mac.updating_packages":       "Updating all packages (this may take a while)...",
+		"msg.mac.updating_packages":       "Updating packages (this may take a while)...",
+		"msg.mac.all_up_to_date":          "All packages are up to date.",
+		"msg.mac.updated_packages":        "Updated packages: %s",
 		"msg.mac.invalid_input":           "Invalid input, please enter y (yes) or n (no)",
 		"msg.mac.cannot_list_packages":    "Cannot list updatable packages",
 		"msg.mac.updatable_packages":      "The following packages can be updated:",

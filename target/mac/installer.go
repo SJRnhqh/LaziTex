@@ -2,6 +2,8 @@
 
 package mac
 
+// cspell:ignore texlive tlmgr pdflatex mactex TeXShop BasicTeX MacPorts MacTeX
+
 import (
 	"bufio"
 	"errors"
@@ -59,14 +61,18 @@ func (i *Installer) Install() error {
 		// 已安装，询问是否更新
 		fmt.Println(core.T("msg.mac.latex_already_installed"))
 
-		// 列出要更新的包
-		packages, err := i.listUpdatablePackages()
+		// 列出要更新的包（附带包名，便于后续只更新必要包）
+		packagesOutput, pkgNames, err := i.listUpdatablePackages()
 		if err != nil {
 			// 如果无法列出包，仍然询问是否更新
 			fmt.Println(core.T("msg.mac.cannot_list_packages"))
 		} else {
+			if len(pkgNames) == 0 {
+				fmt.Println(core.T("msg.mac.all_up_to_date"))
+				return nil
+			}
 			fmt.Println(core.T("msg.mac.updatable_packages"))
-			fmt.Println(packages)
+			fmt.Println(packagesOutput)
 		}
 
 		// 询问是否更新
@@ -134,24 +140,39 @@ func (i *Installer) Install() error {
 }
 
 // listUpdatablePackages 列出可更新的包
-func (i *Installer) listUpdatablePackages() (string, error) {
-	// 查找 tlmgr 路径
-	tlmgrPath, err := exec.LookPath("tlmgr")
+func (i *Installer) listUpdatablePackages() (string, []string, error) {
+	tlmgrPath, err := i.findTlmgrPath()
 	if err != nil {
-		tlmgrPath = "/Library/TeX/texbin/tlmgr"
-		if _, err := os.Stat(tlmgrPath); err != nil {
-			return "", fmt.Errorf("tlmgr not found")
-		}
+		return "", nil, err
 	}
 
 	// 获取可更新的包列表
 	cmd := exec.Command(tlmgrPath, "update", "--list")
 	output, err := cmd.Output()
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 
-	return string(output), nil
+	lines := strings.Split(string(output), "\n")
+	var pkgNames []string
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		// tlmgr --list 格式示例: "[ update: collection-basictex ]"
+		if strings.HasPrefix(line, "[") && strings.Contains(line, "update:") {
+			fields := strings.Fields(line)
+			if len(fields) >= 3 {
+				// fields[1] 形如 "update:"，fields[2] 是包名或带右括号，做一下清理
+				name := strings.Trim(fields[2], "[]")
+				name = strings.TrimSuffix(name, "]")
+				name = strings.TrimSpace(name)
+				if name != "" {
+					pkgNames = append(pkgNames, name)
+				}
+			}
+		}
+	}
+
+	return string(output), pkgNames, nil
 }
 
 // isLaTeXInstalled 检查是否已安装 LaTeX
@@ -173,14 +194,19 @@ func (i *Installer) isLaTeXInstalled() bool {
 
 // updateTlmgr 更新 tlmgr 和所有包
 func (i *Installer) updateTlmgr() error {
-	// 查找 tlmgr 路径
-	tlmgrPath, err := exec.LookPath("tlmgr")
+	tlmgrPath, err := i.findTlmgrPath()
 	if err != nil {
-		// 如果找不到 tlmgr，尝试标准路径
-		tlmgrPath = "/Library/TeX/texbin/tlmgr"
-		if _, err := os.Stat(tlmgrPath); err != nil {
-			return fmt.Errorf("tlmgr not found")
-		}
+		return err
+	}
+
+	// 可选：允许通过环境变量指定镜像，加速国内更新
+	// 示例: LAZITEX_TLMGR_REPO="https://mirrors.tuna.tsinghua.edu.cn/CTAN/systems/texlive/tlnet"
+	if repo := os.Getenv("LAZITEX_TLMGR_REPO"); repo != "" {
+		fmt.Printf("Using TeX Live mirror: %s\n", repo)
+		cmdRepo := exec.Command("sudo", tlmgrPath, "option", "repository", repo)
+		cmdRepo.Stdout = os.Stdout
+		cmdRepo.Stderr = os.Stderr
+		_ = cmdRepo.Run()
 	}
 
 	// 更新 tlmgr 自身
@@ -192,15 +218,51 @@ func (i *Installer) updateTlmgr() error {
 		return fmt.Errorf("failed to update tlmgr: %w", err)
 	}
 
-	// 更新所有包（可选，可能需要较长时间）
+	// 获取需要更新的包列表，避免对全部包执行 --all
+	packagesOutput, pkgNames, err := i.listUpdatablePackages()
+	if err != nil {
+		fmt.Println(core.T("msg.mac.cannot_list_packages"))
+		// 如果无法列出，退回全量更新，但会更慢
+		fmt.Println(core.T("msg.mac.updating_packages"))
+		cmdAll := exec.Command("sudo", tlmgrPath, "update", "--all", "--no-doc", "--no-src")
+		cmdAll.Stdout = os.Stdout
+		cmdAll.Stderr = os.Stderr
+		_ = cmdAll.Run()
+		return nil
+	}
+
+	if len(pkgNames) == 0 {
+		fmt.Println(core.T("msg.mac.all_up_to_date"))
+		return nil
+	}
+
 	fmt.Println(core.T("msg.mac.updating_packages"))
-	cmd = exec.Command("sudo", tlmgrPath, "update", "--all")
+	fmt.Println(packagesOutput)
+
+	args := append([]string{"update", "--no-doc", "--no-src"}, pkgNames...)
+	cmd = exec.Command("sudo", append([]string{tlmgrPath}, args...)...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	// 这里不检查错误，因为更新所有包可能需要很长时间，用户可能中断
 	_ = cmd.Run()
 
+	if len(pkgNames) > 0 {
+		fmt.Printf(core.T("msg.mac.updated_packages")+"\n", strings.Join(pkgNames, ", "))
+	}
+
 	return nil
+}
+
+// findTlmgrPath 查找 tlmgr 的路径
+func (i *Installer) findTlmgrPath() (string, error) {
+	if path, err := exec.LookPath("tlmgr"); err == nil {
+		return path, nil
+	}
+	// 如果找不到 tlmgr，尝试标准路径
+	tlmgrPath := "/Library/TeX/texbin/tlmgr"
+	if _, err := os.Stat(tlmgrPath); err == nil {
+		return tlmgrPath, nil
+	}
+	return "", fmt.Errorf("tlmgr not found")
 }
 
 // detectInstallationMethod 检测 LaTeX 的安装方式
