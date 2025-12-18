@@ -512,7 +512,7 @@ LaziTex can detect **23 LaTeX tools** across 7 categories:
 - [x] macOS LaTeX environment auto-uninstall
 - [x] Modern REPL interactive mode (History, Tab completion, Shell shortcuts, Full i18n)
 - [x] LaTeX Build Engine (Basic: One-click .tex to PDF, smart working directory)
-- [x] Smart Preview System (macOS Skim/Web auto-adapter with one-click preview)
+- [x] Smart Preview System (macOS Skim/Web & Windows SumatraPDF/Default auto-adapter)
 
 ### In Progress 🚧
 

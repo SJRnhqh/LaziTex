@@ -560,7 +560,7 @@ LaziTex 可以检测 **23 个 LaTeX 工具**，涵盖 7 大类别：
 - [x] macOS LaTeX 环境自动卸载
 - [x] 现代化的 REPL 交互模式（支持历史记录、Tab 补全、Shell 快捷命令、全语言国际化）
 - [x] LaTeX 编译引擎（基础功能：支持 .tex 到 PDF 的一键转换，自动处理工作目录）
-- [x] 智能预览系统（macOS 平台 Skim/Web 自动适配，支持一键打开预览）
+- [x] 智能预览系统（macOS Skim/Web 与 Windows SumatraPDF/系统默认自动适配）
 
 ### 进行中 🚧
 
