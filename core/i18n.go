@@ -159,6 +159,8 @@ func init() {
 		"msg.err_mkdir":          "错误: 无法创建输出目录 '%s'",
 		"msg.err_invalid_ext":    "错误: 无效的文件类型 '%s' (仅支持 .tex 文件)",
 		"msg.err_file_not_found": "错误: 找不到文件 '%s'",
+		"msg.preview_usage":      "用法: lazitex -p <文件名.tex>",
+		"msg.watching_file":      "👀 正在实时监听文件: %s (按 Ctrl+C 退出监听)",
 
 		// macOS 安装相关消息
 		"msg.mac.brew_not_installed":       "错误: 未安装 Homebrew。请先安装 Homebrew: https://brew.sh",
@@ -210,6 +212,7 @@ func init() {
 		"help.install_latex":   "安装或更新 LaTeX 环境",
 		"help.uninstall_latex": "卸载 LaTeX 环境",
 		"help.build_latex":     "一键构建 LaTeX 文档为 PDF (使用 -o 指定输出, -s 编译后展示)",
+		"help.live_preview":    "一键实时预览 PDF 文档 (使用 -p 指定文件名)",
 		"help.set_language":    "设置语言 (zh/en)",
 		"help.description":     "LaziTex: 零配置 LaTeX 编译工具，支持 AI 辅助",
 
@@ -253,6 +256,8 @@ func init() {
 		"repl.uninstall_desc":   "卸载 LaTeX 环境",
 		"repl.build_desc":       "构建 LaTeX 文档 (使用 -o 指定输出, -s 编译后展示)",
 		"repl.build_usage":      "用法: build <文件名.tex> [-o 输出路径] [-s]",
+		"repl.preview_desc":     "实时预览 PDF 文档 (使用 -p 指定.tex文件名)",
+		"repl.preview_usage":    "用法: preview <文件名.tex>",
 		"repl.lang_desc":        "切换语言 (zh/en)",
 		"repl.quit_desc":        "退出 REPL",
 		"repl.lang_usage":       "用法: lang <zh|en>",
@@ -321,6 +326,8 @@ func init() {
 		"msg.err_mkdir":          "Error: Failed to create output directory '%s'",
 		"msg.err_invalid_ext":    "Error: Invalid file type '%s' (only .tex files supported)",
 		"msg.err_file_not_found": "Error: File not found '%s'",
+		"msg.preview_usage":      "Usage: lazitex -p <file.tex>",
+		"msg.watching_file":      "👀 Watching file: %s (press Ctrl+C to stop)",
 
 		// macOS installation messages
 		"msg.mac.brew_not_installed":       "Error: Homebrew is not installed. Please install Homebrew first: https://brew.sh",
@@ -372,6 +379,7 @@ func init() {
 		"help.install_latex":   "Install or update LaTeX environment",
 		"help.uninstall_latex": "Uninstall LaTeX environment",
 		"help.build_latex":     "Build LaTeX document to PDF (use -o for output, -s to show after build)",
+		"help.live_preview":    "Live preview PDF document (use -p for file name)",
 		"help.set_language":    "Set language (zh/en)",
 		"help.description":     "LaziTex: Zero-config LaTeX compilation with AI assistance",
 
@@ -415,6 +423,8 @@ func init() {
 		"repl.uninstall_desc":   "Uninstall LaTeX environment",
 		"repl.build_desc":       "Build LaTeX document (use -o for output, -s to show after build)",
 		"repl.build_usage":      "Usage: build <filename.tex> [-o output_path] [-s]",
+		"repl.preview_desc":     "Live preview PDF document (use -p for .tex file name)",
+		"repl.preview_usage":    "Usage: preview <filename.tex>",
 		"repl.lang_desc":        "Switch language (zh/en)",
 		"repl.quit_desc":        "Exit REPL",
 		"repl.lang_usage":       "Usage: lang <zh|en>",

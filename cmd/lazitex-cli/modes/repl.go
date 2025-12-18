@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"time"
 
 	core "github.com/SJRnhqh/lazitex/core"
 	linux "github.com/SJRnhqh/lazitex/target/linux"
@@ -35,6 +36,7 @@ var replCompleter = readline.NewPrefixCompleter(
 
 	// 3. 带路径补全的命令
 	readline.PcItem("build"), // 后面我们会动态处理
+	readline.PcItem("preview"),
 	readline.PcItem("cd"),
 	readline.PcItem("ls"),
 	readline.PcItem("pwd"),
@@ -58,7 +60,7 @@ func (c *LaTexCompleter) Do(line []rune, pos int) (newLine [][]rune, length int)
 	cmd := strings.ToLower(parts[0])
 
 	// 仅对需要路径参数的命令进行增强补全
-	if cmd == "build" || cmd == "cd" || cmd == "ls" || cmd == "cat" {
+	if cmd == "build" || cmd == "cd" || cmd == "ls" || cmd == "cat" || cmd == "preview" {
 		var inputPath string
 		if strings.HasSuffix(strLine, " ") {
 			inputPath = ""
@@ -101,7 +103,7 @@ func (c *LaTexCompleter) Do(line []rune, pos int) (newLine [][]rune, length int)
 			}
 
 			// 2. build 命令：只补全目录和 .tex 文件
-			if cmd == "build" {
+			if cmd == "build" || cmd == "preview" {
 				if !isDir && !strings.HasSuffix(strings.ToLower(name), ".tex") {
 					continue
 				}
@@ -249,7 +251,13 @@ func handleREPLCommand(input string) bool {
 
 		// 调用统一的构建入口
 		BuildLaTeX(filePath, outputPath, show)
-
+	case "preview":
+		if len(parts) < 2 {
+			fmt.Println(core.T("repl.preview_usage"))
+			return false
+		}
+		filePath := parts[1]
+		StartLivePreview(filePath)
 	case "lang", "language":
 		// 语言切换命令
 		if len(parts) < 2 {
@@ -316,6 +324,7 @@ func showREPLHelp() {
 	fmt.Printf("  %-30s - %s\n", "install", core.T("repl.install_desc"))
 	fmt.Printf("  %-30s - %s\n", "uninstall", core.T("repl.uninstall_desc"))
 	fmt.Printf("  %-30s - %s\n", "build <file> [-o path] [-s]", core.T("repl.build_desc"))
+	fmt.Printf("  %-30s - %s\n", "preview <file>", core.T("repl.preview_desc"))
 	fmt.Printf("  %-30s - %s\n", "lang <zh|en>", core.T("repl.lang_desc"))
 	fmt.Printf("  %-30s - %s\n", "lang", core.T("repl.lang_current")+getCurrentLanguageName())
 	fmt.Printf("  %-30s - %s\n", "quit / exit", core.T("repl.quit_desc"))
@@ -521,5 +530,39 @@ func OpenPDF(pdfPath string) {
 
 	if err != nil {
 		fmt.Printf("Warning: Failed to open preview: %v\n", err)
+	}
+}
+
+// StartLivePreview 启动实时预览模式
+// filePath: 要预览的 .tex 文件路径
+func StartLivePreview(filePath string) {
+	// 1. 获取绝对路径，确保监听准确
+	absPath, err := filepath.Abs(filePath)
+	if err != nil {
+		fmt.Printf(core.T("msg.err_abs_path")+"\n", filePath)
+		return
+	}
+
+	// 2. 启动后立即执行一次“初次构建并展示”
+	// 这里调用我们已有的 BuildLaTeX 函数，设置展示标志为 true
+	BuildLaTeX(absPath, "", true)
+
+	// 3. 打印监听提示（文案已在 i18n 中定义）
+	fmt.Printf(core.T("msg.watching_file")+"\n", filepath.Base(absPath))
+
+	// 4. 调用 core 层的监听引擎
+	// 当文件变动时，它会回调执行我们定义的闭包函数
+	err = core.WatchAndAction(absPath, func() {
+		// 这里是文件变动后的动作
+		currentTime := time.Now().Format("15:04:05")
+		fmt.Printf("\n🔄 [%s] %s\n", currentTime, core.T("msg.building_doc"))
+
+		// 重新执行编译和展示逻辑
+		BuildLaTeX(absPath, "", true)
+	})
+
+	// 5. 错误处理（如果监听器意外崩溃）
+	if err != nil {
+		fmt.Printf("Watcher error: %v\n", err)
 	}
 }

@@ -70,6 +70,7 @@ go build -o lazitex ./cmd/lazitex-cli
 | `-i, --install` | 安装/更新 LaTeX | `lazitex -i` |
 | `-u, --uninstall` | 卸载 LaTeX | `lazitex -u` |
 | `-b, --build` | 构建 LaTeX 文档 (支持 `-o` 输出, `-s` 编译后展示) | `lazitex -b main.tex [-o out/] [-s]` |
+| `-p, --preview` | 实时预览 PDF 文档 (监听保存动作并自动刷新) | `lazitex -p main.tex` |
 | `-r, --repl` | 启动 REPL 模式 | `lazitex -r` |
 | `-l, --lang` | 设置语言 | `lazitex -l zh` |
 | `-h, --help` | 显示帮助 | `lazitex -h` |
@@ -95,9 +96,9 @@ lazitex -c         # 简短命令
 **示例输出：**
 
 ```txt
-╔═══════════════════════════════════════════════════════════╗
-║           LaTeX 编译环境检测结果                          ║
-╚═══════════════════════════════════════════════════════════╝
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           LaTeX 编译环境检测结果 (Environment Check)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 🖥️  操作系统: Windows (windows)
 📦 LaTeX 发行版: TeX Live 2025
@@ -558,13 +559,14 @@ LaziTex 可以检测 **23 个 LaTeX 工具**，涵盖 7 大类别：
 - [x] 全面的 LaTeX 工具检查（23 个工具）
 - [x] macOS LaTeX 环境自动安装/更新
 - [x] macOS LaTeX 环境自动卸载
-- [x] 现代化的 REPL 交互模式（支持历史记录、Tab 补全、Shell 快捷命令、全语言国际化）
+- [x] 现代化的 REPL 交互模式（支持历史记录、Tab 补全、Shell 快捷命令、全语言国际化、实时预览命令）
 - [x] LaTeX 编译引擎（基础功能：支持 .tex 到 PDF 的一键转换，自动处理工作目录）
 - [x] 智能预览系统（macOS Skim/Web 与 Windows SumatraPDF/系统默认自动适配）
+- [x] 实时预览监听 (Live Preview Mode) - 支持监听文件保存并自动触发毫秒级编译与 PDF 刷新
 
 ### 进行中 🚧
 
-- [ ] 实时预览监听 (Watch Mode) - 正在实现中
+- [ ] 实时预览体验优化（包括任务抢占、编译锁、错误反馈增强等细节）
 - [ ] 自动宏包补全（检测缺失宏包并提示自动安装）
 - [ ] 多轮编译支持（自动处理交叉引用和参考文献）
 - [ ] Linux LaTeX 环境自动安装/更新

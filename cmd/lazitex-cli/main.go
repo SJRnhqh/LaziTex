@@ -88,6 +88,14 @@ func main() {
 		}
 
 		modes.BuildLaTeX(filePath, outputPath, show)
+	case "-p", "--preview":
+		if len(args) < 2 {
+			// 如果没传文件名，显示用法
+			fmt.Println(core.T("msg.preview_usage"))
+			return
+		}
+		filePath := args[1]
+		modes.StartLivePreview(filePath)
 	default:
 		fmt.Printf(core.T("msg.unknown_command")+"\n", args[0])
 		showHelp()
@@ -147,6 +155,7 @@ func showHelp() {
 	fmt.Printf("  %-38s %s\n", "-i, --install", core.T("help.install_latex"))
 	fmt.Printf("  %-38s %s\n", "-u, --uninstall", core.T("help.uninstall_latex"))
 	fmt.Printf("  %-38s %s\n", "-b, --build <file> [-o path] [-s]", core.T("help.build_latex"))
+	fmt.Printf("  %-38s %s\n", "-p, --preview <file>", core.T("help.live_preview"))
 	fmt.Printf("  %-38s %s\n", "-l, --lang <lang>", core.T("help.set_language"))
 }
 

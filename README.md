@@ -70,6 +70,7 @@ Download pre-built binaries from [Releases](https://github.com/SJRnhqh/lazitex/r
 | `-i, --install` | Install/update LaTeX | `lazitex -i` |
 | `-u, --uninstall` | Uninstall LaTeX | `lazitex -u` |
 | `-b, --build` | Build LaTeX document (supports `-o` output, `-s` show) | `lazitex -b main.tex [-o out/] [-s]` |
+| `-p, --preview` | Live preview PDF (watches for saves and refreshes) | `lazitex -p main.tex` |
 | `-r, --repl` | Start REPL mode | `lazitex -r` |
 | `-l, --lang` | Set language | `lazitex -l zh` |
 | `-h, --help` | Show help | `lazitex -h` |
@@ -95,9 +96,9 @@ This will detect:
 **Sample Output:**
 
 ``` txt
-╔═══════════════════════════════════════════════════════════╗
-║        LaTeX Environment Check Results                     ║
-╚═══════════════════════════════════════════════════════════╝
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        LaTeX Environment Check Results
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 🖥️  Operating System: Windows (windows)
 📦 LaTeX Distribution: TeX Live 2025
@@ -510,13 +511,14 @@ LaziTex can detect **23 LaTeX tools** across 7 categories:
 - [x] Comprehensive LaTeX tool checking (23 tools)
 - [x] macOS LaTeX environment auto-install/update
 - [x] macOS LaTeX environment auto-uninstall
-- [x] Modern REPL interactive mode (History, Tab completion, Shell shortcuts, Full i18n)
+- [x] Modern REPL interactive mode (History, Tab completion, Shell shortcuts, Full i18n, Live Preview command)
 - [x] LaTeX Build Engine (Basic: One-click .tex to PDF, smart working directory)
 - [x] Smart Preview System (macOS Skim/Web & Windows SumatraPDF/Default auto-adapter)
+- [x] Live Preview Mode - Auto-trigger millisecond-level compilation and PDF refresh on save
 
 ### In Progress 🚧
 
-- [ ] Live Preview Watcher (Watch Mode) - Implementation in progress
+- [ ] Live Preview experience optimization (task preemption, compilation locks, enhanced error feedback, etc.)
 - [ ] Auto-Package Completion (Detect missing packages and install automatically)
 - [ ] Multi-pass Compilation (Handle cross-references and bibliographies)
 - [ ] Linux LaTeX environment auto-install/update

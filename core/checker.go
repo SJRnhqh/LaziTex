@@ -320,17 +320,12 @@ func getDisplayWidth(s string) int {
 func (env *LaTeXEnvironment) PrintEnvironment() {
 	title := T("title.env_check")
 	titleWidth := getDisplayWidth(title)
-	const contentWidth = 59 // 内容区域宽度（边框总宽度61减去左右边框各1个字符）
 
-	titlePadding := (contentWidth - titleWidth) / 2
-	rightPadding := contentWidth - titlePadding - titleWidth
-
-	fmt.Println("╔═══════════════════════════════════════════════════════════╗")
-	fmt.Printf("║%s%s%s║\n",
-		strings.Repeat(" ", titlePadding),
-		title,
-		strings.Repeat(" ", rightPadding))
-	fmt.Println("╚═══════════════════════════════════════════════════════════╝")
+	fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+	fmt.Printf("%s%s\n",
+		strings.Repeat(" ", (61-titleWidth)/2),
+		title)
+	fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
 	fmt.Println()
 
 	// 打印操作系统信息
