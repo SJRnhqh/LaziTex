@@ -64,8 +64,6 @@ Download pre-built binaries from [Releases](https://github.com/SJRnhqh/lazitex/r
 
 ## 🚀 Quick Start
 
-### 📋 Command Reference
-
 | Command | Description | Example |
 |---------|-------------|---------|
 | `-c, --check` | Check LaTex environment | `lazitex -c` |
@@ -78,119 +76,30 @@ Download pre-built binaries from [Releases](https://github.com/SJRnhqh/lazitex/r
 | `-h, --help` | Show help | `lazitex -h` |
 | `-v, --version` | Show version | `lazitex -v` |
 
-### Check Your LaTex Environment
-
-Before compiling, verify your LaTex installation:
-
-```bash
-lazitex --check    # Full command
-lazitex -c         # Short command
-```
-
-This will detect:
-
-- ✅ All installed LaTex compilers (pdflatex, xelatex, lualatex, etc.)
-- ✅ Bibliography tools (bibtex, biber)
-- ✅ Conversion utilities (dvipdfmx, ps2pdf, etc.)
-- ✅ Package managers (tlmgr, mpm)
-- ✅ Your LaTex distribution (TeX Live, MiKTeX, MacTeX)
-
-**Sample Output:**
-
-``` txt
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        LaTex Environment Check Results
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-🖥️  Operating System: Windows (windows)
-📦 LaTex Distribution: TeX Live 2025
-
-✅ Installed: 22/23 tools (core tools: 6/6)
-
-🔨 Compilers (7/7)
-────────────────────────────────────────────────────────────
-  ⭐ ✓ PDFLaTex        [Installed]
-      Path: C:\texlive\2025\bin\windows\pdflatex.exe
-      Version: pdfTeX 3.141592653-2.6-1.40.28 (TeX Live 2025)
-  ⭐ ✓ XeLaTex         [Installed]
-      Path: C:\texlive\2025\bin\windows\xelatex.exe
-      Version: XeTeX 3.141592653-2.6-0.999997 (TeX Live 2025)
-  ...
-```
-
 ---
 
-## 🌍 Language Settings
+## 📖 Usage Guide
 
-LaziTex is a **bilingual tool** supporting both **English** and **Chinese (中文)**.
+### Language Settings
 
-### Default Language
+LaziTex supports **English** and **Chinese** languages. You can set the language in two ways:
 
-- **English** is the default language
-- All output (help messages, environment check results, errors) will be in English by default
-
-### Quick Start
-
-**Use a specific language once:**
+Method 1: Runtime Change
 
 ```bash
-lazitex --lang en --check    # Use English for this command
-lazitex -l zh --check        # Use Chinese (中文) for this command (short form)
+lazitex -l zh --check    # Use Chinese for this command
+lazitex --lang en --check  # Use English for this command
 ```
 
-**Switch default language permanently:**
+Language preference is automatically saved when using `-l` or `--lang` parameters.
 
-```bash
-# When you use --lang or -l, your choice is automatically saved
-lazitex -l zh --help         # Switch to Chinese and save as default
-lazitex --help               # Future commands now use Chinese
-
-# Switch back anytime (use either form)
-lazitex --lang en --help     # Switch to English and save as default
-lazitex --check              # Now uses English
-```
-
-### Advanced Usage
-
-**Temporary override with environment variable:**
-
-```bash
-# Windows PowerShell
-$env:LAZITEX_LANG="zh"; lazitex --check
-
-# Linux/macOS/Git Bash
-export LAZITEX_LANG=zh
-lazitex --check
-```
-
-**Supported language codes:**
-
-- `en`, `english` → English
-- `zh`, `chinese` → 中文 (Chinese)
-
-**Command formats:**
-
-- Long form: `--lang <code>`
-- Short form: `-l <code>`
-
-Both forms work identically and save your preference.
-
-### Language Priority (highest to lowest)
-
-1. **Command-line flag** `-l <lang>` or `--lang <lang>` (saves preference)
-2. **Environment variable** `LAZITEX_LANG=<lang>`
-3. **Saved user preference** (config file)
-4. **System default** (English)
-
-### Configuration File
-
-Your language preference is stored in:
+Method 2: Configuration File
 
 | Platform | Config Location |
 |----------|----------------|
-| **Windows** | `%APPDATA%\lazitex\config.json` |
-| **Linux** | `~/.config/lazitex/config.json` |
-| **macOS** | `~/Library/Application Support/lazitex/config.json` |
+| Windows | `%APPDATA%\lazitex\config.json` |
+| Linux | `~/.config/lazitex/config.json` |
+| macOS | `~/Library/Application Support/lazitex/config.json` |
 
 Example config file:
 
@@ -200,172 +109,17 @@ Example config file:
 }
 ```
 
-### Examples
+Edit the config file directly or use `--lang` parameter to update automatically.
 
-```bash
-# Check environment in English (default)
-lazitex --check
-
-# Check environment in Chinese once (short form)
-lazitex -l zh --check
-
-# Switch to Chinese permanently
-lazitex --lang zh --help
-
-# All future commands use Chinese
-lazitex --check
-lazitex --version
-
-# Switch back to English (short form)
-lazitex -l en --help
-
-# Mix short and long forms freely
-lazitex -l zh --check       # Short form
-lazitex --lang en --check   # Long form
-
-# Switch language in REPL mode
-lazitex --repl
-lazitex> lang zh            # Switch to Chinese interactively
-lazitex> help               # Help is now in Chinese
-```
-
-**Output comparison:**
-
-English:
-
-```txt
-✅ Installed: 22/23 tools (core tools: 6/6)
-🔨 Compilers (7/7)
-  ⭐ ✓ PDFLaTex        [Installed]
-  ⭐ ✓ XeLaTex         [Installed]
-```
-
-中文 (Chinese):
-
-```txt
-✅ 已安装: 22/23 工具 (核心工具: 6/6)
-🔨 编译器 (7/7)
-  ⭐ ✓ PDFLaTex        [已安装]
-  ⭐ ✓ XeLaTex         [已安装]
-```
-
-### Install/Update LaTex Environment
-
-LaziTex supports automatic installation and updates for LaTex environments (currently macOS):
-
-```bash
-lazitex --install    # Install or update LaTex environment
-lazitex -i           # Short form
-```
+### Build & Preview
 
 **Features:**
 
-- 🔍 **Smart Detection** - Automatically detects if LaTex is installed
-- 📦 **Auto Install** - Installs BasicTeX automatically when not installed (macOS)
-- 🔄 **Smart Update** - Checks and updates packages when already installed
-- 💬 **Interactive Confirmation** - Asks for confirmation before install/update
-- 📋 **Package List** - Shows list of updatable packages during update
-
-**macOS Installation Example:**
-
-```bash
-$ lazitex -i
-LaTex environment not detected
-Will install BasicTeX via Homebrew (lightweight version, ~1.5 GB)
-Install command: brew install --cask basictex
-Do you want to install? [y/n]: y
-Installing BasicTeX via Homebrew...
-✅ BasicTeX installed successfully!
-```
-
-**Update Example:**
-
-```bash
-$ lazitex -i
-LaTex is already installed
-The following packages can be updated:
-  ...
-Do you want to update these packages? [y/n]: y
-✅ Update successful!
-```
-
-### Uninstall LaTex Environment
-
-LaziTex supports one-click uninstallation of LaTex environments (currently macOS):
-
-```bash
-lazitex --uninstall  # Uninstall LaTex environment
-lazitex -u           # Short form
-```
-
-**Features:**
-
-- 🔍 **Smart Detection** - Automatically detects if LaTex is installed
-- 🗑️ **Auto Uninstall** - Automatically detects installation method and performs appropriate uninstallation
-- 💬 **Interactive Confirmation** - Asks for confirmation before uninstalling to prevent accidental removal
-- 📋 **Friendly Hints** - Suggests using `-i` to install when LaTex is not installed
-- 🧹 **Residual Cleanup** - Attempts to remove common leftover paths after successful uninstall
-
-**Supported Uninstallation Methods:**
-
-- ✅ Homebrew BasicTeX - Automatic uninstallation
-- ✅ Homebrew MacTeX - Automatic uninstallation
-- ✅ MacPorts (texlive*, including basic/latex/full) - Automatic uninstallation
-- ✅ MacTeX Official Installation - Attempts the official uninstall script; if missing, provides manual paths to remove
-
-**macOS Uninstall Example:**
-
-```bash
-$ lazitex -u
-LaTex is already installed
-Will uninstall LaTex environment (including all installed packages)
-Do you want to uninstall? [y/n]: y
-Uninstalling LaTex environment...
-✅ LaTex environment uninstalled successfully!
-```
-
-**When Not Installed:**
-
-```bash
-$ lazitex -u
-LaTex environment not detected
-Tip: You can use 'lazitex -i' to install LaTex environment with one click
-```
-
-### Build & Preview LaTex Document
-
-LaziTex supports one-click compilation of LaTex documents into PDF with smart previewing:
-
-```bash
-lazitex -b main.tex             # Build LaTex document only
-lazitex -b main.tex -s             # Build LaTex document and show
-lazitex -b main.tex -o out/     # Specify output directory
-lazitex -b main.tex -o res.pdf  # Specify custom output filename
-```
-
-**Features:**
-
-- 🚀 **One-Click Build** - Automatically runs the compiler (XeLaTex) with optimal settings
-- 🔍 **Auto Package Detection & Installation** - Automatically detects missing LaTex packages (`.sty` and `.cls` files) from compilation errors and offers to install them via `tlmgr` or `mpm`
-  - **Smart Package Name Resolution** - Automatically finds the correct package name (e.g., `xeCJK.sty` → `xecjk` package)
-  - **Batch Installation** - Installs all missing packages at once to minimize password prompts
-  - **Intelligent Permission Handling** - Tries installation without sudo first, then prompts for password only when needed
-  - **Auto Retry** - Automatically recompiles after successful package installation
-- 🔄 **Adaptive Multi-Pass Compilation** - Intelligently detects and executes multiple compilation passes when needed:
-  - **Cross-References** - Automatically resolves undefined references through multiple passes
-  - **Table of Contents** - Detects `.toc` files and ensures proper TOC generation
-  - **Bibliographies** - Handles `bibtex`/`biber` workflows automatically (up to 4 passes)
-  - **Indexes & Glossaries** - Automatically runs `makeindex` and `makeglossaries` when needed
-  - **PDF Bookmarks** - Ensures proper bookmark generation through multiple passes
-  - **Smart Detection** - Analyzes auxiliary files (`.aux`, `.toc`, `.out`, `.idx`, `.glo`, `.bib`) to determine compilation requirements
-- 👁️ **Smart Show (`-s`)** - Opens the PDF automatically upon successful build.
-  - **macOS**: Prioritizes **Skim.app** (supporting silent refresh) if installed; otherwise, falls back to the system default browser or viewer.
-  - **Windows**: Prioritizes **SumatraPDF** (supporting silent refresh and instance reuse) if installed; otherwise, falls back to the system default viewer.
-- 📁 **Custom Output (`-o`)** - Supports specifying an output directory (automatically and recursively created if missing) or a complete output filename. **Note**: If `-o` is specified, a path value must be provided, otherwise usage will be displayed
-- 📁 **Smart Default** - If `-o` is not specified, it automatically places PDF and log files in the same directory as the source `.tex` file
-- 📍 **Path Support** - Supports both filenames in current directory and absolute/relative paths
-- 🔍 **Type Safety** - Automatically validates file extensions and ensures source existence
-- 🔄 **Consistent Logic** - Preview behavior is identical across CLI and REPL modes, laying the groundwork for future live-watch features
+- One-click build - Automatically invokes XeLaTex compiler
+- Auto package detection & installation - Detects missing packages from compilation errors and installs them automatically
+- Adaptive multi-pass compilation - Automatically handles cross-references, TOC, bibliographies, indexes, etc.
+- Smart preview - Automatically opens PDF after successful build (macOS prioritizes Skim, Windows prioritizes SumatraPDF)
+- Custom output - Supports specifying output directory or full path
 
 **Build Example:**
 
@@ -378,47 +132,7 @@ $ lazitex -b report.tex -s
 (Automatically opening show window)
 ```
 
-**Auto Package Installation Example:**
-
-```bash
-$ lazitex -b document.tex
-🚀 Building LaTex document: document.tex
-... (compilation fails) ...
-🔍 Missing package detected: xeCJK
-💡 Auto-install? [Y/n]: y
-📦 Installing xeCJK...
-Administrator privileges required, please enter password...
-✅ Installation successful!
-🔄 Retrying build...
-✨ Build successful!
-```
-
-**Adaptive Multi-Pass Compilation Example:**
-
-```bash
-$ lazitex -b report.tex
-🚀 Building LaTex document: report.tex
-📁 Working directory: /Users/user/projects/paper
-... (first compilation) ...
-Running bibtex...
-Pass 2 (resolving cross-references)...
-Pass 3 (resolving cross-references)...
-✨ Build successful!
-```
-
-The system automatically detected that the document needs multiple passes (for bibliography and cross-references) and executed them seamlessly.
-
-### Other Commands
-
-```bash
-lazitex --help     # Show help
-lazitex --version  # Show version
-lazitex --check    # Check LaTex environment
-lazitex --repl     # REPL mode (interactive)
-lazitex --tui      # Terminal UI mode (Coming Soon)
-```
-
-**REPL Mode** - Interactive commands:
+### REPL Mode
 
 ```bash
 lazitex> help                      # Show available commands
@@ -448,6 +162,31 @@ lazitex> cat file.log              # View file content (supports .tex, .log, .au
 - 🌐 **Full i18n Support** - All command help, error messages, and usage tips support instant language switching
 
 Language switching in REPL is instant and persists for future sessions!
+
+### Detected LaTex Tools
+
+LaziTex can detect **23 LaTex tools** across 7 categories:
+
+| Category | Tools | Count |
+|----------|-------|-------|
+| 🔨 **Compilers** | pdflatex, xelatex, lualatex, latex, pdftex, tex, etex | 7 |
+| 📚 **Bibliography** | bibtex, biber | 2 |
+| 📇 **Indexing** | makeindex, xindy, texindy | 3 |
+| 🔄 **Converters** | dvipdfmx, dvips, ps2pdf, dvisvgm | 4 |
+| ⚙️ **Automation** | latexmk | 1 |
+| 📦 **Package Managers** | tlmgr, mpm | 2 |
+| 🔧 **Utilities** | kpsewhich, texdoc, texhash, updmap | 4 |
+
+**Tool Priority:**
+
+- ⭐ **Core Tools (Priority 0)**: Must install, foundation for basic functionality
+  - Examples: pdflatex, xelatex, lualatex, bibtex, latexmk
+  
+- 🔹 **Important Tools (Priority 1)**: Recommended, provides common features
+  - Examples: biber, makeindex, dvipdfmx, tlmgr
+  
+- 🔸 **Optional Tools (Priority 2)**: Advanced usage, specific scenarios
+  - Examples: xindy, dvips, texdoc, updmap
 
 ---
 
@@ -509,50 +248,11 @@ lazitex/
 
 ### Architecture Highlights
 
-- **Layered Architecture**: Clean dependency hierarchy - `config`/`lang` (support) → `core` (business logic) → `tasks` (command execution) → `ui` (interaction)
+- **Compilation Strategy Pattern** - Uses Strategy Pattern (`compileStrategy` interface) to handle different compilation scenarios. Default strategy automatically handles package errors and multi-pass compilation. Future AI-powered strategies can be easily added without modifying the core compilation loop
 
-- **Separation of Concerns**:
-  - `core/` - Core business logic (environment detection, build, package management), completely independent of CLI, reusable by other applications
-    - `core/errors/` - Compilation error handling module with Strategy Pattern support:
-      - `package.go` - Automatic package detection and installation
-      - `passes.go` - Adaptive multi-pass compilation detection (handles 6 scenarios: TOC, cross-refs, bibliographies, indexes, glossaries, PDF bookmarks)
-  - `tasks/` - Command execution layer, unified management of all command execution logic (environment, build, preview, help), shared by `main.go` and `ui/repl.go`
-  - `ui/` - User interface layer, responsible for interaction mode implementation (REPL command parsing, completion, history, TUI state management)
-  - `lang/` - Internationalization module, manages multi-language support and language preferences (contains `Language` type definition)
-  - `config/` - Configuration management, handles user preference settings
+- **Compilation Error Handling Module** - `core/errors/` modularly handles compilation issues: automatic package detection & installation, adaptive multi-pass compilation detection (covers 6 scenarios: TOC, cross-refs, bibliographies, indexes, glossaries, PDF bookmarks)
 
-- **Strategy Pattern for Compilation**: The build system uses a Strategy Pattern (`compileStrategy` interface) to handle different compilation scenarios:
-  - **Default Strategy** - Handles package errors and multi-pass compilation automatically
-  - **Extensible Design** - Easy to add AI-powered strategies in the future without modifying core compilation loop
-  - **Context Management** - `compileContext` encapsulates all compilation state for clean strategy execution
-
-- **Code Reusability**: The refactored architecture eliminates code duplication. Functions in `tasks/` package (like `CheckEnvironment()`, `BuildLaTex()`, `InstallLaTexEnvironment()`) are shared by both CLI mode and REPL mode
-
-- **Modular Design**: Independent packages for i18n and configuration with clear responsibilities, easy to maintain and extend
-
-- **Dependency Injection**: Platform-specific checkers and installers are created in `tasks/` and injected into core logic, avoiding circular dependencies
-
-- **Interface-Driven**: `EnvironmentChecker` and `EnvironmentInstaller` interfaces allow easy platform extensibility. Adding a new platform only requires implementing the interfaces
-
-- **Priority System**: Tools are categorized by priority (⭐ Core, 🔹 Important, 🔸 Optional), helping users understand tool importance
-
-- **Type Safety**: Shared data structures (like `Language`) are defined in `lang/` package, simplifying architecture and avoiding unnecessary abstraction layers
-
----
-
-## 🔍 Detected LaTex Tools
-
-LaziTex can detect **23 LaTex tools** across 7 categories:
-
-| Category | Tools | Count |
-|----------|-------|-------|
-| 🔨 **Compilers** | pdflatex, xelatex, lualatex, latex, pdftex, tex, etex | 7 |
-| 📚 **Bibliography** | bibtex, biber | 2 |
-| 📇 **Indexing** | makeindex, xindy, texindy | 3 |
-| 🔄 **Converters** | dvipdfmx, dvips, ps2pdf, dvisvgm | 4 |
-| ⚙️ **Automation** | latexmk | 1 |
-| 📦 **Package Managers** | tlmgr, mpm | 2 |
-| 🔧 **Utilities** | kpsewhich, texdoc, texhash, updmap | 4 |
+- **Tool Priority System** - Tools categorized by priority (⭐ Core, 🔹 Important, 🔸 Optional), helping users quickly identify critical tools
 
 ---
 
@@ -588,38 +288,31 @@ LaziTex can detect **23 LaTex tools** across 7 categories:
 
 ### Completed ✅
 
-- [x] Environment detection for Windows, Linux, macOS
-- [x] Comprehensive LaTex tool checking (23 tools)
-- [x] macOS LaTex environment auto-install/update
-- [x] macOS LaTex environment auto-uninstall
-- [x] Modern REPL interactive mode (History, Tab completion, Shell shortcuts, Full i18n, Live Preview command)
-- [x] LaTex Build Engine (Basic: One-click .tex to PDF, smart working directory)
-- [x] Smart Preview System (macOS Skim/Web & Windows SumatraPDF/Default auto-adapter)
-- [x] Live Preview Mode - Auto-trigger millisecond-level compilation and PDF refresh on save
-- [x] Auto Package Detection & Installation - Automatically detects missing packages from compilation errors and installs them via tlmgr/mpm
-- [x] Adaptive Multi-Pass Compilation - Automatically detects and executes multiple compilation passes for cross-references, TOC, bibliographies, indexes, glossaries, and PDF bookmarks
+- [x] **Cross-Platform Environment Detection** - Windows, Linux, macOS environment detection and 23 tools checking
+- [x] **macOS Environment Management** - Auto install/update/uninstall, supports Homebrew, MacPorts, MacTeX
+- [x] **REPL Interactive Mode** - Command history, Tab completion, Shell shortcuts, full i18n support
+- [x] **Build & Preview System** - One-click compilation, smart preview (macOS Skim/Windows SumatraPDF), live preview watching
+- [x] **Smart Compilation Optimization** - Auto package detection & installation, adaptive multi-pass compilation (cross-refs, TOC, bibliographies, etc.)
 
 ### In Progress 🚧
 
-- [ ] Live Preview experience optimization (task preemption, compilation locks, enhanced error feedback, etc.)
-- [ ] Linux LaTex environment auto-install/update
-- [ ] Linux LaTex environment auto-uninstall
+- [ ] **Web Preview Mode** - Local HTTP server + browser preview, Overleaf-style web preview experience
+- [ ] **Live Preview Optimization** - Task preemption, compilation locks, enhanced error feedback
+- [ ] **Linux Environment Management** - Auto install/update/uninstall
 
 ### Planned 📋
 
-- [ ] Local AI integration for LaTex assistance
-- [ ] Multi-document project support
-- [ ] Custom compilation profiles
+- [ ] **AI Integration (CLI Internal)** - Compilation error diagnosis, code generation & optimization, smart completion
+- [ ] **Multi-document Project Support** - Automatically handle file dependencies and compilation order
+- [ ] **Custom Compilation Profiles** - Project-level configuration files (compiler selection, output directories, compilation parameters, etc.)
 
 ### Future 🔮
 
-- [ ] `lazitex init` Project Initialization - Minimalist startup experience similar to `uv init`, supporting fast fetching of high-quality LaTex templates from Gitee/GitHub
-- [ ] TUI mode with live preview
-- [ ] Modern GUI support
-- [ ] Windows LaTex environment auto-install/update (Windows installation is complex, lower priority)
-- [ ] Windows LaTex environment auto-uninstall
-- [ ] **AI-Native Authoring Flow**: Bridging human creativity and AI intelligence with high-efficiency interaction and instantaneous feedback, realizing a "DocuGen-style Prompt2PDF" experience. Supporting end-to-end real-time PDF generation from natural language prompts, powered by Multi-Agent workflows for literature retrieval, outline planning, and content refinement
-- [ ] **LaziTex Server & Cloud Vertical Ecosystem**: Exploring server-side deployment solutions to provide "Prompt2PDF" online interactive generation services for vertical sectors such as finance, medical, and research. Supporting multi-modal recognition (e.g., hand-written formulas/charts to LaTex), bridging unstructured intents to professional PDF documents, and building a distributed document platform that is "Free at Local, Intelligent in Cloud".
+- [ ] **Project Initialization** - `lazitex init` minimalist startup, fast template fetching
+- [ ] **Modern GUI Support** - Modern graphical interface
+- [ ] **Windows Environment Management** - Auto install/update/uninstall (lower priority)
+- [ ] **AI-Native Authoring Flow** - Prompt2PDF experience, multi-agent collaborative workflows
+- [ ] **Cloud Vertical Ecosystem** - Server-side deployment, online interactive generation services
 
 ---
 
@@ -674,7 +367,8 @@ Method 1: Use LaziTex auto-install (Recommended)
 lazitex -i    # Auto-install or update LaTex environment (macOS supported)
 ```
 
-**Method 2: Manual installation**
+Method 2: Manual installation
+
 After running `lazitex --check`, if tools are missing, the system will automatically display installation guides for your platform.
 
 ### 4. How to uninstall LaTex environment?
@@ -697,7 +391,30 @@ lazitex -u    # Auto-uninstall LaTex environment (macOS supported)
 - MacPorts: `sudo port uninstall texlive`
 - MacTeX Official: Manually delete `/Library/TeX/` directory
 
-### 5. What features will be supported in the future?
+### 5. How to check current language?
+
+```bash
+# View config file
+# Windows
+type %APPDATA%\lazitex\config.json
+# Linux/macOS
+cat ~/.config/lazitex/config.json
+```
+
+### 6. How to reset to default language (English)?
+
+```bash
+lazitex -l en --help
+# Or use long form
+lazitex --lang en --help
+# Or delete the config file
+```
+
+### 7. Can I add other languages?
+
+Currently only English and Chinese are supported. If you need other language support, please submit an Issue or Pull Request!
+
+### 8. What features will be supported in the future?
 
 Please check the [Roadmap](#-roadmap) section above.
 

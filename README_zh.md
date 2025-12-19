@@ -64,8 +64,6 @@ go build -o lazitex ./cmd/lazitex-cli
 
 ## 🚀 快速开始
 
-### 📋 命令速查
-
 | 命令 | 说明 | 示例 |
 |------|------|------|
 | `-c, --check` | 检查 LaTex 环境 | `lazitex -c` |
@@ -78,119 +76,30 @@ go build -o lazitex ./cmd/lazitex-cli
 | `-h, --help` | 显示帮助 | `lazitex -h` |
 | `-v, --version` | 显示版本 | `lazitex -v` |
 
-### 检查 LaTex 环境
-
-在编译之前，先验证你的 LaTex 安装：
-
-```bash
-lazitex --check    # 完整命令
-lazitex -c         # 简短命令
-```
-
-这将检测：
-
-- ✅ 所有已安装的 LaTex 编译器（pdflatex、xelatex、lualatex 等）
-- ✅ 文献管理工具（bibtex、biber）
-- ✅ 格式转换工具（dvipdfmx、ps2pdf 等）
-- ✅ 包管理器（tlmgr、mpm）
-- ✅ 你的 LaTex 发行版（TeX Live、MiKTeX、MacTeX）
-
-**示例输出：**
-
-```txt
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-           LaTex 编译环境检测结果 (Environment Check)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-🖥️  操作系统: Windows (windows)
-📦 LaTex 发行版: TeX Live 2025
-
-✅ 已安装: 22/23 工具 (核心工具: 6/6)
-
-🔨 编译器 (7/7)
-────────────────────────────────────────────────────────────
-  ⭐ ✓ PDFLaTex        [已安装]
-      路径: C:\texlive\2025\bin\windows\pdflatex.exe
-      版本: pdfTeX 3.141592653-2.6-1.40.28 (TeX Live 2025)
-  ⭐ ✓ XeLaTex         [已安装]
-      路径: C:\texlive\2025\bin\windows\xelatex.exe
-      版本: XeTeX 3.141592653-2.6-0.999997 (TeX Live 2025)
-  ...
-```
-
 ---
 
-## 🌍 语言设置
+## 📖 使用指南
 
-LaziTex 是一个**双语工具**，完整支持**中文**和**英文 (English)**。
+### 语言设置
 
-### 默认语言
+LaziTex 支持**中文**和**英文**两种语言，可通过以下两种方式设置：
 
-- **英文 (English)** 是默认语言
-- 所有输出（帮助信息、环境检测结果、错误提示）默认使用英文
-
-### 快速开始
-
-**一次性使用特定语言：**
+方式一：运行时更改
 
 ```bash
-lazitex --lang zh --check    # 本次命令使用中文
-lazitex -l en --check        # 本次命令使用英文（短选项形式）
+lazitex -l zh --check    # 本次命令使用中文
+lazitex --lang en --check  # 本次命令使用英文
 ```
 
-**永久切换默认语言：**
+使用 `-l` 或 `--lang` 参数时，语言偏好会自动保存。
 
-```bash
-# 使用 --lang 或 -l 时，你的选择会自动保存
-lazitex -l zh --help         # 切换到中文并保存为默认语言
-lazitex --help               # 以后的命令都使用中文
-
-# 随时切换回英文（两种形式都可以）
-lazitex --lang en --help     # 切换到英文并保存为默认语言
-lazitex --check              # 现在使用英文
-```
-
-### 高级用法
-
-**使用环境变量临时覆盖：**
-
-```bash
-# Windows PowerShell
-$env:LAZITEX_LANG="zh"; lazitex --check
-
-# Linux/macOS/Git Bash
-export LAZITEX_LANG=zh
-lazitex --check
-```
-
-**支持的语言代码：**
-
-- `zh`, `chinese` → 中文
-- `en`, `english` → English (英文)
-
-**命令格式：**
-
-- 长选项: `--lang <语言代码>`
-- 短选项: `-l <语言代码>`
-
-两种形式完全等效，都会保存你的偏好设置。
-
-### 语言优先级（从高到低）
-
-1. **命令行参数** `-l <语言>` 或 `--lang <语言>` （会保存偏好）
-2. **环境变量** `LAZITEX_LANG=<语言>`
-3. **已保存的用户偏好**（配置文件）
-4. **系统默认**（英文）
-
-### 配置文件
-
-你的语言偏好保存在：
+方式二：配置文件
 
 | 平台 | 配置文件位置 |
 |------|------------|
-| **Windows** | `%APPDATA%\lazitex\config.json` |
-| **Linux** | `~/.config/lazitex/config.json` |
-| **macOS** | `~/Library/Application Support/lazitex/config.json` |
+| Windows | `%APPDATA%\lazitex\config.json` |
+| Linux | `~/.config/lazitex/config.json` |
+| macOS | `~/Library/Application Support/lazitex/config.json` |
 
 配置文件示例：
 
@@ -200,208 +109,17 @@ lazitex --check
 }
 ```
 
-你可以：
+直接编辑配置文件或使用 `--lang` 参数自动更新。
 
-- 直接编辑这个文件来更改默认语言
-- 使用 `--lang` 参数自动更新
-- 删除配置文件恢复默认（英文）
-
-### 使用示例
-
-```bash
-# 使用默认语言（英文）检查环境
-lazitex --check
-
-# 使用中文检查一次（短选项形式）
-lazitex -l zh --check
-
-# 永久切换到中文
-lazitex --lang zh --help
-
-# 以后所有命令都使用中文
-lazitex --check
-lazitex --version
-
-# 切换回英文（短选项形式）
-lazitex -l en --help
-
-# 灵活使用长短选项
-lazitex -l zh --check       # 短选项
-lazitex --lang en --check   # 长选项
-
-# 在 REPL 模式中切换语言
-lazitex --repl
-lazitex> lang zh            # 交互式切换到中文
-lazitex> help               # 帮助信息现在是中文
-```
-
-### 输出对比
-
-**英文 (English):**
-
-```txt
-✅ Installed: 22/23 tools (core tools: 6/6)
-🔨 Compilers (7/7)
-  ⭐ ✓ PDFLaTex        [Installed]
-      Path: C:\texlive\2025\bin\windows\pdflatex.exe
-  ⭐ ✓ XeLaTex         [Installed]
-🎉 Excellent! All core compilers are installed
-```
-
-**中文:**
-
-```txt
-✅ 已安装: 22/23 工具 (核心工具: 6/6)
-🔨 编译器 (7/7)
-  ⭐ ✓ PDFLaTex        [已安装]
-      路径: C:\texlive\2025\bin\windows\pdflatex.exe
-  ⭐ ✓ XeLaTex         [已安装]
-🎉 太棒了！所有核心编译器都已安装
-```
-
-### 常见问题
-
-**Q: 如何查看当前使用的语言？**
-
-```bash
-# 查看配置文件
-# Windows
-type %APPDATA%\lazitex\config.json
-# Linux/macOS
-cat ~/.config/lazitex/config.json
-```
-
-**Q: 如何重置为默认语言（英文）？**
-
-```bash
-lazitex -l en --help
-# 或使用长选项
-lazitex --lang en --help
-# 或删除配置文件
-```
-
-**Q: 可以添加其他语言吗？**
-
-当前只支持中文和英文。如果你需要其他语言支持，欢迎提交 Issue 或 Pull Request！
-
-### 安装/更新 LaTex 环境
-
-LaziTex 支持自动安装和更新 LaTex 环境（目前支持 macOS）：
-
-```bash
-lazitex --install    # 安装或更新 LaTex 环境
-lazitex -i           # 简短命令
-```
+### 构建与预览
 
 **功能特点：**
 
-- 🔍 **智能检测** - 自动检测是否已安装 LaTex
-- 📦 **自动安装** - 未安装时自动安装 BasicTeX（macOS）
-- 🔄 **智能更新** - 已安装时自动检查并更新包
-- 💬 **交互确认** - 安装/更新前会询问确认
-- 📋 **包列表** - 更新时会显示可更新的包列表
-
-**macOS 安装示例：**
-
-```bash
-$ lazitex -i
-未检测到 LaTex 环境
-将使用 Homebrew 安装 BasicTeX (轻量版，约 1.5 GB)
-安装命令: brew install --cask basictex
-是否要安装? [y/n]: y
-正在通过 Homebrew 安装 BasicTeX...
-✅ BasicTeX 安装成功！
-```
-
-**更新示例：**
-
-```bash
-$ lazitex -i
-检测到 LaTex 已安装
-以下包可以更新:
-
-  ...
-是否要更新这些包? [y/n]: y
-✅ 更新成功！
-```
-
-### 卸载 LaTex 环境
-
-LaziTex 支持一键卸载 LaTex 环境（目前支持 macOS）：
-
-```bash
-lazitex --uninstall  # 卸载 LaTex 环境
-lazitex -u           # 简短命令
-```
-
-**功能特点：**
-
-- 🔍 **智能检测** - 自动检测是否已安装 LaTex
-- 🗑️ **自动卸载** - 自动检测安装方式并执行相应卸载
-- 💬 **交互确认** - 卸载前会询问确认，防止误操作
-- 📋 **友好提示** - 未安装时会提示可以使用 `-i` 一键安装
-- 🧹 **残留清理** - 卸载成功后尝试删除常见残留目录
-
-**支持的卸载方式：**
-
-- ✅ Homebrew BasicTeX - 自动卸载
-- ✅ Homebrew MacTeX - 自动卸载
-- ✅ MacPorts（texlive*，含 basic/latex/full）- 自动卸载
-- ✅ MacTeX 官方安装 - 尝试运行官方卸载脚本，缺失时给出需手动删除的目录提示
-
-**macOS 卸载示例：**
-
-```bash
-$ lazitex -u
-检测到 LaTex 已安装
-将卸载 LaTex 环境（包括所有已安装的包）
-是否要卸载? [y/n]: y
-正在卸载 LaTex 环境...
-✅ LaTex 环境卸载成功！
-```
-
-**未安装时的提示：**
-
-```bash
-$ lazitex -u
-未检测到 LaTex 环境
-提示: 可以使用 'lazitex -i' 一键安装 LaTex 环境
-```
-
-### 构建与预览 LaTex 文档
-
-LaziTex 支持一键将 LaTex 文档编译为 PDF，并提供智能预览功能：
-
-```bash
-lazitex -b main.tex          # 仅构建 LaTex 文档
-lazitex -b main.tex -s       # 构建后自动打开展示
-lazitex -b main.tex -o out/  # 指定输出目录
-lazitex -b main.tex -o res.pdf # 指定输出完整路径
-```
-
-**功能特点：**
-
-- 🚀 **一键构建** - 自动调用编译器（XeLaTex）并配置最优参数
-- 🔍 **自动包检测与安装** - 自动从编译错误中检测缺失的 LaTex 包（`.sty` 和 `.cls` 文件），并通过 `tlmgr` 或 `mpm` 提供安装
-  - **智能包名解析** - 自动查找正确的包名（例如：`xeCJK.sty` → `xecjk` 包）
-  - **批量安装** - 一次性安装所有缺失的包，减少密码输入次数
-  - **智能权限处理** - 先尝试不使用 sudo 安装，仅在需要时提示输入密码
-  - **自动重试** - 包安装成功后自动重新编译
-- 🔄 **自适应多轮编译** - 智能检测并执行多次编译，自动处理以下场景：
-  - **交叉引用** - 自动通过多轮编译解决未定义的引用
-  - **目录生成** - 检测 `.toc` 文件并确保目录正确生成
-  - **参考文献** - 自动处理 `bibtex`/`biber` 工作流（最多 4 次编译）
-  - **索引与术语表** - 需要时自动运行 `makeindex` 和 `makeglossaries`
-  - **PDF 书签** - 通过多轮编译确保书签正确生成
-  - **智能检测** - 分析辅助文件（`.aux`、`.toc`、`.out`、`.idx`、`.glo`、`.bib`）判断编译需求
-- 👁️ **智能展示 (`-s`)** - 构建成功后自动打开 PDF。
-  - **macOS**: 优先检测并使用 **Skim.app**（支持静默刷新），若未安装则自动回退至系统默认浏览器或预览程序。
-  - **Windows**: 优先检测并使用 **SumatraPDF**（支持静默刷新与实例复用），若未安装则自动回退至系统默认关联程序。
-- 📁 **自定义输出 (`-o`)** - 支持指定输出目录（若路径不存在将自动递归创建）或指定完整的输出文件名。**注意**：如果指定了 `-o`，必须提供路径值，否则会显示用法提示
-- 📁 **智能默认** - 若未指定 `-o`，则自动将生成的 PDF 和日志文件存放在与 `.tex` 源文件相同的目录下
-- 📍 **路径支持** - 支持当前目录下的文件名，也支持绝对路径或相对路径
-- 🔍 **类型安全** - 自动校验文件后缀，确保源文件存在
-- 🔄 **逻辑复用** - 预览逻辑在 CLI 和 REPL 模式下完全一致，并为未来的实时监听模式打下了基础
+- 一键构建 - 自动调用 XeLaTex 编译器
+- 自动包检测与安装 - 从编译错误中检测缺失包并自动安装
+- 自适应多轮编译 - 自动处理交叉引用、目录、参考文献、索引等场景
+- 智能预览 - 构建成功后自动打开 PDF（macOS 优先使用 Skim，Windows 优先使用 SumatraPDF）
+- 自定义输出 - 支持指定输出目录或完整路径
 
 **构建示例：**
 
@@ -414,47 +132,7 @@ $ lazitex -b report.tex -s
 (自动打开展示窗口)
 ```
 
-**自动包安装示例：**
-
-```bash
-$ lazitex -b document.tex
-🚀 正在构建 LaTex 文档: document.tex
-... (编译失败) ...
-🔍 检测到缺失的包: xeCJK
-💡 是否自动安装？[Y/n]: y
-📦 正在安装 xeCJK...
-需要管理员权限，请输入密码...
-✅ 安装成功！
-🔄 重新编译中...
-✨ 构建成功！
-```
-
-**自适应多轮编译示例：**
-
-```bash
-$ lazitex -b report.tex
-🚀 正在构建 LaTex 文档: report.tex
-📁 工作目录: /Users/user/projects/paper
-... (第一次编译) ...
-运行 bibtex...
-第 2 次编译（解决交叉引用）...
-第 3 次编译（解决交叉引用）...
-✨ 构建成功！
-```
-
-系统自动检测到文档需要多轮编译（用于参考文献和交叉引用），并无缝执行了所有必要的编译轮次。
-
-### 其他命令
-
-```bash
-lazitex --help     # 显示帮助信息
-lazitex --version  # 显示版本号
-lazitex --check    # 检查 LaTex 环境
-lazitex --repl     # REPL 交互模式
-lazitex --tui      # 终端界面模式（即将推出）
-```
-
-**REPL 模式** - 交互式命令：
+### REPL 模式
 
 ```bash
 lazitex> help                      # 显示可用命令
@@ -484,6 +162,31 @@ lazitex> cat file.log              # 查看文件内容（支持 .tex, .log, .au
 - 🌐 **全方位国际化** - 所有命令帮助、错误提示、用法说明均支持中英文切换
 
 REPL 中的语言切换即时生效，并且会保存偏好设置供下次使用！
+
+### 可检测的 LaTex 工具
+
+LaziTex 可以检测 **23 个 LaTex 工具**，涵盖 7 大类别：
+
+| 类别 | 工具 | 数量 |
+|------|------|------|
+| 🔨 **编译器** | pdflatex, xelatex, lualatex, latex, pdftex, tex, etex | 7 |
+| 📚 **文献管理** | bibtex, biber | 2 |
+| 📇 **索引工具** | makeindex, xindy, texindy | 3 |
+| 🔄 **格式转换** | dvipdfmx, dvips, ps2pdf, dvisvgm | 4 |
+| ⚙️ **自动化工具** | latexmk | 1 |
+| 📦 **包管理器** | tlmgr, mpm | 2 |
+| 🔧 **实用工具** | kpsewhich, texdoc, texhash, updmap | 4 |
+
+**工具优先级说明：**
+
+- ⭐ **核心工具（Priority 0）**：必须安装，是基本功能的基础
+  - 示例：pdflatex, xelatex, lualatex, bibtex, latexmk
+  
+- 🔹 **重要工具（Priority 1）**：推荐安装，提供常用功能
+  - 示例：biber, makeindex, dvipdfmx, tlmgr
+  
+- 🔸 **可选工具（Priority 2）**：进阶使用，特定场景需要
+  - 示例：xindy, dvips, texdoc, updmap
 
 ---
 
@@ -545,61 +248,11 @@ lazitex/
 
 ### 架构亮点
 
-- **分层架构**：清晰的依赖层次 - `config`/`lang`（支持层）→ `core`（业务逻辑层）→ `tasks`（命令执行层）→ `ui`（交互层）
+- **编译策略模式** - 采用策略模式（`compileStrategy` 接口）处理不同编译场景，默认策略自动处理包错误和多轮编译，未来可轻松扩展 AI 驱动策略，无需修改核心编译循环
 
-- **职责分离**：
-  - `core/` - 核心业务逻辑（环境检测、构建、包管理），完全独立于 CLI，可被其他应用复用
-    - `core/errors/` - 编译错误处理模块，采用策略模式设计：
-      - `package.go` - 自动包检测与安装
-      - `passes.go` - 自适应多轮编译检测（处理 6 种场景：目录、交叉引用、参考文献、索引、术语表、PDF 书签）
-  - `tasks/` - 命令执行层，统一管理所有命令的执行逻辑（环境、构建、预览、帮助），被 `main.go` 和 `ui/repl.go` 共享使用
-  - `ui/` - 用户界面层，负责交互模式实现（REPL 的命令解析、补全、历史，TUI 的状态管理）
-  - `lang/` - 国际化模块，管理多语言支持和语言偏好（包含 `Language` 类型定义）
-  - `config/` - 配置管理，处理用户偏好设置
+- **编译错误处理模块** - `core/errors/` 模块化处理编译问题：自动包检测与安装、自适应多轮编译检测（覆盖目录、交叉引用、参考文献、索引、术语表、PDF 书签等 6 种场景）
 
-- **编译策略模式**：构建系统采用策略模式（`compileStrategy` 接口）处理不同编译场景：
-  - **默认策略** - 自动处理包错误和多轮编译
-  - **可扩展设计** - 未来可轻松添加 AI 驱动策略，无需修改核心编译循环
-  - **上下文管理** - `compileContext` 封装所有编译状态，实现清晰的策略执行
-
-- **代码复用**：重构后的架构消除了代码重复，`tasks/` 包中的函数（如 `CheckEnvironment()`, `BuildLaTex()`, `InstallLaTexEnvironment()`）被命令行模式和 REPL 模式共享使用
-
-- **模块化设计**：独立的包管理国际化、配置，职责清晰，易于维护和扩展
-
-- **依赖注入**：平台特定的检查器和安装器在 `tasks/` 中创建并注入到核心逻辑，避免循环依赖
-
-- **接口驱动**：`EnvironmentChecker` 和 `EnvironmentInstaller` 接口使平台扩展变得简单，新增平台只需实现接口
-
-- **优先级系统**：工具按优先级分类（⭐ 核心、🔹 重要、🔸 可选），便于用户了解工具重要性
-
-- **类型安全**：共享数据结构（如 `Language`）定义在 `lang/` 包中，简化架构，避免不必要的抽象层
-
----
-
-## 🔍 可检测的 LaTex 工具
-
-LaziTex 可以检测 **23 个 LaTex 工具**，涵盖 7 大类别：
-
-| 类别 | 工具 | 数量 |
-|------|------|------|
-| 🔨 **编译器** | pdflatex, xelatex, lualatex, latex, pdftex, tex, etex | 7 |
-| 📚 **文献管理** | bibtex, biber | 2 |
-| 📇 **索引工具** | makeindex, xindy, texindy | 3 |
-| 🔄 **格式转换** | dvipdfmx, dvips, ps2pdf, dvisvgm | 4 |
-| ⚙️ **自动化工具** | latexmk | 1 |
-| 📦 **包管理器** | tlmgr, mpm | 2 |
-| 🔧 **实用工具** | kpsewhich, texdoc, texhash, updmap | 4 |
-
-### 工具优先级说明
-
-- ⭐ **核心工具（Priority 0）**：必须安装，是基本功能的基础
-  - 示例：pdflatex, xelatex, lualatex, bibtex, latexmk
-  
-- 🔹 **重要工具（Priority 1）**：推荐安装，提供常用功能
-  - 示例：biber, makeindex, dvipdfmx, tlmgr
-  
-- 🔸 **可选工具（Priority 2）**：进阶使用，特定场景需要
-  - 示例：xindy, dvips, texdoc, updmap
+- **工具优先级系统** - 工具按优先级分类（⭐ 核心、🔹 重要、🔸 可选），帮助用户快速识别关键工具
 
 ---
 
@@ -636,38 +289,31 @@ LaziTex 可以检测 **23 个 LaTex 工具**，涵盖 7 大类别：
 
 ### 已完成 ✅
 
-- [x] Windows、Linux、macOS 环境检测
-- [x] 全面的 LaTex 工具检查（23 个工具）
-- [x] macOS LaTex 环境自动安装/更新
-- [x] macOS LaTex 环境自动卸载
-- [x] 现代化的 REPL 交互模式（支持历史记录、Tab 补全、Shell 快捷命令、全语言国际化、实时预览命令）
-- [x] LaTex 编译引擎（基础功能：支持 .tex 到 PDF 的一键转换，自动处理工作目录）
-- [x] 智能预览系统（macOS Skim/Web 与 Windows SumatraPDF/系统默认自动适配）
-- [x] 实时预览监听 (Live Preview Mode) - 支持监听文件保存并自动触发毫秒级编译与 PDF 刷新
-- [x] 自动包检测与安装 - 从编译错误中自动检测缺失的包并通过 tlmgr/mpm 安装
-- [x] 自适应多轮编译 - 自动检测并执行多轮编译，处理交叉引用、目录、参考文献、索引、术语表和 PDF 书签
+- [x] **跨平台环境检测** - Windows、Linux、macOS 环境检测与 23 个工具检查
+- [x] **macOS 环境管理** - 自动安装/更新/卸载，支持 Homebrew、MacPorts、MacTeX
+- [x] **REPL 交互模式** - 历史记录、Tab 补全、Shell 快捷命令、全语言国际化
+- [x] **编译与预览系统** - 一键编译、智能预览（macOS Skim/Windows SumatraPDF）、实时预览监听
+- [x] **智能编译优化** - 自动包检测与安装、自适应多轮编译（交叉引用、目录、参考文献等）
 
 ### 进行中 🚧
 
-- [ ] 实时预览体验优化（包括任务抢占、编译锁、错误反馈增强等细节）
-- [ ] Linux LaTex 环境自动安装/更新
-- [ ] Linux LaTex 环境自动卸载
+- [ ] **Web 预览模式** - 本地 HTTP 服务器 + 浏览器预览，提供 Overleaf 风格的 Web 预览体验
+- [ ] **实时预览优化** - 任务抢占、编译锁、错误反馈增强
+- [ ] **Linux 环境管理** - 自动安装/更新/卸载
 
 ### 计划中 📋
 
-- [ ] 本地 AI 集成，提供 LaTex 写作辅助
-- [ ] 多文档项目支持
-- [ ] 自定义编译配置文件
+- [ ] **AI 集成（CLI 内部）** - 编译错误诊断、代码生成与优化、智能补全
+- [ ] **多文档项目支持** - 自动处理文件依赖关系和编译顺序
+- [ ] **自定义编译配置** - 项目级别配置文件（编译器选择、输出目录、编译参数等）
 
 ### 后续计划 🔮
 
-- [ ] `lazitex init` 项目初始化 - 类似 `uv init` 的极简启动体验，支持从 Gitee/GitHub 快速拉取国内外优质 LaTex 模板
-- [ ] 带实时预览的 TUI 模式
-- [ ] 现代化的 GUI 图形界面支持
-- [ ] Windows LaTex 环境自动安装/更新（Windows 安装方式复杂，优先级较低）
-- [ ] Windows LaTex 环境自动卸载
-- [ ] **AI 原生创作流**：构建人类与 AI 高效交互与瞬时反馈的桥梁，实现“DocuGen 式的 Prompt2PDF”体验。支持从自然语言意图到 PDF 文档的端到端实时生成与交互式编辑，并引入多智能体 (Multi-Agent) 协同驱动的文献检索、大纲规划与内容润色工作流
-- [ ] **LaziTex Server & 云端垂直生态**：探索服务器端部署方案，为金融、医疗、科研等垂直领域提供“Prompt2PDF”在线交互式生成服务。支持多模态识别（如手写公式/图表转 LaTex），将非结构化意图一键桥接至专业级 PDF 文档，打造“本地免费、云端智能”的分布式文档平台。
+- [ ] **项目初始化** - `lazitex init` 极简启动，快速拉取优质 LaTex 模板
+- [ ] **GUI 图形界面** - 现代化图形界面支持
+- [ ] **Windows 环境管理** - 自动安装/更新/卸载（优先级较低）
+- [ ] **AI 原生创作流** - Prompt2PDF 体验，多智能体协同工作流
+- [ ] **云端垂直生态** - 服务器端部署，在线交互式生成服务
 
 ---
 
@@ -729,7 +375,8 @@ Apache License 2.0 - 包含明确的专利授权，保护开发者与用户。
 lazitex -i    # 自动安装或更新 LaTex 环境（目前支持 macOS）
 ```
 
-**方法二：手动安装**
+方法二：手动安装
+
 运行 `lazitex --check` 后，如果有工具未安装，系统会自动显示针对你平台的安装指南。
 
 ### 4. 如何卸载 LaTex 环境？
@@ -752,7 +399,30 @@ lazitex -u    # 自动卸载 LaTex 环境（目前支持 macOS）
 - MacPorts: `sudo port uninstall texlive`
 - MacTeX 官方: 手动删除 `/Library/TeX/` 目录
 
-### 5. 未来会支持哪些功能？
+### 5. 如何查看当前使用的语言？
+
+```bash
+# 查看配置文件
+# Windows
+type %APPDATA%\lazitex\config.json
+# Linux/macOS
+cat ~/.config/lazitex/config.json
+```
+
+### 6. 如何重置为默认语言（英文）？
+
+```bash
+lazitex -l en --help
+# 或使用长选项
+lazitex --lang en --help
+# 或删除配置文件
+```
+
+### 7. 可以添加其他语言吗？
+
+当前只支持中文和英文。如果你需要其他语言支持，欢迎提交 Issue 或 Pull Request！
+
+### 8. 未来会支持哪些功能？
 
 请查看上方的 [开发路线图](#-开发路线图) 部分。
 
