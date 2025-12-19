@@ -301,6 +301,23 @@ func handleREPLCommand(input string) bool {
 	case "uninstall":
 		tasks.UninstallLaTexEnvironment()
 
+	case "ollama":
+		if len(parts) < 2 {
+			fmt.Println(lang.T("repl.ollama_usage"))
+			return false
+		}
+		action := parts[1]
+		switch action {
+		case "check", "-c", "--check":
+			tasks.CheckOllama()
+		case "install", "-i", "--install":
+			tasks.InstallOllama()
+		case "uninstall", "-u", "--uninstall":
+			tasks.UninstallOllama()
+		default:
+			fmt.Println(lang.T("repl.ollama_usage"))
+		}
+
 	case "build":
 		if len(parts) < 2 {
 			fmt.Println(lang.T("repl.build_usage"))

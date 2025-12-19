@@ -23,6 +23,7 @@ Instant LaTex compilation across platforms — powered by Go with local AI to he
 - 🔄 **Adaptive Multi-Pass Compilation** - Automatically detects and handles multiple compilation passes for cross-references, table of contents, bibliographies, indexes, and glossaries
 - 📦 **Auto Package Management** - Automatically detects missing packages from compilation errors and installs them via tlmgr/mpm
 - 🌐 **Web Preview Mode** - Local HTTP server + browser preview, SSE real-time auto-refresh, double-buffering optimization, Overleaf-style web preview experience
+- 🦙 **Ollama Management** - One-click check, install, and uninstall Ollama (Windows supported), providing foundation for AI features
 - 🧠 **AI-Powered** (Coming Soon) - Local AI assistance for writing and refining LaTex documents
 - 🎨 **Multiple Modes** - TUI (Terminal UI) and REPL modes for different workflows
 
@@ -72,6 +73,7 @@ Download pre-built binaries from [Releases](https://github.com/SJRnhqh/lazitex/r
 | `-u, --uninstall` | Uninstall LaTex | `lazitex -u` |
 | `-b, --build` | Build LaTex document (supports `-o` output, `-s` show, `-q` quiet) | `lazitex -b main.tex [-o out/] [-s] [-q]` |
 | `-p, --preview` | Live preview PDF (watches for saves and refreshes) | `lazitex -p main.tex` |
+| `-o, --ollama` | Ollama management (`-c` check, `-i` install, `-u` uninstall) | `lazitex -o -c` |
 | `-r, --repl` | Start REPL mode | `lazitex -r` |
 | `-l, --lang` | Set language | `lazitex -l zh` |
 | `-h, --help` | Show help | `lazitex -h` |
@@ -111,6 +113,36 @@ Example config file:
 ```
 
 Edit the config file directly or use `--lang` parameter to update automatically.
+
+### Ollama Management
+
+**Features:**
+
+- One-click Check - Detect if Ollama is installed and version information
+- One-click Install - Auto-install Ollama via winget (Windows)
+- One-click Uninstall - Auto-uninstall Ollama via winget (Windows)
+- Smart Detection - Automatically detect installation status and service running status
+- Path Detection - Can detect installation even if not in PATH
+
+**Usage Examples:**
+
+```bash
+# CLI Mode
+$ lazitex -o -c        # Check Ollama
+$ lazitex -o -i        # Install Ollama
+$ lazitex -o -u        # Uninstall Ollama
+
+# REPL Mode
+lazitex> ollama -c     # Check
+lazitex> ollama -i     # Install
+lazitex> ollama -u     # Uninstall
+```
+
+**Notes:**
+
+- Windows version includes GUI, but CLI tools are also available
+- You may need to restart the terminal after installation to recognize the `ollama` command
+- If installed but not in PATH, you'll be prompted to restart the terminal
 
 ### Build & Preview
 
@@ -165,6 +197,9 @@ lazitex> help                      # Show available commands
 lazitex> check                     # Check LaTex environment
 lazitex> install                   # Install or update LaTex environment
 lazitex> uninstall                 # Uninstall LaTex environment
+lazitex> ollama -c                 # Check if Ollama is installed
+lazitex> ollama -i                 # Install Ollama (Windows via winget)
+lazitex> ollama -u                 # Uninstall Ollama
 lazitex> build main.tex -o out/ -s -q # Build LaTex document with show, output path, and quiet mode
 lazitex> lang zh                   # Switch to Chinese
 lazitex> lang en                   # Switch to English
@@ -231,6 +266,7 @@ lazitex/
 │   ├── 🌍 env.go                  # Environment detection, installer interface & install/uninstall logic
 │   ├── 🔨 build.go                # Build workflow with Strategy Pattern (cross-platform, adaptive multi-pass)
 │   ├── 👀 watcher.go              # File watching for live preview
+│   ├── 🦙 ollama.go               # Ollama manager interface definition and wrapper functions
 │   └── 🚨 errors/                 # Compilation error handling module
 │       ├── 📦 package.go           # Auto package detection & installation
 │       └── 🔄 passes.go            # Adaptive multi-pass compilation detection
@@ -256,6 +292,7 @@ lazitex/
 │   ├── 🪟 win/                    # Windows-specific detection
 │   │   ├── 🔍 checker.go          # Detects TeX Live & MiKTeX on Windows
 │   │   ├── 📦 installer.go        # Windows installer (In Development)
+│   │   ├── 🦙 ollama.go           # Windows Ollama manager (✅ Implemented)
 │   │   └── 🛠️  builder.go         # Windows compilation logic (Coming Soon)
 │   ├── 🐧 linux/                  # Linux-specific detection
 │   │   ├── 🔍 checker.go          # Detects distro-specific TeX installations
@@ -273,6 +310,7 @@ lazitex/
 │       │   ├── 🌍 env.go          # Environment operations (check, install, uninstall)
 │       │   ├── 🔨 build.go        # Build functionality
 │       │   ├── 👀 preview.go      # Live preview functionality
+│       │   ├── 🦙 ollama.go       # Ollama management functionality
 │       │   └── 📖 help.go         # Help information
 │       └── 🎨 ui/                 # User interface layer (interaction mode implementation)
 │           ├── 🖼️  tui.go         # Terminal UI mode with Bubble Tea
@@ -333,6 +371,7 @@ lazitex/
 - [x] **Build & Preview System** - One-click compilation, smart preview (macOS Skim/Windows SumatraPDF), live preview watching
 - [x] **Smart Compilation Optimization** - Auto package detection & installation, adaptive multi-pass compilation (cross-refs, TOC, bibliographies, etc.)
 - [x] **Web Preview Mode** - Local HTTP server + browser preview, SSE real-time auto-refresh, double-buffering optimization, Overleaf-style web preview experience
+- [x] **Ollama Management (Windows)** - One-click check, install, and uninstall Ollama, supports automatic winget installation, smart detection of installation status and service running status
 
 ### In Progress 🚧
 

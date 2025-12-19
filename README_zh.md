@@ -23,6 +23,7 @@
 - 🔄 **自适应多轮编译** - 自动检测并处理交叉引用、目录、参考文献、索引、术语表等需要多次编译的场景
 - 📦 **自动包管理** - 从编译错误中自动检测缺失的包并通过 tlmgr/mpm 安装
 - 🌐 **Web 预览模式** - 本地 HTTP 服务器 + 浏览器预览，SSE 实时自动刷新，提供 Overleaf 风格的 Web 预览体验
+- 🦙 **Ollama 管理** - 一键检查、安装、卸载 Ollama（Windows 已支持），为 AI 功能提供基础支持
 - 🧠 **AI 增强** (即将推出) - 本地 AI 助手，帮助撰写和优化 LaTex 文档
 - 🎨 **多种模式** - 支持 TUI（终端界面）和 REPL 模式，适应不同工作流
 
@@ -72,6 +73,7 @@ go build -o lazitex ./cmd/lazitex-cli
 | `-u, --uninstall` | 卸载 LaTex | `lazitex -u` |
 | `-b, --build` | 构建 LaTex 文档 (支持 `-o` 输出, `-s` 编译后展示, `-q` 静默模式) | `lazitex -b main.tex [-o out/] [-s] [-q]` |
 | `-p, --preview` | 实时预览 PDF 文档 (监听保存动作并自动刷新) | `lazitex -p main.tex` |
+| `-o, --ollama` | Ollama 管理 (`-c` 检查, `-i` 安装, `-u` 卸载) | `lazitex -o -c` |
 | `-r, --repl` | 启动 REPL 模式 | `lazitex -r` |
 | `-l, --lang` | 设置语言 | `lazitex -l zh` |
 | `-h, --help` | 显示帮助 | `lazitex -h` |
@@ -111,6 +113,36 @@ lazitex --lang en --check  # 本次命令使用英文
 ```
 
 直接编辑配置文件或使用 `--lang` 参数自动更新。
+
+### Ollama 管理
+
+**功能特点：**
+
+- 一键检查 - 检测 Ollama 是否已安装及版本信息
+- 一键安装 - 通过 winget 自动安装 Ollama（Windows）
+- 一键卸载 - 通过 winget 自动卸载 Ollama（Windows）
+- 智能检测 - 自动检测安装状态和服务运行状态
+- 路径检测 - 即使不在 PATH 中也能检测到安装
+
+**使用示例：**
+
+```bash
+# CLI 模式
+$ lazitex -o -c        # 检查 Ollama
+$ lazitex -o -i        # 安装 Ollama
+$ lazitex -o -u        # 卸载 Ollama
+
+# REPL 模式
+lazitex> ollama -c     # 检查
+lazitex> ollama -i     # 安装
+lazitex> ollama -u     # 卸载
+```
+
+**注意事项：**
+
+- Windows 版本包含 GUI 界面，但 CLI 工具同样可用
+- 安装后可能需要重启终端才能识别 `ollama` 命令
+- 如果检测到已安装但不在 PATH 中，会提示重启终端
 
 ### 构建与预览
 
@@ -166,6 +198,9 @@ lazitex> check                     # 检查 LaTex 环境
 lazitex> install                   # 安装或更新 LaTex 环境
 lazitex> uninstall                 # 卸载 LaTex 环境
 lazitex> build main.tex -o out/ -s -q # 构建 LaTex 文档，指定输出目录、展示并启用静默模式
+lazitex> ollama -c                    # 检查 Ollama 是否安装
+lazitex> ollama -i                    # 安装 Ollama（Windows 通过 winget）
+lazitex> ollama -u                    # 卸载 Ollama
 lazitex> lang zh                   # 切换到中文
 lazitex> lang en                   # 切换到英文
 lazitex> lang                      # 查看当前语言
@@ -231,6 +266,7 @@ lazitex/
 │   ├── 🌍 env.go                  # 环境检测、安装器接口定义及安装/卸载逻辑
 │   ├── 🔨 build.go                # 跨平台编译工作流（策略模式，自适应多轮编译）
 │   ├── 👀 watcher.go              # 文件监听（实时预览）
+│   ├── 🦙 ollama.go               # Ollama 管理器接口定义和包装函数
 │   └── 🚨 errors/                 # 编译错误处理模块
 │       ├── 📦 package.go           # 自动包检测与安装
 │       └── 🔄 passes.go            # 自适应多轮编译检测
@@ -256,6 +292,7 @@ lazitex/
 │   ├── 🪟 win/                    # Windows 平台
 │   │   ├── 🔍 checker.go          # 检测 Windows 上的 TeX Live 和 MiKTeX
 │   │   ├── 📦 installer.go        # Windows 安装器（开发中）
+│   │   ├── 🦙 ollama.go           # Windows Ollama 管理器（✅ 已实现）
 │   │   └── 🛠️  builder.go         # Windows 编译逻辑（即将推出）
 │   ├── 🐧 linux/                  # Linux 平台
 │   │   ├── 🔍 checker.go          # 检测各发行版的 TeX 安装
@@ -273,6 +310,7 @@ lazitex/
 │       │   ├── 🌍 env.go          # 环境操作（检查、安装、卸载）
 │       │   ├── 🔨 build.go        # 构建功能
 │       │   ├── 👀 preview.go      # 实时预览功能
+│       │   ├── 🦙 ollama.go       # Ollama 管理功能
 │       │   └── 📖 help.go         # 帮助信息
 │       └── 🎨 ui/                 # 用户界面层（交互模式实现）
 │           ├── 🖼️  tui.go         # 基于 Bubble Tea 的终端 UI 模式

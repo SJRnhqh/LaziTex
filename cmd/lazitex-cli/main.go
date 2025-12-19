@@ -41,6 +41,22 @@ func main() {
 		tasks.InstallLaTexEnvironment()
 	case "-u", "--uninstall":
 		tasks.UninstallLaTexEnvironment()
+	case "-o", "--ollama":
+		if len(args) < 2 {
+			fmt.Println(lang.T("msg.ollama_usage"))
+			return
+		}
+		action := args[1]
+		switch action {
+		case "-c", "--check":
+			tasks.CheckOllama()
+		case "-i", "--install":
+			tasks.InstallOllama()
+		case "-u", "--uninstall":
+			tasks.UninstallOllama()
+		default:
+			fmt.Println(lang.T("msg.ollama_usage"))
+		}
 	case "-b", "--build":
 		if len(args) < 2 {
 			fmt.Println(lang.T("msg.build_usage"))
