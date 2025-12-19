@@ -341,7 +341,8 @@ lazitex/
 
 ### Planned 📋
 
-- [ ] **AI Integration (CLI Internal)** - Compilation error diagnosis, code generation & optimization, smart completion
+- [ ] **AI Agent Environment Management** - Manage AI Agents like conda environments, supporting multi-agent creation, switching, and configuration. Use `ai` command to manage agents (create, list, switch LLM), and `agent` command to invoke agents (ask, chat, generate). Each agent can be configured with independent LLM providers, tool sets, and system prompts, enabling quick switching between different scenarios (compiler expert, writing assistant, error diagnosis, etc.)
+- [ ] **AI Integration (CLI Internal)** - Compilation error diagnosis, code generation & optimization, smart completion. CLI provides quick access via `-a` flag using the currently configured agent, while REPL offers full agent management and invocation capabilities
 - [ ] **Quiet Mode Error Formatting** - In quiet mode, extract and format compilation errors with LaziTex-style error messages (with icons) instead of raw compiler output
 - [ ] **Multi-document Project Support** - Automatically handle file dependencies and compilation order
 - [ ] **Custom Compilation Profiles** - Project-level configuration files (compiler selection, output directories, compilation parameters, etc.)
