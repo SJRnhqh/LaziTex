@@ -3,6 +3,7 @@
 package modes
 
 import (
+	// 外部包
 	"fmt"
 	"os"
 	"path/filepath"
@@ -10,7 +11,11 @@ import (
 	"strings"
 	"time"
 
+	// 内部包
+	config "github.com/SJRnhqh/lazitex/config"
 	core "github.com/SJRnhqh/lazitex/core"
+	lang "github.com/SJRnhqh/lazitex/lang"
+	model "github.com/SJRnhqh/lazitex/model"
 	linux "github.com/SJRnhqh/lazitex/target/linux"
 	mac "github.com/SJRnhqh/lazitex/target/mac"
 	win "github.com/SJRnhqh/lazitex/target/win"
@@ -146,14 +151,14 @@ func StartREPL() {
 
 	// 2. 初始化 readline 实例
 	rl, err := readline.NewEx(&readline.Config{
-		Prompt:          core.T("repl.prompt"),
+		Prompt:          lang.T("repl.prompt"),
 		HistoryFile:     historyFile,
 		AutoComplete:    &LaTexCompleter{},
 		InterruptPrompt: "^C",
 		EOFPrompt:       "exit",
 	})
 	if err != nil {
-		fmt.Printf(core.T("repl.err_init")+"\n", err)
+		fmt.Printf(lang.T("repl.err_init")+"\n", err)
 		return
 	}
 	defer rl.Close()
@@ -175,7 +180,7 @@ func StartREPL() {
 			break
 		}
 	}
-	fmt.Println(core.T("repl.goodbye"))
+	fmt.Println(lang.T("repl.goodbye"))
 }
 
 // StartREPL 启动 REPL 模式
@@ -213,7 +218,7 @@ func handleREPLCommand(input string) bool {
 
 	case "build":
 		if len(parts) < 2 {
-			fmt.Println(core.T("repl.build_usage"))
+			fmt.Println(lang.T("repl.build_usage"))
 			return false
 		}
 
@@ -231,7 +236,7 @@ func handleREPLCommand(input string) bool {
 				pendingOutput = true
 			} else if strings.HasPrefix(arg, "-") {
 				// 严谨处理：未知标志位报错
-				fmt.Printf(core.T("repl.unknown_command")+"\n", arg)
+				fmt.Printf(lang.T("repl.unknown_command")+"\n", arg)
 				return false
 			} else {
 				if pendingOutput && outputPath == "" {
@@ -245,7 +250,7 @@ func handleREPLCommand(input string) bool {
 
 		// 检查：如果开启了 -o 但没拿到路径，或者没提供输入文件
 		if (pendingOutput && outputPath == "") || filePath == "" {
-			fmt.Println(core.T("repl.build_usage"))
+			fmt.Println(lang.T("repl.build_usage"))
 			return false
 		}
 
@@ -253,7 +258,7 @@ func handleREPLCommand(input string) bool {
 		BuildLaTeX(filePath, outputPath, show)
 	case "preview":
 		if len(parts) < 2 {
-			fmt.Println(core.T("repl.preview_usage"))
+			fmt.Println(lang.T("repl.preview_usage"))
 			return false
 		}
 		filePath := parts[1]
@@ -261,15 +266,15 @@ func handleREPLCommand(input string) bool {
 	case "lang", "language":
 		// 语言切换命令
 		if len(parts) < 2 {
-			fmt.Println(core.T("repl.lang_usage"))
-			fmt.Println(core.T("repl.lang_current") + getCurrentLanguageName())
+			fmt.Println(lang.T("repl.lang_usage"))
+			fmt.Println(lang.T("repl.lang_current") + getCurrentLanguageName())
 		} else {
 			handleLanguageSwitch(parts[1])
 		}
 
 	default:
-		fmt.Printf(core.T("repl.unknown_command")+"\n", command)
-		fmt.Println(core.T("repl.type_help"))
+		fmt.Printf(lang.T("repl.unknown_command")+"\n", command)
+		fmt.Println(lang.T("repl.type_help"))
 	}
 
 	return false
@@ -277,17 +282,17 @@ func handleREPLCommand(input string) bool {
 
 // printREPLWelcome 打印欢迎信息
 func printREPLWelcome() {
-	fmt.Println(core.T("repl.welcome"))
-	fmt.Println(core.T("repl.help_hint"))
+	fmt.Println(lang.T("repl.welcome"))
+	fmt.Println(lang.T("repl.help_hint"))
 	fmt.Println()
 }
 
 // getCurrentLanguageName 获取当前语言的友好名称
 func getCurrentLanguageName() string {
-	switch core.GetLanguage() {
-	case core.LangZH:
+	switch lang.GetLanguage() {
+	case model.LangZH:
 		return "中文 (Chinese)"
-	case core.LangEN:
+	case model.LangEN:
 		return "English"
 	default:
 		return "English"
@@ -295,46 +300,46 @@ func getCurrentLanguageName() string {
 }
 
 // handleLanguageSwitch 处理语言切换
-func handleLanguageSwitch(lang string) {
-	lang = strings.ToLower(lang)
+func handleLanguageSwitch(langStr string) {
+	langStr = strings.ToLower(langStr)
 
-	switch lang {
+	switch langStr {
 	case "zh", "chinese", "中文":
-		core.SetLanguage(core.LangZH)
-		core.SaveLanguagePreference(core.LangZH)
-		fmt.Println(core.T("repl.lang_switched"))
+		lang.SetLanguage(model.LangZH)
+		config.SaveLanguagePreference(model.LangZH)
+		fmt.Println(lang.T("repl.lang_switched"))
 
 	case "en", "english", "英文":
-		core.SetLanguage(core.LangEN)
-		core.SaveLanguagePreference(core.LangEN)
-		fmt.Println(core.T("repl.lang_switched"))
+		lang.SetLanguage(model.LangEN)
+		config.SaveLanguagePreference(model.LangEN)
+		fmt.Println(lang.T("repl.lang_switched"))
 
 	default:
-		fmt.Printf(core.T("repl.lang_unsupported")+"\n", lang)
-		fmt.Println(core.T("repl.lang_available"))
+		fmt.Printf(lang.T("repl.lang_unsupported")+"\n", langStr)
+		fmt.Println(lang.T("repl.lang_available"))
 	}
 }
 
 // showREPLHelp 显示帮助信息
 func showREPLHelp() {
-	fmt.Println(core.T("repl.help_title"))
-	fmt.Printf("  %-30s - %s\n", "help", core.T("repl.help_desc"))
-	fmt.Printf("  %-30s - %s\n", "version", core.T("repl.version_desc"))
-	fmt.Printf("  %-30s - %s\n", "check", core.T("repl.check_desc"))
-	fmt.Printf("  %-30s - %s\n", "install", core.T("repl.install_desc"))
-	fmt.Printf("  %-30s - %s\n", "uninstall", core.T("repl.uninstall_desc"))
-	fmt.Printf("  %-30s - %s\n", "build <file> [-o path] [-s]", core.T("repl.build_desc"))
-	fmt.Printf("  %-30s - %s\n", "preview <file>", core.T("repl.preview_desc"))
-	fmt.Printf("  %-30s - %s\n", "lang <zh|en>", core.T("repl.lang_desc"))
-	fmt.Printf("  %-30s - %s\n", "lang", core.T("repl.lang_current")+getCurrentLanguageName())
-	fmt.Printf("  %-30s - %s\n", "quit / exit", core.T("repl.quit_desc"))
+	fmt.Println(lang.T("repl.help_title"))
+	fmt.Printf("  %-30s - %s\n", "help", lang.T("repl.help_desc"))
+	fmt.Printf("  %-30s - %s\n", "version", lang.T("repl.version_desc"))
+	fmt.Printf("  %-30s - %s\n", "check", lang.T("repl.check_desc"))
+	fmt.Printf("  %-30s - %s\n", "install", lang.T("repl.install_desc"))
+	fmt.Printf("  %-30s - %s\n", "uninstall", lang.T("repl.uninstall_desc"))
+	fmt.Printf("  %-30s - %s\n", "build <file> [-o path] [-s]", lang.T("repl.build_desc"))
+	fmt.Printf("  %-30s - %s\n", "preview <file>", lang.T("repl.preview_desc"))
+	fmt.Printf("  %-30s - %s\n", "lang <zh|en>", lang.T("repl.lang_desc"))
+	fmt.Printf("  %-30s - %s\n", "lang", lang.T("repl.lang_current")+getCurrentLanguageName())
+	fmt.Printf("  %-30s - %s\n", "quit / exit", lang.T("repl.quit_desc"))
 	fmt.Println()
-	fmt.Println(core.T("repl.shell_title") + ":")
-	fmt.Printf("  %-30s - %s\n", "cd [path]", core.T("repl.help_cd"))
-	fmt.Printf("  %-30s - %s\n", "ls [path]", core.T("repl.help_ls"))
-	fmt.Printf("  %-30s - %s\n", "pwd", core.T("repl.help_pwd"))
-	fmt.Printf("  %-30s - %s\n", "clear", core.T("repl.help_clear"))
-	fmt.Printf("  %-30s - %s\n", "cat <file>", core.T("repl.help_cat"))
+	fmt.Println(lang.T("repl.shell_title") + ":")
+	fmt.Printf("  %-30s - %s\n", "cd [path]", lang.T("repl.help_cd"))
+	fmt.Printf("  %-30s - %s\n", "ls [path]", lang.T("repl.help_ls"))
+	fmt.Printf("  %-30s - %s\n", "pwd", lang.T("repl.help_pwd"))
+	fmt.Printf("  %-30s - %s\n", "clear", lang.T("repl.help_clear"))
+	fmt.Printf("  %-30s - %s\n", "cat <file>", lang.T("repl.help_cat"))
 }
 
 // 检查 LaTeX 环境
@@ -351,7 +356,7 @@ func checkREPLEnvironment() {
 		checker = mac.NewChecker()
 	default:
 		// 不支持的平台，使用一个简单的错误提示
-		fmt.Printf(core.T("msg.unsupported_os")+"\n", runtime.GOOS)
+		fmt.Printf(lang.T("msg.unsupported_os")+"\n", runtime.GOOS)
 		return
 	}
 
@@ -368,20 +373,20 @@ func InstallLaTeXEnvironment() {
 	switch runtime.GOOS {
 	case "windows":
 		// TODO: 后续实现 Windows 安装器
-		fmt.Printf(core.T("msg.unsupported_os")+"\n", runtime.GOOS)
+		fmt.Printf(lang.T("msg.unsupported_os")+"\n", runtime.GOOS)
 		return
 	case "linux":
 		installer = linux.NewInstaller()
 	case "darwin":
 		installer = mac.NewInstaller()
 	default:
-		fmt.Printf(core.T("msg.unsupported_os")+"\n", runtime.GOOS)
+		fmt.Printf(lang.T("msg.unsupported_os")+"\n", runtime.GOOS)
 		return
 	}
 
 	// 执行安装
 	if err := core.InstallLaTeXEnvironment(installer); err != nil {
-		fmt.Printf(core.T("msg.install_failed")+": %v\n", err)
+		fmt.Printf(lang.T("msg.install_failed")+": %v\n", err)
 		return
 	}
 	// 注意：成功消息由安装器内部输出，这里不需要再输出
@@ -395,20 +400,20 @@ func UninstallLaTeXEnvironment() {
 	switch runtime.GOOS {
 	case "windows":
 		// TODO: 后续实现 Windows 安装器
-		fmt.Printf(core.T("msg.unsupported_os")+"\n", runtime.GOOS)
+		fmt.Printf(lang.T("msg.unsupported_os")+"\n", runtime.GOOS)
 		return
 	case "linux":
 		installer = linux.NewInstaller()
 	case "darwin":
 		installer = mac.NewInstaller()
 	default:
-		fmt.Printf(core.T("msg.unsupported_os")+"\n", runtime.GOOS)
+		fmt.Printf(lang.T("msg.unsupported_os")+"\n", runtime.GOOS)
 		return
 	}
 
 	// 执行卸载
 	if err := core.UninstallLaTeXEnvironment(installer); err != nil {
-		fmt.Printf(core.T("msg.uninstall_failed")+": %v\n", err)
+		fmt.Printf(lang.T("msg.uninstall_failed")+": %v\n", err)
 		return
 	}
 	// 注意：成功消息由卸载器内部输出，这里不需要再输出
@@ -429,7 +434,7 @@ func handleShellLikeCommands(parts []string) bool {
 			if home, err := os.UserHomeDir(); err == nil {
 				target = home
 			} else {
-				fmt.Printf(core.T("repl.err_cd")+"\n", err)
+				fmt.Printf(lang.T("repl.err_cd")+"\n", err)
 				return true
 			}
 		} else {
@@ -437,7 +442,7 @@ func handleShellLikeCommands(parts []string) bool {
 		}
 
 		if err := os.Chdir(target); err != nil {
-			fmt.Printf(core.T("repl.err_cd")+"\n", err)
+			fmt.Printf(lang.T("repl.err_cd")+"\n", err)
 		}
 		return true
 
@@ -445,7 +450,7 @@ func handleShellLikeCommands(parts []string) bool {
 		if cwd, err := os.Getwd(); err == nil {
 			fmt.Println(cwd)
 		} else {
-			fmt.Printf(core.T("repl.err_pwd")+"\n", err)
+			fmt.Printf(lang.T("repl.err_pwd")+"\n", err)
 		}
 		return true
 
@@ -456,7 +461,7 @@ func handleShellLikeCommands(parts []string) bool {
 		}
 		entries, err := os.ReadDir(dir)
 		if err != nil {
-			fmt.Printf(core.T("repl.err_ls")+"\n", err)
+			fmt.Printf(lang.T("repl.err_ls")+"\n", err)
 			return true
 		}
 		for _, e := range entries {
@@ -475,12 +480,12 @@ func handleShellLikeCommands(parts []string) bool {
 
 	case "cat":
 		if len(parts) < 2 {
-			fmt.Println(core.T("repl.cat_usage"))
+			fmt.Println(lang.T("repl.cat_usage"))
 			return true
 		}
 		content, err := os.ReadFile(parts[1])
 		if err != nil {
-			fmt.Printf(core.T("repl.err_cat")+"\n", err)
+			fmt.Printf(lang.T("repl.err_cat")+"\n", err)
 		} else {
 			fmt.Print(string(content))
 			if !strings.HasSuffix(string(content), "\n") {
@@ -503,7 +508,7 @@ func BuildLaTeX(filePath string, outputPath string, show bool) {
 
 	pdfPath, err := core.Build(opts)
 	if err != nil {
-		fmt.Printf(core.T("msg.build_failed")+": %v\n", err)
+		fmt.Printf(lang.T("msg.build_failed")+": %v\n", err)
 		return
 	}
 
@@ -521,15 +526,15 @@ func OpenPDF(pdfPath string) {
 	case "windows":
 		err = win.PreviewPDF(pdfPath) // Windows 预览 PDF
 	case "linux":
-		fmt.Printf(core.T("msg.unsupported_os")+"\n", runtime.GOOS)
+		fmt.Printf(lang.T("msg.unsupported_os")+"\n", runtime.GOOS)
 	default:
 		// 如果不支持，就打印个提示，不强求
-		fmt.Printf(core.T("msg.unsupported_os")+"\n", runtime.GOOS)
+		fmt.Printf(lang.T("msg.unsupported_os")+"\n", runtime.GOOS)
 		return
 	}
 
 	if err != nil {
-		fmt.Printf(core.T("msg.preview_failed")+"\n", err)
+		fmt.Printf(lang.T("msg.preview_failed")+"\n", err)
 	}
 }
 
@@ -539,7 +544,7 @@ func StartLivePreview(filePath string) {
 	// 1. 获取绝对路径，确保监听准确
 	absPath, err := filepath.Abs(filePath)
 	if err != nil {
-		fmt.Printf(core.T("msg.err_abs_path")+"\n", filePath)
+		fmt.Printf(lang.T("msg.err_abs_path")+"\n", filePath)
 		return
 	}
 
@@ -548,14 +553,14 @@ func StartLivePreview(filePath string) {
 	BuildLaTeX(absPath, "", true)
 
 	// 3. 打印监听提示（文案已在 i18n 中定义）
-	fmt.Printf(core.T("msg.watching_file")+"\n", filepath.Base(absPath))
+	fmt.Printf(lang.T("msg.watching_file")+"\n", filepath.Base(absPath))
 
 	// 4. 调用 core 层的监听引擎
 	// 当文件变动时，它会回调执行我们定义的闭包函数
 	err = core.WatchAndAction(absPath, func() {
 		// 这里是文件变动后的动作
 		currentTime := time.Now().Format("15:04:05")
-		fmt.Printf("\n🔄 [%s] %s\n", currentTime, core.T("msg.building_doc"))
+		fmt.Printf("\n🔄 [%s] %s\n", currentTime, lang.T("msg.building_doc"))
 
 		// 重新执行编译和展示逻辑
 		BuildLaTeX(absPath, "", true)

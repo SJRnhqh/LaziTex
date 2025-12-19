@@ -1,9 +1,10 @@
 // core/build.go
-// 编译LaTeX文档
+// 核心业务：编译LaTeX文档
 
 package core
 
 import (
+	// 外部包
 	"bytes"
 	"fmt"
 	"io"
@@ -11,6 +12,9 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+
+	// 内部包
+	"github.com/SJRnhqh/lazitex/lang"
 )
 
 // BuildOptions 编译选项，方便后续扩展
@@ -25,17 +29,17 @@ func Build(opts BuildOptions) (string, error) {
 	// 1. 获取输入文件的绝对路径
 	absPath, err := filepath.Abs(opts.InputPath)
 	if err != nil {
-		return "", fmt.Errorf(T("msg.err_abs_path"), opts.InputPath)
+		return "", fmt.Errorf(lang.T("msg.err_abs_path"), opts.InputPath)
 	}
 
 	// 检查是否是 .tex 文件
 	if strings.ToLower(filepath.Ext(absPath)) != ".tex" {
-		return "", fmt.Errorf(T("msg.err_invalid_ext"), opts.InputPath)
+		return "", fmt.Errorf(lang.T("msg.err_invalid_ext"), opts.InputPath)
 	}
 
 	// 2. 检查文件是否存在
 	if _, err := os.Stat(absPath); os.IsNotExist(err) {
-		return "", fmt.Errorf(T("msg.err_file_not_found"), absPath)
+		return "", fmt.Errorf(lang.T("msg.err_file_not_found"), absPath)
 	}
 
 	// 3. 提取工作目录和文件名
@@ -53,7 +57,7 @@ func Build(opts BuildOptions) (string, error) {
 			outDir = outPath
 			// 确保目录存在
 			if err := os.MkdirAll(outDir, 0755); err != nil {
-				return "", fmt.Errorf(T("msg.err_mkdir"), outDir)
+				return "", fmt.Errorf(lang.T("msg.err_mkdir"), outDir)
 			}
 		} else {
 			// 如果是完整 PDF 路径
@@ -61,7 +65,7 @@ func Build(opts BuildOptions) (string, error) {
 			// 从自定义路径中提取 JobName
 			jobName = strings.TrimSuffix(filepath.Base(outPath), ".pdf")
 			if err := os.MkdirAll(outDir, 0755); err != nil {
-				return "", fmt.Errorf(T("msg.err_mkdir"), outDir)
+				return "", fmt.Errorf(lang.T("msg.err_mkdir"), outDir)
 			}
 		}
 	}
@@ -78,8 +82,8 @@ func Build(opts BuildOptions) (string, error) {
 	cmd := exec.Command("xelatex", args...)
 	cmd.Dir = workDir
 
-	fmt.Printf(T("msg.building_doc")+"\n", fileName)
-	fmt.Printf(T("msg.working_dir")+"\n", workDir)
+	fmt.Printf(lang.T("msg.building_doc")+"\n", fileName)
+	fmt.Printf(lang.T("msg.working_dir")+"\n", workDir)
 
 	// 5. 捕获编译输出（同时显示给用户和保存用于错误分析）
 	var logOutput bytes.Buffer
@@ -101,7 +105,7 @@ func Build(opts BuildOptions) (string, error) {
 
 		if handled {
 			// 包已安装，重新编译
-			fmt.Println(T("msg.package_retry_build"))
+			fmt.Println(lang.T("msg.package_retry_build"))
 			return Build(opts) // 递归调用，但只重试一次（因为 handleMissingPackages 已经处理了）
 		}
 
@@ -109,7 +113,7 @@ func Build(opts BuildOptions) (string, error) {
 		return "", err
 	}
 
-	fmt.Println(T("msg.build_success"))
+	fmt.Println(lang.T("msg.build_success"))
 
 	// 返回生成的 PDF 完整路径
 	return filepath.Join(outDir, jobName+".pdf"), nil

@@ -1,11 +1,16 @@
-// core/config.go
+// config/config.go
+// 负责管理应用配置
 
-package core
+package config
 
 import (
+	// 外部包
 	"encoding/json"
 	"os"
 	"path/filepath"
+
+	// 内部包
+	"github.com/SJRnhqh/lazitex/model"
 )
 
 // Config 应用配置
@@ -72,7 +77,7 @@ func SaveConfig(config *Config) error {
 }
 
 // SaveLanguagePreference 保存语言偏好
-func SaveLanguagePreference(lang Language) error {
+func SaveLanguagePreference(lang model.Language) error {
 	config := &Config{
 		Language: string(lang),
 	}
@@ -80,14 +85,14 @@ func SaveLanguagePreference(lang Language) error {
 }
 
 // LoadLanguagePreference 加载语言偏好
-func LoadLanguagePreference() Language {
+func LoadLanguagePreference() model.Language {
 	config, err := LoadConfig()
 	if err != nil {
-		return LangEN // 默认英文
+		return model.LangEN // 默认英文
 	}
 
 	if config.Language == "zh" {
-		return LangZH
+		return model.LangZH
 	}
-	return LangEN
+	return model.LangEN
 }

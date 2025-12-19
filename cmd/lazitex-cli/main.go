@@ -2,13 +2,18 @@
 package main
 
 import (
+	// 外部包
 	"fmt"
 	"os"
 	"runtime"
 	"strings"
 
+	// 内部包
 	modes "github.com/SJRnhqh/lazitex/cmd/lazitex-cli/modes"
+	config "github.com/SJRnhqh/lazitex/config"
 	core "github.com/SJRnhqh/lazitex/core"
+	lang "github.com/SJRnhqh/lazitex/lang"
+	model "github.com/SJRnhqh/lazitex/model"
 	linux "github.com/SJRnhqh/lazitex/target/linux"
 	mac "github.com/SJRnhqh/lazitex/target/mac"
 	win "github.com/SJRnhqh/lazitex/target/win"
@@ -45,7 +50,7 @@ func main() {
 		uninstallLaTeXEnvironment()
 	case "-b", "--build":
 		if len(args) < 2 {
-			fmt.Println(core.T("msg.build_usage"))
+			fmt.Println(lang.T("msg.build_usage"))
 			return
 		}
 
@@ -63,7 +68,7 @@ func main() {
 				pendingOutput = true
 			} else if strings.HasPrefix(arg, "-") {
 				// 严谨处理：未知的标志位直接报错，防止静默错误
-				fmt.Printf(core.T("msg.unknown_command")+"\n", arg)
+				fmt.Printf(lang.T("msg.unknown_command")+"\n", arg)
 				return
 			} else {
 				// 遇到不以 - 开头的参数
@@ -78,12 +83,12 @@ func main() {
 
 		// 检查：如果开启了 -o 但没拿到路径，或者没提供输入文件
 		if pendingOutput && outputPath == "" {
-			fmt.Println(core.T("msg.build_usage"))
+			fmt.Println(lang.T("msg.build_usage"))
 			return
 		}
 
 		if filePath == "" {
-			fmt.Println(core.T("msg.build_usage"))
+			fmt.Println(lang.T("msg.build_usage"))
 			return
 		}
 
@@ -91,13 +96,13 @@ func main() {
 	case "-p", "--preview":
 		if len(args) < 2 {
 			// 如果没传文件名，显示用法
-			fmt.Println(core.T("msg.preview_usage"))
+			fmt.Println(lang.T("msg.preview_usage"))
 			return
 		}
 		filePath := args[1]
 		modes.StartLivePreview(filePath)
 	default:
-		fmt.Printf(core.T("msg.unknown_command")+"\n", args[0])
+		fmt.Printf(lang.T("msg.unknown_command")+"\n", args[0])
 		showHelp()
 	}
 }
@@ -112,18 +117,18 @@ func processLanguageFlag() []string {
 		// 支持 --lang 和 -l 两种形式
 		if (args[i] == "--lang" || args[i] == "-l") && i+1 < len(args) {
 			// 设置语言
-			lang := args[i+1]
-			switch lang {
+			langStr := args[i+1]
+			switch langStr {
 			case "en", "english":
-				core.SetLanguage(core.LangEN)
+				lang.SetLanguage(model.LangEN)
 				langSet = true
 				// 保存用户偏好
-				core.SaveLanguagePreference(core.LangEN)
+				config.SaveLanguagePreference(model.LangEN)
 			case "zh", "chinese":
-				core.SetLanguage(core.LangZH)
+				lang.SetLanguage(model.LangZH)
 				langSet = true
 				// 保存用户偏好
-				core.SaveLanguagePreference(core.LangZH)
+				config.SaveLanguagePreference(model.LangZH)
 			}
 			i++ // 跳过语言值
 		} else {
@@ -133,7 +138,7 @@ func processLanguageFlag() []string {
 
 	// 如果没有通过 --lang 设置，使用环境检测（会读取配置文件）
 	if !langSet {
-		core.SetLanguage(core.DetectSystemLanguage())
+		lang.SetLanguage(lang.DetectSystemLanguage())
 	}
 
 	return newArgs
@@ -141,22 +146,22 @@ func processLanguageFlag() []string {
 
 // 显示命令帮助
 func showHelp() {
-	fmt.Println(core.T("help.description"))
+	fmt.Println(lang.T("help.description"))
 	fmt.Println()
-	fmt.Println(core.T("help.usage"))
+	fmt.Println(lang.T("help.usage"))
 	fmt.Println("  lazitex [command]")
 	fmt.Println()
-	fmt.Println(core.T("help.commands"))
-	fmt.Printf("  %-38s %s\n", "-h, --help", core.T("help.show_help"))
-	fmt.Printf("  %-38s %s\n", "-v, --version", core.T("help.show_version"))
-	fmt.Printf("  %-38s %s\n", "-c, --check", core.T("help.check_env"))
-	fmt.Printf("  %-38s %s\n", "-r, --repl", core.T("help.start_repl"))
-	fmt.Printf("  %-38s %s\n", "-t, --tui", core.T("help.start_tui"))
-	fmt.Printf("  %-38s %s\n", "-i, --install", core.T("help.install_latex"))
-	fmt.Printf("  %-38s %s\n", "-u, --uninstall", core.T("help.uninstall_latex"))
-	fmt.Printf("  %-38s %s\n", "-b, --build <file> [-o path] [-s]", core.T("help.build_latex"))
-	fmt.Printf("  %-38s %s\n", "-p, --preview <file>", core.T("help.live_preview"))
-	fmt.Printf("  %-38s %s\n", "-l, --lang <lang>", core.T("help.set_language"))
+	fmt.Println(lang.T("help.commands"))
+	fmt.Printf("  %-38s %s\n", "-h, --help", lang.T("help.show_help"))
+	fmt.Printf("  %-38s %s\n", "-v, --version", lang.T("help.show_version"))
+	fmt.Printf("  %-38s %s\n", "-c, --check", lang.T("help.check_env"))
+	fmt.Printf("  %-38s %s\n", "-r, --repl", lang.T("help.start_repl"))
+	fmt.Printf("  %-38s %s\n", "-t, --tui", lang.T("help.start_tui"))
+	fmt.Printf("  %-38s %s\n", "-i, --install", lang.T("help.install_latex"))
+	fmt.Printf("  %-38s %s\n", "-u, --uninstall", lang.T("help.uninstall_latex"))
+	fmt.Printf("  %-38s %s\n", "-b, --build <file> [-o path] [-s]", lang.T("help.build_latex"))
+	fmt.Printf("  %-38s %s\n", "-p, --preview <file>", lang.T("help.live_preview"))
+	fmt.Printf("  %-38s %s\n", "-l, --lang <lang>", lang.T("help.set_language"))
 }
 
 // 打印Logo
@@ -261,7 +266,7 @@ func checkEnvironment() {
 		checker = mac.NewChecker()
 	default:
 		// 不支持的平台，使用一个简单的错误提示
-		fmt.Printf(core.T("msg.unsupported_os")+"\n", runtime.GOOS)
+		fmt.Printf(lang.T("msg.unsupported_os")+"\n", runtime.GOOS)
 		return
 	}
 

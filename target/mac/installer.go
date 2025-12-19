@@ -3,6 +3,7 @@
 package mac
 
 import (
+	// 外部包
 	"bufio"
 	"errors"
 	"fmt"
@@ -10,7 +11,8 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/SJRnhqh/lazitex/core"
+	// 内部包
+	"github.com/SJRnhqh/lazitex/lang"
 )
 
 // Installer macOS 平台安装器
@@ -41,7 +43,7 @@ func (i *Installer) askForConfirmation(prompt string) (bool, error) {
 			return false, nil
 		default:
 			// 其他键，重新询问
-			fmt.Println(core.T("msg.mac.invalid_input"))
+			fmt.Println(lang.T("msg.mac.invalid_input"))
 		}
 	}
 }
@@ -51,66 +53,66 @@ func (i *Installer) askForConfirmation(prompt string) (bool, error) {
 func (i *Installer) Install() error {
 	// 1. 检查是否安装了 Homebrew
 	if _, err := exec.LookPath("brew"); err != nil {
-		return errors.New(core.T("msg.mac.brew_not_installed"))
+		return errors.New(lang.T("msg.mac.brew_not_installed"))
 	}
 
 	// 2. 检查是否已经安装了 LaTeX
 	if i.isLaTeXInstalled() {
 		// 已安装，询问是否更新
-		fmt.Println(core.T("msg.mac.latex_already_installed"))
+		fmt.Println(lang.T("msg.mac.latex_already_installed"))
 
 		// 列出要更新的包（附带包名，便于后续只更新必要包）
 		packagesOutput, pkgNames, err := i.listUpdatablePackages()
 		if err != nil {
 			// 如果无法列出包，仍然询问是否更新
-			fmt.Println(core.T("msg.mac.cannot_list_packages"))
+			fmt.Println(lang.T("msg.mac.cannot_list_packages"))
 		} else {
 			if len(pkgNames) == 0 {
-				fmt.Println(core.T("msg.mac.all_up_to_date"))
+				fmt.Println(lang.T("msg.mac.all_up_to_date"))
 				return nil
 			}
-			fmt.Println(core.T("msg.mac.updatable_packages"))
+			fmt.Println(lang.T("msg.mac.updatable_packages"))
 			fmt.Println(packagesOutput)
 		}
 
 		// 询问是否更新
-		confirmed, err := i.askForConfirmation(core.T("msg.mac.confirm_update"))
+		confirmed, err := i.askForConfirmation(lang.T("msg.mac.confirm_update"))
 		if err != nil {
 			return err
 		}
 
 		if !confirmed {
-			fmt.Println(core.T("msg.mac.update_cancelled"))
+			fmt.Println(lang.T("msg.mac.update_cancelled"))
 			return nil
 		}
 
 		// 执行更新
 		if err := i.updateTlmgr(); err != nil {
-			return fmt.Errorf("%s: %w", core.T("msg.mac.update_failed"), err)
+			return fmt.Errorf("%s: %w", lang.T("msg.mac.update_failed"), err)
 		}
 
-		fmt.Println(core.T("msg.mac.update_success"))
+		fmt.Println(lang.T("msg.mac.update_success"))
 		return nil
 	}
 
 	// 3. 未安装，询问是否安装
-	fmt.Println(core.T("msg.mac.install_prompt"))
-	fmt.Println(core.T("msg.mac.install_info"))
+	fmt.Println(lang.T("msg.mac.install_prompt"))
+	fmt.Println(lang.T("msg.mac.install_info"))
 
 	// 询问是否安装
-	confirmed, err := i.askForConfirmation(core.T("msg.mac.confirm_install"))
+	confirmed, err := i.askForConfirmation(lang.T("msg.mac.confirm_install"))
 	if err != nil {
 		return err
 	}
 
 	if !confirmed {
-		fmt.Println(core.T("msg.mac.install_cancelled"))
+		fmt.Println(lang.T("msg.mac.install_cancelled"))
 		return nil
 	}
 
 	// 4. 执行安装
-	fmt.Println(core.T("msg.mac.installing_basictex"))
-	fmt.Println(core.T("msg.mac.install_warning"))
+	fmt.Println(lang.T("msg.mac.installing_basictex"))
+	fmt.Println(lang.T("msg.mac.install_warning"))
 
 	// 使用 Homebrew 安装 BasicTeX
 	cmd := exec.Command("brew", "install", "--cask", "basictex")
@@ -118,21 +120,21 @@ func (i *Installer) Install() error {
 	cmd.Stderr = os.Stderr
 
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("%s: %w", core.T("msg.mac.install_failed"), err)
+		return fmt.Errorf("%s: %w", lang.T("msg.mac.install_failed"), err)
 	}
 
 	// 5. 安装后自动更新 tlmgr
 	fmt.Println()
-	fmt.Println(core.T("msg.mac.updating_tlmgr"))
+	fmt.Println(lang.T("msg.mac.updating_tlmgr"))
 	if err := i.updateTlmgr(); err != nil {
 		// 更新失败不影响安装成功，只显示警告
-		fmt.Printf(core.T("msg.mac.update_warning")+": %v\n", err)
+		fmt.Printf(lang.T("msg.mac.update_warning")+": %v\n", err)
 	}
 
 	// 6. 显示成功信息和后续步骤
 	fmt.Println()
-	fmt.Println(core.T("msg.mac.install_success"))
-	fmt.Println(core.T("msg.mac.next_steps"))
+	fmt.Println(lang.T("msg.mac.install_success"))
+	fmt.Println(lang.T("msg.mac.next_steps"))
 
 	return nil
 }
@@ -208,7 +210,7 @@ func (i *Installer) updateTlmgr() error {
 	}
 
 	// 更新 tlmgr 自身
-	fmt.Println(core.T("msg.mac.updating_tlmgr_self"))
+	fmt.Println(lang.T("msg.mac.updating_tlmgr_self"))
 	cmd := exec.Command("sudo", tlmgrPath, "update", "--self")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -219,9 +221,9 @@ func (i *Installer) updateTlmgr() error {
 	// 获取需要更新的包列表，避免对全部包执行 --all
 	packagesOutput, pkgNames, err := i.listUpdatablePackages()
 	if err != nil {
-		fmt.Println(core.T("msg.mac.cannot_list_packages"))
+		fmt.Println(lang.T("msg.mac.cannot_list_packages"))
 		// 如果无法列出，退回全量更新，但会更慢
-		fmt.Println(core.T("msg.mac.updating_packages"))
+		fmt.Println(lang.T("msg.mac.updating_packages"))
 		cmdAll := exec.Command("sudo", tlmgrPath, "update", "--all", "--no-doc", "--no-src")
 		cmdAll.Stdout = os.Stdout
 		cmdAll.Stderr = os.Stderr
@@ -230,11 +232,11 @@ func (i *Installer) updateTlmgr() error {
 	}
 
 	if len(pkgNames) == 0 {
-		fmt.Println(core.T("msg.mac.all_up_to_date"))
+		fmt.Println(lang.T("msg.mac.all_up_to_date"))
 		return nil
 	}
 
-	fmt.Println(core.T("msg.mac.updating_packages"))
+	fmt.Println(lang.T("msg.mac.updating_packages"))
 	fmt.Println(packagesOutput)
 
 	args := append([]string{"update", "--no-doc", "--no-src"}, pkgNames...)
@@ -244,7 +246,7 @@ func (i *Installer) updateTlmgr() error {
 	_ = cmd.Run()
 
 	if len(pkgNames) > 0 {
-		fmt.Printf(core.T("msg.mac.updated_packages")+"\n", strings.Join(pkgNames, ", "))
+		fmt.Printf(lang.T("msg.mac.updated_packages")+"\n", strings.Join(pkgNames, ", "))
 	}
 
 	return nil
@@ -312,7 +314,7 @@ func (i *Installer) cleanupResidual() {
 
 	for _, p := range paths {
 		if _, err := os.Stat(p.path); err == nil {
-			fmt.Printf(core.T("msg.mac.removing_residual")+"\n", p.path)
+			fmt.Printf(lang.T("msg.mac.removing_residual")+"\n", p.path)
 			var cmd *exec.Cmd
 			if p.useSudo {
 				cmd = exec.Command("sudo", "rm", "-rf", p.path)
@@ -331,31 +333,31 @@ func (i *Installer) Uninstall() error {
 	// 1. 检查是否已安装 LaTeX
 	if !i.isLaTeXInstalled() {
 		// 未安装，提示用户
-		fmt.Println(core.T("msg.mac.latex_not_installed"))
+		fmt.Println(lang.T("msg.mac.latex_not_installed"))
 		fmt.Println()
-		fmt.Println(core.T("msg.mac.uninstall_install_hint"))
+		fmt.Println(lang.T("msg.mac.uninstall_install_hint"))
 		return nil
 	}
 
 	// 2. 已安装，询问是否卸载
-	fmt.Println(core.T("msg.mac.uninstall_prompt"))
-	fmt.Println(core.T("msg.mac.uninstall_info"))
+	fmt.Println(lang.T("msg.mac.uninstall_prompt"))
+	fmt.Println(lang.T("msg.mac.uninstall_info"))
 	fmt.Println()
 
 	// 询问是否卸载
-	confirmed, err := i.askForConfirmation(core.T("msg.mac.confirm_uninstall"))
+	confirmed, err := i.askForConfirmation(lang.T("msg.mac.confirm_uninstall"))
 	if err != nil {
 		return err
 	}
 
 	if !confirmed {
-		fmt.Println(core.T("msg.mac.uninstall_cancelled"))
+		fmt.Println(lang.T("msg.mac.uninstall_cancelled"))
 		return nil
 	}
 
 	// 3. 检测安装方式并执行卸载
 	installMethod := i.detectInstallationMethod()
-	fmt.Println(core.T("msg.mac.uninstalling"))
+	fmt.Println(lang.T("msg.mac.uninstalling"))
 
 	switch installMethod {
 	case "homebrew_basictex":
@@ -379,11 +381,11 @@ func (i *Installer) uninstallHomebrewBasicTeX() error {
 	cmd.Stderr = os.Stderr
 
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("%s: %w", core.T("msg.mac.uninstall_failed"), err)
+		return fmt.Errorf("%s: %w", lang.T("msg.mac.uninstall_failed"), err)
 	}
 
 	i.cleanupResidual()
-	fmt.Println(core.T("msg.mac.uninstall_success"))
+	fmt.Println(lang.T("msg.mac.uninstall_success"))
 	return nil
 }
 
@@ -394,11 +396,11 @@ func (i *Installer) uninstallHomebrewMacTeX() error {
 	cmd.Stderr = os.Stderr
 
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("%s: %w", core.T("msg.mac.uninstall_failed"), err)
+		return fmt.Errorf("%s: %w", lang.T("msg.mac.uninstall_failed"), err)
 	}
 
 	i.cleanupResidual()
-	fmt.Println(core.T("msg.mac.uninstall_success"))
+	fmt.Println(lang.T("msg.mac.uninstall_success"))
 	return nil
 }
 
@@ -411,21 +413,21 @@ func (i *Installer) uninstallMacTeX() error {
 
 	for _, p := range scriptCandidates {
 		if st, err := os.Stat(p); err == nil && !st.IsDir() {
-			fmt.Println(core.T("msg.mac.uninstall_mactex_running"))
+			fmt.Println(lang.T("msg.mac.uninstall_mactex_running"))
 			cmd := exec.Command("sudo", p)
 			cmd.Stdout = os.Stdout
 			cmd.Stderr = os.Stderr
 			if err := cmd.Run(); err != nil {
-				return fmt.Errorf("%s: %w", core.T("msg.mac.uninstall_failed"), err)
+				return fmt.Errorf("%s: %w", lang.T("msg.mac.uninstall_failed"), err)
 			}
 			i.cleanupResidual()
-			fmt.Println(core.T("msg.mac.uninstall_success"))
+			fmt.Println(lang.T("msg.mac.uninstall_success"))
 			return nil
 		}
 	}
 
 	// 找不到脚本则提示手动卸载
-	fmt.Println(core.T("msg.mac.uninstall_mactex_manual"))
+	fmt.Println(lang.T("msg.mac.uninstall_mactex_manual"))
 	fmt.Println("  - /Library/TeX/")
 	fmt.Println("  - /usr/local/texlive/")
 	fmt.Println("  - ~/Library/TeX/")
@@ -447,14 +449,14 @@ func (i *Installer) uninstallMacPorts() error {
 			continue
 		}
 		i.cleanupResidual()
-		fmt.Println(core.T("msg.mac.uninstall_success"))
+		fmt.Println(lang.T("msg.mac.uninstall_success"))
 		return nil
 	}
 
 	if lastErr != nil {
-		return fmt.Errorf("%s: %w", core.T("msg.mac.uninstall_failed"), lastErr)
+		return fmt.Errorf("%s: %w", lang.T("msg.mac.uninstall_failed"), lastErr)
 	}
-	return fmt.Errorf("%s: no texlive-* port found", core.T("msg.mac.uninstall_failed"))
+	return fmt.Errorf("%s: no texlive-* port found", lang.T("msg.mac.uninstall_failed"))
 }
 
 // uninstallGeneric 通用卸载方法（当无法确定安装方式时）

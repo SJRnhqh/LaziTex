@@ -1,19 +1,24 @@
-// core/i18n.go
+// lang/i18n.go
+// 中英文支持管理模块
 
-package core
+package lang
 
 import (
+	// 外部包
 	"os"
 	"strings"
+
+	// 内部包
+	"github.com/SJRnhqh/lazitex/config"
+	"github.com/SJRnhqh/lazitex/model"
 )
 
-// Language 语言代码
-type Language string
+// 继承 model.Language 类型
+type Language = model.Language
 
-const (
-	LangZH Language = "zh" // 中文
-	LangEN Language = "en" // English
-)
+// 定义中文和英文常量
+var LangZH = model.LangZH
+var LangEN = model.LangEN
 
 // 全局当前语言
 var currentLang Language = LangZH
@@ -45,7 +50,7 @@ func DetectSystemLanguage() Language {
 	}
 
 	// 2. 检查用户配置文件
-	userLang := LoadLanguagePreference()
+	userLang := config.LoadLanguagePreference()
 	if userLang != "" {
 		return userLang
 	}

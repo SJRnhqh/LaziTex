@@ -10,22 +10,22 @@ import (
 )
 
 // model 定义 TUI 的状态
-type model struct {
+type TUI struct {
 	quitting bool
 }
 
 // 结构体model的Init方法
-func (m model) Init() tea.Cmd {
+func (m TUI) Init() tea.Cmd {
 	return nil
 }
 
 // 初始化model
-func initialModel() model {
-	return model{quitting: false}
+func initialModel() TUI {
+	return TUI{quitting: false}
 }
 
 // 结构体model的Update方法
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m TUI) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -38,7 +38,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 // 结构体model的View方法
-func (m model) View() string {
+func (m TUI) View() string {
 	if m.quitting {
 		return "Bye!\n"
 	}

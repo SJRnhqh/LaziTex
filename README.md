@@ -440,10 +440,19 @@ lazitex/
 ├── 📁 bin/                        # Build output directory
 │
 ├── 🧠 core/                       # Core logic - the brain of LaziTex
-│   ├── 🔍 checker.go              # Environment detection engine
-│   ├── 📦 installer.go            # Installer interface definition
-│   ├── 🌐 i18n.go                 # Internationalization (English/Chinese)
-│   └── 🔨 build.go                # Build workflow (cross-platform)
+│   ├── 🌍 environment.go          # Environment detection, installer interface & install/uninstall logic
+│   ├── 🔨 build.go                # Build workflow (cross-platform)
+│   ├── 📦 package.go              # Auto package detection & installation
+│   └── 👀 watcher.go              # File watching for live preview
+│
+├── 🌐 lang/                       # Internationalization module
+│   └── i18n.go                    # Multi-language support (English/Chinese)
+│
+├── ⚙️  config/                     # Configuration management
+│   └── config.go                  # User preferences & settings
+│
+├── 📐 model/                      # Shared data models
+│   └── language.go                # Language type definitions
 │
 ├── 🎯 target/                     # Platform-specific implementations
 │   ├── 🪟 win/                    # Windows-specific detection
@@ -473,9 +482,12 @@ lazitex/
 
 ### Architecture Highlights
 
+- **Layered Architecture**: Clean dependency hierarchy - `model` (base) → `config` (layer 1) → `lang` (layer 2) → `core` (business logic)
+- **Modular Design**: Separated concerns with dedicated packages for i18n (`lang/`), configuration (`config/`), and shared models (`model/`)
 - **Dependency Injection**: Platform-specific checkers are created in `main.go` and injected into core logic, avoiding circular dependencies
 - **Interface-Driven**: `EnvironmentChecker` interface allows easy platform extensibility
 - **Priority System**: Tools are categorized by priority (⭐ Core, 🔹 Important, 🔸 Optional)
+- **Type Safety**: Shared data structures (like `Language`) are defined in `model/` to prevent circular imports
 
 ---
 

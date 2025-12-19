@@ -4,12 +4,16 @@
 package core
 
 import (
+	// 外部包
 	"bufio"
 	"fmt"
 	"os"
 	"os/exec"
 	"regexp"
 	"strings"
+
+	// 内部包
+	"github.com/SJRnhqh/lazitex/lang"
 )
 
 // extractMissingPackages 从编译日志中提取缺失的包名
@@ -53,7 +57,7 @@ func findPackageManager() (string, string, error) {
 		return path, "mpm", nil
 	}
 
-	return "", "", fmt.Errorf("%s", T("msg.package_no_manager"))
+	return "", "", fmt.Errorf("%s", lang.T("msg.package_no_manager"))
 }
 
 // findPackageName 使用 tlmgr search 查找文件对应的正确包名
@@ -118,7 +122,7 @@ func installPackages(packages []string) error {
 			args = append(args, "--install="+pkg)
 		}
 	default:
-		return fmt.Errorf(T("msg.package_unsupported_manager"), managerType)
+		return fmt.Errorf(lang.T("msg.package_unsupported_manager"), managerType)
 	}
 
 	// 先尝试不使用 sudo
@@ -163,7 +167,7 @@ func installPackages(packages []string) error {
 
 		// 如果还是失败，尝试使用 sudo
 		if err != nil {
-			fmt.Println(T("msg.package_need_sudo"))
+			fmt.Println(lang.T("msg.package_need_sudo"))
 			// 确定要安装的包列表：优先使用 resolvedPackages，否则使用原始 packages
 			packagesToInstall := resolvedPackages
 			if len(packagesToInstall) == 0 {
@@ -191,10 +195,10 @@ func handleMissingPackages(logOutput string) (bool, error) {
 	}
 
 	// 显示检测到的缺失包
-	fmt.Printf(T("msg.package_missing")+"\n", strings.Join(packages, ", "))
+	fmt.Printf(lang.T("msg.package_missing")+"\n", strings.Join(packages, ", "))
 
 	// 询问用户是否安装
-	fmt.Print(T("msg.package_install_prompt"))
+	fmt.Print(lang.T("msg.package_install_prompt"))
 
 	reader := bufio.NewReader(os.Stdin)
 	response, err := reader.ReadString('\n')
@@ -207,12 +211,12 @@ func handleMissingPackages(logOutput string) (bool, error) {
 	// 如果用户确认（Y 或直接回车）
 	if response == "" || response == "y" || response == "yes" {
 		// 一次性安装所有包（减少密码输入次数）
-		fmt.Printf(T("msg.package_installing")+"\n", strings.Join(packages, ", "))
+		fmt.Printf(lang.T("msg.package_installing")+"\n", strings.Join(packages, ", "))
 		if err := installPackages(packages); err != nil {
-			fmt.Printf(T("msg.package_install_failed")+"\n", err)
+			fmt.Printf(lang.T("msg.package_install_failed")+"\n", err)
 			return false, err
 		}
-		fmt.Println(T("msg.package_install_success"))
+		fmt.Println(lang.T("msg.package_install_success"))
 		return true, nil
 	}
 

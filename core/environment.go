@@ -1,8 +1,10 @@
-// core/checker.go
+// core/environment.go
+// 核心业务：安装、卸载、检查LaTeX编译环境
 
 package core
 
 import (
+	// 外部包
 	"context"
 	"fmt"
 	"os"
@@ -13,6 +15,9 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	// 内部包
+	"github.com/SJRnhqh/lazitex/lang"
 )
 
 // ToolCategory 工具分类
@@ -318,7 +323,7 @@ func getDisplayWidth(s string) int {
 
 // PrintEnvironment 打印环境信息
 func (env *LaTeXEnvironment) PrintEnvironment() {
-	title := T("title.env_check")
+	title := lang.T("title.env_check")
 	titleWidth := getDisplayWidth(title)
 
 	fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
@@ -329,8 +334,8 @@ func (env *LaTeXEnvironment) PrintEnvironment() {
 	fmt.Println()
 
 	// 打印操作系统信息
-	fmt.Printf("%s: %s (%s)\n", T("label.os"), env.Checker.GetPlatformName(), env.OS)
-	fmt.Printf("%s: %s\n", T("label.distro"), env.Distribution)
+	fmt.Printf("%s: %s (%s)\n", lang.T("label.os"), env.Checker.GetPlatformName(), env.OS)
+	fmt.Printf("%s: %s\n", lang.T("label.distro"), env.Distribution)
 	fmt.Println()
 
 	// 按分类统计和显示
@@ -366,9 +371,9 @@ func (env *LaTeXEnvironment) PrintEnvironment() {
 	}
 
 	fmt.Printf("%s: %d/%d %s (%s: %d/%d)\n",
-		T("label.installed"),
-		totalInstalled, totalTools, T("label.tools"),
-		T("label.core_tools"),
+		lang.T("label.installed"),
+		totalInstalled, totalTools, lang.T("label.tools"),
+		lang.T("label.core_tools"),
 		coreInstalled, coreTotal)
 	fmt.Println()
 
@@ -386,15 +391,15 @@ func (env *LaTeXEnvironment) PrintEnvironment() {
 			}
 		}
 
-		fmt.Printf("%s (%d/%d)\n", T(cat.name), installed, len(tools))
+		fmt.Printf("%s (%d/%d)\n", lang.T(cat.name), installed, len(tools))
 		fmt.Println(strings.Repeat("─", 60))
 
 		for _, tool := range tools {
 			priorityIcon := getPriorityIcon(tool.Priority)
 			if tool.Installed {
-				fmt.Printf("  %s ✓ %-15s %s\n", priorityIcon, tool.DisplayName, T("status.installed"))
+				fmt.Printf("  %s ✓ %-15s %s\n", priorityIcon, tool.DisplayName, lang.T("status.installed"))
 				if tool.Path != "" {
-					fmt.Printf("      %s: %s\n", T("label.path"), tool.Path)
+					fmt.Printf("      %s: %s\n", lang.T("label.path"), tool.Path)
 				}
 				if tool.Version != "" {
 					// 截断过长的版本信息
@@ -402,10 +407,10 @@ func (env *LaTeXEnvironment) PrintEnvironment() {
 					if len(version) > 80 {
 						version = version[:77] + "..."
 					}
-					fmt.Printf("      %s: %s\n", T("label.version"), version)
+					fmt.Printf("      %s: %s\n", lang.T("label.version"), version)
 				}
 			} else {
-				fmt.Printf("  %s ✗ %-15s %s - %s\n", priorityIcon, tool.DisplayName, T("status.missing"), T(tool.Description))
+				fmt.Printf("  %s ✗ %-15s %s - %s\n", priorityIcon, tool.DisplayName, lang.T("status.missing"), lang.T(tool.Description))
 			}
 		}
 		fmt.Println()
@@ -413,13 +418,13 @@ func (env *LaTeXEnvironment) PrintEnvironment() {
 
 	// 给出建议
 	if coreInstalled == 0 {
-		fmt.Println(T("msg.no_compilers"))
+		fmt.Println(lang.T("msg.no_compilers"))
 		fmt.Println()
 		fmt.Println(env.Checker.GetInstallGuide())
 	} else if coreInstalled < coreTotal {
-		fmt.Println(T("msg.partial_install"))
+		fmt.Println(lang.T("msg.partial_install"))
 	} else {
-		fmt.Println(T("msg.all_installed"))
+		fmt.Println(lang.T("msg.all_installed"))
 	}
 }
 
