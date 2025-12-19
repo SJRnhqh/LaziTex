@@ -70,7 +70,7 @@ Download pre-built binaries from [Releases](https://github.com/SJRnhqh/lazitex/r
 | `-c, --check` | Check LaTex environment | `lazitex -c` |
 | `-i, --install` | Install/update LaTex | `lazitex -i` |
 | `-u, --uninstall` | Uninstall LaTex | `lazitex -u` |
-| `-b, --build` | Build LaTex document (supports `-o` output, `-s` show) | `lazitex -b main.tex [-o out/] [-s]` |
+| `-b, --build` | Build LaTex document (supports `-o` output, `-s` show, `-q` quiet) | `lazitex -b main.tex [-o out/] [-s] [-q]` |
 | `-p, --preview` | Live preview PDF (watches for saves and refreshes) | `lazitex -p main.tex` |
 | `-r, --repl` | Start REPL mode | `lazitex -r` |
 | `-l, --lang` | Set language | `lazitex -l zh` |
@@ -122,6 +122,7 @@ Edit the config file directly or use `--lang` parameter to update automatically.
 - Smart preview - Automatically opens PDF after successful build (macOS prioritizes Skim, Windows prioritizes SumatraPDF)
 - Web preview mode - Local HTTP server + browser preview, SSE real-time auto-refresh, zero-latency update experience
 - Custom output - Supports specifying output directory or full path
+- Quiet mode - Use `-q` flag to suppress compiler verbose output, showing only key information and errors
 
 **Build Example:**
 
@@ -132,6 +133,16 @@ $ lazitex -b report.tex -s
 ... (compiler output) ...
 ✨ Build successful!
 (Automatically opening show window)
+```
+
+**Quiet Mode Example:**
+
+```bash
+$ lazitex -b report.tex -q
+🚀 Building LaTex document: report.tex
+📁 Working directory: /Users/user/projects/paper
+✨ Build successful!
+# Compiler verbose output is suppressed, only key information is shown
 ```
 
 **Web Preview Mode:**
@@ -154,7 +165,7 @@ lazitex> help                      # Show available commands
 lazitex> check                     # Check LaTex environment
 lazitex> install                   # Install or update LaTex environment
 lazitex> uninstall                 # Uninstall LaTex environment
-lazitex> build main.tex -o out/ -s # Build LaTex document with show and output path
+lazitex> build main.tex -o out/ -s -q # Build LaTex document with show, output path, and quiet mode
 lazitex> lang zh                   # Switch to Chinese
 lazitex> lang en                   # Switch to English
 lazitex> lang                      # Show current language

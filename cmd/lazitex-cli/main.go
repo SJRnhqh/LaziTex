@@ -50,6 +50,7 @@ func main() {
 		var filePath string
 		var outputPath string
 		show := false
+		quiet := false
 		pendingOutput := false // 标记是否正在等待输出路径值
 
 		// 灵活解析：遍历 -b 之后的所有参数
@@ -57,6 +58,8 @@ func main() {
 			arg := args[i]
 			if arg == "-s" || arg == "--show" {
 				show = true
+			} else if arg == "-q" || arg == "--quiet" {
+				quiet = true
 			} else if arg == "-o" || arg == "--output" {
 				pendingOutput = true
 			} else if strings.HasPrefix(arg, "-") {
@@ -85,7 +88,7 @@ func main() {
 			return
 		}
 
-		tasks.BuildLaTex(filePath, outputPath, show)
+		tasks.BuildLaTex(filePath, outputPath, show, quiet)
 	case "-p", "--preview":
 		if len(args) < 2 {
 			// 如果没传文件名，显示用法

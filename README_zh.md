@@ -70,7 +70,7 @@ go build -o lazitex ./cmd/lazitex-cli
 | `-c, --check` | 检查 LaTex 环境 | `lazitex -c` |
 | `-i, --install` | 安装/更新 LaTex | `lazitex -i` |
 | `-u, --uninstall` | 卸载 LaTex | `lazitex -u` |
-| `-b, --build` | 构建 LaTex 文档 (支持 `-o` 输出, `-s` 编译后展示) | `lazitex -b main.tex [-o out/] [-s]` |
+| `-b, --build` | 构建 LaTex 文档 (支持 `-o` 输出, `-s` 编译后展示, `-q` 静默模式) | `lazitex -b main.tex [-o out/] [-s] [-q]` |
 | `-p, --preview` | 实时预览 PDF 文档 (监听保存动作并自动刷新) | `lazitex -p main.tex` |
 | `-r, --repl` | 启动 REPL 模式 | `lazitex -r` |
 | `-l, --lang` | 设置语言 | `lazitex -l zh` |
@@ -122,6 +122,7 @@ lazitex --lang en --check  # 本次命令使用英文
 - 智能预览 - 构建成功后自动打开 PDF（macOS 优先使用 Skim，Windows 优先使用 SumatraPDF）
 - Web 预览模式 - 本地 HTTP 服务器 + 浏览器预览，SSE 实时自动刷新，零延迟更新体验
 - 自定义输出 - 支持指定输出目录或完整路径
+- 静默模式 - 使用 `-q` 参数可隐藏编译器详细输出，只显示关键信息和错误
 
 **构建示例：**
 
@@ -132,6 +133,16 @@ $ lazitex -b report.tex -s
 ... (编译器输出) ...
 ✨ 构建成功！
 (自动打开展示窗口)
+```
+
+**静默模式示例：**
+
+```bash
+$ lazitex -b report.tex -q
+🚀 正在构建 LaTex 文档: report.tex
+📁 工作目录: /Users/user/projects/paper
+✨ 构建成功！
+# 编译器详细输出已被隐藏，只显示关键信息
 ```
 
 **Web 预览模式：**
@@ -154,7 +165,7 @@ lazitex> help                      # 显示可用命令
 lazitex> check                     # 检查 LaTex 环境
 lazitex> install                   # 安装或更新 LaTex 环境
 lazitex> uninstall                 # 卸载 LaTex 环境
-lazitex> build main.tex -o out/ -s # 构建 LaTex 文档，指定输出目录并带展示
+lazitex> build main.tex -o out/ -s -q # 构建 LaTex 文档，指定输出目录、展示并启用静默模式
 lazitex> lang zh                   # 切换到中文
 lazitex> lang en                   # 切换到英文
 lazitex> lang                      # 查看当前语言

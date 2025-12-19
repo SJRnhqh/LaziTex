@@ -23,6 +23,7 @@ type BuildOptions struct {
 	InputPath  string // 输入的 .tex 文件路径
 	OutputPath string // 输出的 PDF 文件路径
 	Show       bool   // 编译完是否展示PDF
+	Quiet      bool   // 是否安静模式，不输出日志
 }
 
 // compileContext 编译上下文，封装编译过程中的所有信息
@@ -33,6 +34,7 @@ type compileContext struct {
 	fileName  string // 源文件名
 	passCount int    // 当前编译次数
 	firstPass bool   // 是否是第一次编译
+	quiet     bool   // 是否安静模式，不输出日志
 }
 
 // compileStrategy 编译策略接口，定义不同场景的处理方式
@@ -117,6 +119,7 @@ func prepareContext(opts BuildOptions) (*compileContext, error) {
 		fileName:  fileName,
 		passCount: 0,
 		firstPass: true,
+		quiet:     opts.Quiet,
 	}, nil
 }
 
@@ -141,6 +144,20 @@ func buildWithStrategy(ctx *compileContext, strategy compileStrategy) (string, e
 					ctx.firstPass = true
 					continue
 				}
+
+				// 如果是静默模式，提取并格式化错误
+				if ctx.quiet {
+					errorList := errors.ExtractErrors(logStr)
+					if len(errorList) > 0 {
+						for _, errMsg := range errorList {
+							fmt.Println(errors.FormatError(errMsg))
+						}
+					} else {
+						// 如果没有提取到具体错误，显示通用错误
+						fmt.Printf(lang.T("msg.build_failed")+": %v\n", newErr)
+					}
+				}
+
 				return "", newErr
 			}
 		}
@@ -150,7 +167,7 @@ func buildWithStrategy(ctx *compileContext, strategy compileStrategy) (string, e
 
 		// 运行中间工具（如果需要）
 		if strategy.shouldRunIntermediateTools(ctx, passInfo) {
-			runIntermediateTools(ctx.workDir, ctx.jobName, passInfo)
+			runIntermediateTools(ctx.workDir, ctx.jobName, passInfo, ctx.quiet)
 		}
 
 		// 判断是否继续编译
@@ -232,46 +249,70 @@ func compileOnce(ctx *compileContext, isFirstPass bool) (string, error) {
 	// 只在第一次编译时打印详细信息
 	if isFirstPass {
 		fmt.Printf(lang.T("msg.building_doc")+"\n", ctx.fileName)
-		fmt.Printf(lang.T("msg.working_dir")+"\n", ctx.workDir)
+		// 如果输出目录和工作目录不同，显示两个
+		if ctx.workDir != ctx.outDir {
+			fmt.Printf(lang.T("msg.working_dir")+"\n", ctx.workDir)
+			fmt.Printf(lang.T("msg.output_dir")+"\n", ctx.outDir)
+		} else {
+			fmt.Printf(lang.T("msg.working_dir")+"\n", ctx.workDir)
+		}
 	}
 
 	var logOutput bytes.Buffer
-	multiWriter := io.MultiWriter(os.Stdout, &logOutput)
-	cmd.Stdout = multiWriter
-	cmd.Stderr = multiWriter
+	// 根据 Quiet 选项决定输出方式
+	if ctx.quiet {
+		// 静默模式：只写入缓冲区，不输出到控制台
+		cmd.Stdout = &logOutput
+		cmd.Stderr = &logOutput
+	} else {
+		// 正常模式：同时输出到控制台和缓冲区
+		multiWriter := io.MultiWriter(os.Stdout, &logOutput)
+		cmd.Stdout = multiWriter
+		cmd.Stderr = multiWriter
+	}
 
 	err := cmd.Run()
 	return logOutput.String(), err
 }
 
 // runIntermediateTools 运行中间工具（bibtex、biber、makeindex等）
-func runIntermediateTools(workDir, jobName string, passInfo errors.PassInfo) {
+func runIntermediateTools(workDir, jobName string, passInfo errors.PassInfo, quiet bool) {
 	if passInfo.NeedsBibtex {
 		fmt.Println(lang.T("msg.running_bibtex"))
-		runTool("bibtex", workDir, jobName)
+		runTool("bibtex", workDir, jobName, quiet)
 	} else if passInfo.NeedsBiber {
 		fmt.Println(lang.T("msg.running_biber"))
-		runTool("biber", workDir, jobName)
+		runTool("biber", workDir, jobName, quiet)
 	}
 
 	if passInfo.NeedsMakeindex {
 		fmt.Println(lang.T("msg.running_makeindex"))
-		runTool("makeindex", workDir, jobName)
+		runTool("makeindex", workDir, jobName, quiet)
 	}
 
 	if passInfo.NeedsMakeglossaries {
 		fmt.Println(lang.T("msg.running_makeglossaries"))
-		runTool("makeglossaries", workDir, jobName)
+		runTool("makeglossaries", workDir, jobName, quiet)
 	}
 }
 
 // runTool 运行单个工具
-func runTool(toolName, workDir, jobName string) error {
+func runTool(toolName, workDir, jobName string, quiet bool) error {
 	cmd := exec.Command(toolName, jobName)
 	cmd.Dir = workDir
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+
+	if quiet {
+		// 静默模式：只捕获输出，不打印
+		var logOutput bytes.Buffer
+		cmd.Stdout = &logOutput
+		cmd.Stderr = &logOutput
+	} else {
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+	}
+
 	if err := cmd.Run(); err != nil {
+		// 错误信息仍然显示（即使是静默模式，错误也是重要信息）
 		fmt.Printf(lang.T("msg.tool_failed")+"\n", toolName, err)
 		return err
 	}
