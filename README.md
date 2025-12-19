@@ -342,6 +342,7 @@ lazitex/
 ### Planned 📋
 
 - [ ] **AI Integration (CLI Internal)** - Compilation error diagnosis, code generation & optimization, smart completion
+- [ ] **Quiet Mode Error Formatting** - In quiet mode, extract and format compilation errors with LaziTex-style error messages (with icons) instead of raw compiler output
 - [ ] **Multi-document Project Support** - Automatically handle file dependencies and compilation order
 - [ ] **Custom Compilation Profiles** - Project-level configuration files (compiler selection, output directories, compilation parameters, etc.)
 
