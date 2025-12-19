@@ -213,6 +213,14 @@ func init() {
 		"msg.package_need_sudo":           "需要管理员权限，请输入密码...",
 		"msg.package_unsupported_manager": "不支持的包管理器: %s",
 
+		// 多次编译相关
+		"msg.compile_pass_n":         "第 %d 次编译（解决交叉引用）...",
+		"msg.running_bibtex":         "运行 bibtex...",
+		"msg.running_biber":          "运行 biber...",
+		"msg.running_makeindex":      "运行 makeindex...",
+		"msg.running_makeglossaries": "运行 makeglossaries...",
+		"msg.tool_failed":            "运行 %s 失败: %v（继续编译）",
+
 		// macOS 安装相关消息
 		"msg.mac.brew_not_installed":       "错误: 未安装 Homebrew。请先安装 Homebrew: https://brew.sh",
 		"msg.mac.latex_already_installed":  "检测到 LaTex 已安装",
@@ -392,6 +400,14 @@ func init() {
 		"msg.package_no_manager":          "⚠️  No package manager (tlmgr/mpm) found, cannot auto-install",
 		"msg.package_need_sudo":           "Administrator privileges required, please enter password...",
 		"msg.package_unsupported_manager": "Unsupported package manager: %s",
+
+		// Multiple compilation passes related
+		"msg.compile_pass_n":         "Pass %d (resolving cross-references)...",
+		"msg.running_bibtex":         "Running bibtex...",
+		"msg.running_biber":          "Running biber...",
+		"msg.running_makeindex":      "Running makeindex...",
+		"msg.running_makeglossaries": "Running makeglossaries...",
+		"msg.tool_failed":            "Running %s failed: %v (continuing compilation)",
 
 		// macOS installation messages
 		"msg.mac.brew_not_installed":       "Error: Homebrew is not installed. Please install Homebrew first: https://brew.sh",

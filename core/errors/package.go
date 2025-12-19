@@ -1,7 +1,7 @@
-// core/package.go
+// core/errors/package.go
 // 核心业务内部，编译LaTex文档时检测并处理缺失的包
 
-package core
+package errors
 
 import (
 	// 外部包
@@ -13,7 +13,7 @@ import (
 	"strings"
 
 	// 内部包
-	"github.com/SJRnhqh/lazitex/lang"
+	lang "github.com/SJRnhqh/lazitex/lang"
 )
 
 // extractMissingPackages 从编译日志中提取缺失的包名
@@ -187,7 +187,7 @@ func installPackages(packages []string) error {
 }
 
 // handleMissingPackages 检测并处理缺失的包
-func handleMissingPackages(logOutput string) (bool, error) {
+func HandleMissingPackages(logOutput string) (bool, error) {
 	// 提取缺失的包
 	packages := extractMissingPackages(logOutput)
 	if len(packages) == 0 {

@@ -17,7 +17,7 @@ import (
 	"time"
 
 	// 内部包
-	"github.com/SJRnhqh/lazitex/lang"
+	lang "github.com/SJRnhqh/lazitex/lang"
 )
 
 // ToolCategory 工具分类

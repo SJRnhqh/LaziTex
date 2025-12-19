@@ -20,6 +20,8 @@ Instant LaTex compilation across platforms — powered by Go with local AI to he
 - 🎯 **Zero Configuration** - Works out of the box with TeX Live, MiKTeX, and MacTeX
 - 🚀 **Fast & Lightweight** - Built with Go for blazing-fast compilation
 - 💬 **Interactive REPL** - Interactive commands for check, install, uninstall, language switching, and more
+- 🔄 **Adaptive Multi-Pass Compilation** - Automatically detects and handles multiple compilation passes for cross-references, table of contents, bibliographies, indexes, and glossaries
+- 📦 **Auto Package Management** - Automatically detects missing packages from compilation errors and installs them via tlmgr/mpm
 - 🧠 **AI-Powered** (Coming Soon) - Local AI assistance for writing and refining LaTex documents
 - 🎨 **Multiple Modes** - TUI (Terminal UI) and REPL modes for different workflows
 
@@ -349,10 +351,17 @@ lazitex -b main.tex -o res.pdf  # Specify custom output filename
   - **Batch Installation** - Installs all missing packages at once to minimize password prompts
   - **Intelligent Permission Handling** - Tries installation without sudo first, then prompts for password only when needed
   - **Auto Retry** - Automatically recompiles after successful package installation
+- 🔄 **Adaptive Multi-Pass Compilation** - Intelligently detects and executes multiple compilation passes when needed:
+  - **Cross-References** - Automatically resolves undefined references through multiple passes
+  - **Table of Contents** - Detects `.toc` files and ensures proper TOC generation
+  - **Bibliographies** - Handles `bibtex`/`biber` workflows automatically (up to 4 passes)
+  - **Indexes & Glossaries** - Automatically runs `makeindex` and `makeglossaries` when needed
+  - **PDF Bookmarks** - Ensures proper bookmark generation through multiple passes
+  - **Smart Detection** - Analyzes auxiliary files (`.aux`, `.toc`, `.out`, `.idx`, `.glo`, `.bib`) to determine compilation requirements
 - 👁️ **Smart Show (`-s`)** - Opens the PDF automatically upon successful build.
   - **macOS**: Prioritizes **Skim.app** (supporting silent refresh) if installed; otherwise, falls back to the system default browser or viewer.
   - **Windows**: Prioritizes **SumatraPDF** (supporting silent refresh and instance reuse) if installed; otherwise, falls back to the system default viewer.
-- 📁 **Custom Output (`-o`)** - Supports specifying an output directory (automatically and recursively created if missing) or a complete output filename
+- 📁 **Custom Output (`-o`)** - Supports specifying an output directory (automatically and recursively created if missing) or a complete output filename. **Note**: If `-o` is specified, a path value must be provided, otherwise usage will be displayed
 - 📁 **Smart Default** - If `-o` is not specified, it automatically places PDF and log files in the same directory as the source `.tex` file
 - 📍 **Path Support** - Supports both filenames in current directory and absolute/relative paths
 - 🔍 **Type Safety** - Automatically validates file extensions and ensures source existence
@@ -383,6 +392,21 @@ Administrator privileges required, please enter password...
 🔄 Retrying build...
 ✨ Build successful!
 ```
+
+**Adaptive Multi-Pass Compilation Example:**
+
+```bash
+$ lazitex -b report.tex
+🚀 Building LaTex document: report.tex
+📁 Working directory: /Users/user/projects/paper
+... (first compilation) ...
+Running bibtex...
+Pass 2 (resolving cross-references)...
+Pass 3 (resolving cross-references)...
+✨ Build successful!
+```
+
+The system automatically detected that the document needs multiple passes (for bibliography and cross-references) and executed them seamlessly.
 
 ### Other Commands
 
@@ -433,17 +457,18 @@ LaziTex is built with a clean, modular architecture — making it easy to extend
 
 ```txt
 lazitex/
-├── 📦 go.mod                      # Go module definition
-├── 📦 go.sum                      # Go dependencies
+├── 🗂️  go.mod                      # Go module definition
+├── 🔒 go.sum                      # Go dependencies (lock file)
 ├── 🛠️  build.sh                   # Linux/macOS build script
 ├── 🛠️  build.bat                  # Windows build script
-├── 📁 bin/                        # Build output directory
 │
 ├── 🧠 core/                       # Core logic - the brain of LaziTex
 │   ├── 🌍 env.go                  # Environment detection, installer interface & install/uninstall logic
-│   ├── 🔨 build.go                # Build workflow (cross-platform)
-│   ├── 📦 package.go              # Auto package detection & installation
-│   └── 👀 watcher.go              # File watching for live preview
+│   ├── 🔨 build.go                # Build workflow with Strategy Pattern (cross-platform, adaptive multi-pass)
+│   ├── 👀 watcher.go              # File watching for live preview
+│   └── 🚨 errors/                 # Compilation error handling module
+│       ├── 📦 package.go           # Auto package detection & installation
+│       └── 🔄 passes.go            # Adaptive multi-pass compilation detection
 │
 ├── 🌐 lang/                       # Internationalization module
 │   └── i18n.go                    # Multi-language support (English/Chinese)
@@ -468,7 +493,7 @@ lazitex/
 ├── 🖥️  cmd/                       # Command-line interface
 │   └── 🚀 lazitex-cli/
 │       ├── 📄 main.go             # CLI entry point: parses commands and routes to modes
-│       ├── 🎯 tasks/              # Task execution layer (unified command execution logic)
+│       ├── 📋 tasks/              # Task execution layer (unified command execution logic)
 │       │   ├── 🌍 env.go          # Environment operations (check, install, uninstall)
 │       │   ├── 🔨 build.go        # Build functionality
 │       │   ├── 👀 preview.go      # Live preview functionality
@@ -488,10 +513,18 @@ lazitex/
 
 - **Separation of Concerns**:
   - `core/` - Core business logic (environment detection, build, package management), completely independent of CLI, reusable by other applications
+    - `core/errors/` - Compilation error handling module with Strategy Pattern support:
+      - `package.go` - Automatic package detection and installation
+      - `passes.go` - Adaptive multi-pass compilation detection (handles 6 scenarios: TOC, cross-refs, bibliographies, indexes, glossaries, PDF bookmarks)
   - `tasks/` - Command execution layer, unified management of all command execution logic (environment, build, preview, help), shared by `main.go` and `ui/repl.go`
   - `ui/` - User interface layer, responsible for interaction mode implementation (REPL command parsing, completion, history, TUI state management)
   - `lang/` - Internationalization module, manages multi-language support and language preferences (contains `Language` type definition)
   - `config/` - Configuration management, handles user preference settings
+
+- **Strategy Pattern for Compilation**: The build system uses a Strategy Pattern (`compileStrategy` interface) to handle different compilation scenarios:
+  - **Default Strategy** - Handles package errors and multi-pass compilation automatically
+  - **Extensible Design** - Easy to add AI-powered strategies in the future without modifying core compilation loop
+  - **Context Management** - `compileContext` encapsulates all compilation state for clean strategy execution
 
 - **Code Reusability**: The refactored architecture eliminates code duplication. Functions in `tasks/` package (like `CheckEnvironment()`, `BuildLaTex()`, `InstallLaTexEnvironment()`) are shared by both CLI mode and REPL mode
 
@@ -564,12 +597,11 @@ LaziTex can detect **23 LaTex tools** across 7 categories:
 - [x] Smart Preview System (macOS Skim/Web & Windows SumatraPDF/Default auto-adapter)
 - [x] Live Preview Mode - Auto-trigger millisecond-level compilation and PDF refresh on save
 - [x] Auto Package Detection & Installation - Automatically detects missing packages from compilation errors and installs them via tlmgr/mpm
+- [x] Adaptive Multi-Pass Compilation - Automatically detects and executes multiple compilation passes for cross-references, TOC, bibliographies, indexes, glossaries, and PDF bookmarks
 
 ### In Progress 🚧
 
 - [ ] Live Preview experience optimization (task preemption, compilation locks, enhanced error feedback, etc.)
-- [ ] Auto-Package Completion (Detect missing packages and install automatically)
-- [ ] Multi-pass Compilation (Handle cross-references and bibliographies)
 - [ ] Linux LaTex environment auto-install/update
 - [ ] Linux LaTex environment auto-uninstall
 

@@ -3,10 +3,11 @@
 package core
 
 import (
+	// 外部包
 	"path/filepath"
 	"time"
 
-	"github.com/fsnotify/fsnotify"
+	fsnotify "github.com/fsnotify/fsnotify"
 )
 
 // WatchAndAction 监听文件变动并执行指定的动作
