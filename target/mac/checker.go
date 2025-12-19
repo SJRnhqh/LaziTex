@@ -97,7 +97,7 @@ func (c *Checker) GetSearchPaths() []string {
 	return paths
 }
 
-// DetectDistribution 检测 LaTeX 发行版
+// DetectDistribution 检测 LaTex 发行版
 func (c *Checker) DetectDistribution(tools map[string]core.CompilerInfo) string {
 	// 优先检查 pdflatex 的版本信息
 	if pdflatex, exists := tools["pdflatex"]; exists && pdflatex.Installed {
@@ -176,7 +176,7 @@ func (c *Checker) GetInstallGuide() string {
 	guide += "    - 完整的 TeX Live 发行版\n"
 	guide += "    - TeXShop 编辑器\n"
 	guide += "    - BibDesk 文献管理\n"
-	guide += "    - LaTeXiT 公式编辑器\n"
+	guide += "    - LaTexiT 公式编辑器\n"
 	guide += "\n"
 
 	guide += "  推荐选项 2: Homebrew (轻量快捷)\n"
@@ -216,7 +216,7 @@ func (c *Checker) GetInstallGuide() string {
 }
 
 // PostCheck macOS 特定的后处理检查
-func (c *Checker) PostCheck(env *core.LaTeXEnvironment) {
+func (c *Checker) PostCheck(env *core.LaTexEnvironment) {
 	// 检查是否是 MacTeX 完整安装
 	isMacTeX := false
 	if _, err := os.Stat("/Library/TeX/texbin"); err == nil {
@@ -228,7 +228,7 @@ func (c *Checker) PostCheck(env *core.LaTeXEnvironment) {
 		guiApps := map[string]string{
 			"TeXShop": "/Applications/TeX/TeXShop.app",
 			"BibDesk": "/Applications/TeX/BibDesk.app",
-			"LaTeXiT": "/Applications/TeX/LaTeXiT.app",
+			"LaTexiT": "/Applications/TeX/LaTexiT.app",
 		}
 
 		// 这里可以检查 GUI 应用是否存在
@@ -236,9 +236,9 @@ func (c *Checker) PostCheck(env *core.LaTeXEnvironment) {
 		_ = guiApps
 	}
 
-	// 检查 XeLaTeX 的字体访问
+	// 检查 XeLaTex 的字体访问
 	if xelatex, exists := env.Tools["xelatex"]; exists && xelatex.Installed {
-		// macOS 上 XeLaTeX 应该能访问系统字体
+		// macOS 上 XeLaTex 应该能访问系统字体
 		// 可以通过 fc-list 检查，但 macOS 默认使用 fontconfig
 	}
 

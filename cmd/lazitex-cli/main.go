@@ -1,23 +1,18 @@
 // cmd/lazitex-cli/main.go
+// 程序入口
+
 package main
 
 import (
 	// 外部包
 	"fmt"
 	"os"
-	"runtime"
 	"strings"
 
 	// 内部包
 	tasks "github.com/SJRnhqh/lazitex/cmd/lazitex-cli/tasks"
 	ui "github.com/SJRnhqh/lazitex/cmd/lazitex-cli/ui"
-	config "github.com/SJRnhqh/lazitex/config"
-	core "github.com/SJRnhqh/lazitex/core"
 	lang "github.com/SJRnhqh/lazitex/lang"
-	model "github.com/SJRnhqh/lazitex/model"
-	linux "github.com/SJRnhqh/lazitex/target/linux"
-	mac "github.com/SJRnhqh/lazitex/target/mac"
-	win "github.com/SJRnhqh/lazitex/target/win"
 )
 
 func main() {
@@ -37,15 +32,15 @@ func main() {
 	case "-v", "--version":
 		fmt.Println("LaziTex v0.0.1")
 	case "-c", "--check":
-		checkEnvironment()
+		tasks.CheckEnvironment()
 	case "-t", "--tui":
 		ui.StartTUI()
 	case "-r", "--repl":
 		ui.StartREPL()
 	case "-i", "--install":
-		installLaTeXEnvironment()
+		tasks.InstallLaTexEnvironment()
 	case "-u", "--uninstall":
-		uninstallLaTeXEnvironment()
+		tasks.UninstallLaTexEnvironment()
 	case "-b", "--build":
 		if len(args) < 2 {
 			fmt.Println(lang.T("msg.build_usage"))
@@ -90,7 +85,7 @@ func main() {
 			return
 		}
 
-		ui.BuildLaTeX(filePath, outputPath, show)
+		tasks.BuildLaTex(filePath, outputPath, show)
 	case "-p", "--preview":
 		if len(args) < 2 {
 			// 如果没传文件名，显示用法
@@ -98,7 +93,7 @@ func main() {
 			return
 		}
 		filePath := args[1]
-		ui.StartLivePreview(filePath)
+		tasks.StartLivePreview(filePath)
 	default:
 		fmt.Printf(lang.T("msg.unknown_command")+"\n", args[0])
 		tasks.ShowHelp()
@@ -118,15 +113,15 @@ func processLanguageFlag() []string {
 			langStr := args[i+1]
 			switch langStr {
 			case "en", "english":
-				lang.SetLanguage(model.LangEN)
+				lang.SetLanguage(lang.LangEN)
 				langSet = true
 				// 保存用户偏好
-				config.SaveLanguagePreference(model.LangEN)
+				lang.SaveLanguagePreference(lang.LangEN)
 			case "zh", "chinese":
-				lang.SetLanguage(model.LangZH)
+				lang.SetLanguage(lang.LangZH)
 				langSet = true
 				// 保存用户偏好
-				config.SaveLanguagePreference(model.LangZH)
+				lang.SaveLanguagePreference(lang.LangZH)
 			}
 			i++ // 跳过语言值
 		} else {
@@ -140,37 +135,4 @@ func processLanguageFlag() []string {
 	}
 
 	return newArgs
-}
-
-// 检查 LaTeX 环境
-func checkEnvironment() {
-	// 根据平台创建对应的检查器
-	var checker core.EnvironmentChecker
-
-	switch runtime.GOOS {
-	case "windows":
-		checker = win.NewChecker()
-	case "linux":
-		checker = linux.NewChecker()
-	case "darwin":
-		checker = mac.NewChecker()
-	default:
-		// 不支持的平台，使用一个简单的错误提示
-		fmt.Printf(lang.T("msg.unsupported_os")+"\n", runtime.GOOS)
-		return
-	}
-
-	// 执行检测
-	env := core.CheckLaTeXEnvironment(checker)
-	env.PrintEnvironment()
-}
-
-// 安装 LaTeX 环境
-func installLaTeXEnvironment() {
-	ui.InstallLaTeXEnvironment()
-}
-
-// 卸载 LaTeX 环境
-func uninstallLaTeXEnvironment() {
-	ui.UninstallLaTeXEnvironment()
 }

@@ -8,9 +8,6 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
-
-	// 内部包
-	"github.com/SJRnhqh/lazitex/model"
 )
 
 // Config 应用配置
@@ -74,25 +71,4 @@ func SaveConfig(config *Config) error {
 	}
 
 	return os.WriteFile(configPath, data, 0644)
-}
-
-// SaveLanguagePreference 保存语言偏好
-func SaveLanguagePreference(lang model.Language) error {
-	config := &Config{
-		Language: string(lang),
-	}
-	return SaveConfig(config)
-}
-
-// LoadLanguagePreference 加载语言偏好
-func LoadLanguagePreference() model.Language {
-	config, err := LoadConfig()
-	if err != nil {
-		return model.LangEN // 默认英文
-	}
-
-	if config.Language == "zh" {
-		return model.LangZH
-	}
-	return model.LangEN
 }

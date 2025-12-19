@@ -1,6 +1,6 @@
 # LaziTex 🧸
 
-Instant LaTeX compilation across platforms — powered by Go with local AI to help you write and refine.
+Instant LaTex compilation across platforms — powered by Go with local AI to help you write and refine.
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Go Version](https://img.shields.io/badge/Go-1.25%2B-00ADD8)](https://go.dev/)
@@ -13,14 +13,14 @@ Instant LaTeX compilation across platforms — powered by Go with local AI to he
 
 ## ✨ Features
 
-- 🔍 **Smart Environment Detection** - Automatically detects your LaTeX installation and provides detailed diagnostics
-- 📦 **Auto Install/Update** - One-click installation or update of LaTeX environments (macOS supported)
-- 🗑️ **Auto Uninstall** - One-click uninstallation of LaTeX environments with smart installation method detection (macOS supported)
+- 🔍 **Smart Environment Detection** - Automatically detects your LaTex installation and provides detailed diagnostics
+- 📦 **Auto Install/Update** - One-click installation or update of LaTex environments (macOS supported)
+- 🗑️ **Auto Uninstall** - One-click uninstallation of LaTex environments with smart installation method detection (macOS supported)
 - 🌍 **Cross-Platform** - Seamless support for Windows, Linux, and macOS
 - 🎯 **Zero Configuration** - Works out of the box with TeX Live, MiKTeX, and MacTeX
 - 🚀 **Fast & Lightweight** - Built with Go for blazing-fast compilation
 - 💬 **Interactive REPL** - Interactive commands for check, install, uninstall, language switching, and more
-- 🧠 **AI-Powered** (Coming Soon) - Local AI assistance for writing and refining LaTeX documents
+- 🧠 **AI-Powered** (Coming Soon) - Local AI assistance for writing and refining LaTex documents
 - 🎨 **Multiple Modes** - TUI (Terminal UI) and REPL modes for different workflows
 
 ---
@@ -66,19 +66,19 @@ Download pre-built binaries from [Releases](https://github.com/SJRnhqh/lazitex/r
 
 | Command | Description | Example |
 |---------|-------------|---------|
-| `-c, --check` | Check LaTeX environment | `lazitex -c` |
-| `-i, --install` | Install/update LaTeX | `lazitex -i` |
-| `-u, --uninstall` | Uninstall LaTeX | `lazitex -u` |
-| `-b, --build` | Build LaTeX document (supports `-o` output, `-s` show) | `lazitex -b main.tex [-o out/] [-s]` |
+| `-c, --check` | Check LaTex environment | `lazitex -c` |
+| `-i, --install` | Install/update LaTex | `lazitex -i` |
+| `-u, --uninstall` | Uninstall LaTex | `lazitex -u` |
+| `-b, --build` | Build LaTex document (supports `-o` output, `-s` show) | `lazitex -b main.tex [-o out/] [-s]` |
 | `-p, --preview` | Live preview PDF (watches for saves and refreshes) | `lazitex -p main.tex` |
 | `-r, --repl` | Start REPL mode | `lazitex -r` |
 | `-l, --lang` | Set language | `lazitex -l zh` |
 | `-h, --help` | Show help | `lazitex -h` |
 | `-v, --version` | Show version | `lazitex -v` |
 
-### Check Your LaTeX Environment
+### Check Your LaTex Environment
 
-Before compiling, verify your LaTeX installation:
+Before compiling, verify your LaTex installation:
 
 ```bash
 lazitex --check    # Full command
@@ -87,30 +87,30 @@ lazitex -c         # Short command
 
 This will detect:
 
-- ✅ All installed LaTeX compilers (pdflatex, xelatex, lualatex, etc.)
+- ✅ All installed LaTex compilers (pdflatex, xelatex, lualatex, etc.)
 - ✅ Bibliography tools (bibtex, biber)
 - ✅ Conversion utilities (dvipdfmx, ps2pdf, etc.)
 - ✅ Package managers (tlmgr, mpm)
-- ✅ Your LaTeX distribution (TeX Live, MiKTeX, MacTeX)
+- ✅ Your LaTex distribution (TeX Live, MiKTeX, MacTeX)
 
 **Sample Output:**
 
 ``` txt
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        LaTeX Environment Check Results
+        LaTex Environment Check Results
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 🖥️  Operating System: Windows (windows)
-📦 LaTeX Distribution: TeX Live 2025
+📦 LaTex Distribution: TeX Live 2025
 
 ✅ Installed: 22/23 tools (core tools: 6/6)
 
 🔨 Compilers (7/7)
 ────────────────────────────────────────────────────────────
-  ⭐ ✓ PDFLaTeX        [Installed]
+  ⭐ ✓ PDFLaTex        [Installed]
       Path: C:\texlive\2025\bin\windows\pdflatex.exe
       Version: pdfTeX 3.141592653-2.6-1.40.28 (TeX Live 2025)
-  ⭐ ✓ XeLaTeX         [Installed]
+  ⭐ ✓ XeLaTex         [Installed]
       Path: C:\texlive\2025\bin\windows\xelatex.exe
       Version: XeTeX 3.141592653-2.6-0.999997 (TeX Live 2025)
   ...
@@ -234,8 +234,8 @@ English:
 ```txt
 ✅ Installed: 22/23 tools (core tools: 6/6)
 🔨 Compilers (7/7)
-  ⭐ ✓ PDFLaTeX        [Installed]
-  ⭐ ✓ XeLaTeX         [Installed]
+  ⭐ ✓ PDFLaTex        [Installed]
+  ⭐ ✓ XeLaTex         [Installed]
 ```
 
 中文 (Chinese):
@@ -243,22 +243,22 @@ English:
 ```txt
 ✅ 已安装: 22/23 工具 (核心工具: 6/6)
 🔨 编译器 (7/7)
-  ⭐ ✓ PDFLaTeX        [已安装]
-  ⭐ ✓ XeLaTeX         [已安装]
+  ⭐ ✓ PDFLaTex        [已安装]
+  ⭐ ✓ XeLaTex         [已安装]
 ```
 
-### Install/Update LaTeX Environment
+### Install/Update LaTex Environment
 
-LaziTex supports automatic installation and updates for LaTeX environments (currently macOS):
+LaziTex supports automatic installation and updates for LaTex environments (currently macOS):
 
 ```bash
-lazitex --install    # Install or update LaTeX environment
+lazitex --install    # Install or update LaTex environment
 lazitex -i           # Short form
 ```
 
 **Features:**
 
-- 🔍 **Smart Detection** - Automatically detects if LaTeX is installed
+- 🔍 **Smart Detection** - Automatically detects if LaTex is installed
 - 📦 **Auto Install** - Installs BasicTeX automatically when not installed (macOS)
 - 🔄 **Smart Update** - Checks and updates packages when already installed
 - 💬 **Interactive Confirmation** - Asks for confirmation before install/update
@@ -268,7 +268,7 @@ lazitex -i           # Short form
 
 ```bash
 $ lazitex -i
-LaTeX environment not detected
+LaTex environment not detected
 Will install BasicTeX via Homebrew (lightweight version, ~1.5 GB)
 Install command: brew install --cask basictex
 Do you want to install? [y/n]: y
@@ -280,28 +280,28 @@ Installing BasicTeX via Homebrew...
 
 ```bash
 $ lazitex -i
-LaTeX is already installed
+LaTex is already installed
 The following packages can be updated:
   ...
 Do you want to update these packages? [y/n]: y
 ✅ Update successful!
 ```
 
-### Uninstall LaTeX Environment
+### Uninstall LaTex Environment
 
-LaziTex supports one-click uninstallation of LaTeX environments (currently macOS):
+LaziTex supports one-click uninstallation of LaTex environments (currently macOS):
 
 ```bash
-lazitex --uninstall  # Uninstall LaTeX environment
+lazitex --uninstall  # Uninstall LaTex environment
 lazitex -u           # Short form
 ```
 
 **Features:**
 
-- 🔍 **Smart Detection** - Automatically detects if LaTeX is installed
+- 🔍 **Smart Detection** - Automatically detects if LaTex is installed
 - 🗑️ **Auto Uninstall** - Automatically detects installation method and performs appropriate uninstallation
 - 💬 **Interactive Confirmation** - Asks for confirmation before uninstalling to prevent accidental removal
-- 📋 **Friendly Hints** - Suggests using `-i` to install when LaTeX is not installed
+- 📋 **Friendly Hints** - Suggests using `-i` to install when LaTex is not installed
 - 🧹 **Residual Cleanup** - Attempts to remove common leftover paths after successful uninstall
 
 **Supported Uninstallation Methods:**
@@ -315,36 +315,36 @@ lazitex -u           # Short form
 
 ```bash
 $ lazitex -u
-LaTeX is already installed
-Will uninstall LaTeX environment (including all installed packages)
+LaTex is already installed
+Will uninstall LaTex environment (including all installed packages)
 Do you want to uninstall? [y/n]: y
-Uninstalling LaTeX environment...
-✅ LaTeX environment uninstalled successfully!
+Uninstalling LaTex environment...
+✅ LaTex environment uninstalled successfully!
 ```
 
 **When Not Installed:**
 
 ```bash
 $ lazitex -u
-LaTeX environment not detected
-Tip: You can use 'lazitex -i' to install LaTeX environment with one click
+LaTex environment not detected
+Tip: You can use 'lazitex -i' to install LaTex environment with one click
 ```
 
-### Build & Preview LaTeX Document
+### Build & Preview LaTex Document
 
-LaziTex supports one-click compilation of LaTeX documents into PDF with smart previewing:
+LaziTex supports one-click compilation of LaTex documents into PDF with smart previewing:
 
 ```bash
-lazitex -b main.tex             # Build LaTeX document only
-lazitex -b main.tex -s             # Build LaTeX document and show
+lazitex -b main.tex             # Build LaTex document only
+lazitex -b main.tex -s             # Build LaTex document and show
 lazitex -b main.tex -o out/     # Specify output directory
 lazitex -b main.tex -o res.pdf  # Specify custom output filename
 ```
 
 **Features:**
 
-- 🚀 **One-Click Build** - Automatically runs the compiler (XeLaTeX) with optimal settings
-- 🔍 **Auto Package Detection & Installation** - Automatically detects missing LaTeX packages (`.sty` and `.cls` files) from compilation errors and offers to install them via `tlmgr` or `mpm`
+- 🚀 **One-Click Build** - Automatically runs the compiler (XeLaTex) with optimal settings
+- 🔍 **Auto Package Detection & Installation** - Automatically detects missing LaTex packages (`.sty` and `.cls` files) from compilation errors and offers to install them via `tlmgr` or `mpm`
   - **Smart Package Name Resolution** - Automatically finds the correct package name (e.g., `xeCJK.sty` → `xecjk` package)
   - **Batch Installation** - Installs all missing packages at once to minimize password prompts
   - **Intelligent Permission Handling** - Tries installation without sudo first, then prompts for password only when needed
@@ -362,7 +362,7 @@ lazitex -b main.tex -o res.pdf  # Specify custom output filename
 
 ```bash
 $ lazitex -b report.tex -s
-🚀 Building LaTeX document: report.tex
+🚀 Building LaTex document: report.tex
 📁 Working directory: /Users/user/projects/paper
 ... (compiler output) ...
 ✨ Build successful!
@@ -373,7 +373,7 @@ $ lazitex -b report.tex -s
 
 ```bash
 $ lazitex -b document.tex
-🚀 Building LaTeX document: document.tex
+🚀 Building LaTex document: document.tex
 ... (compilation fails) ...
 🔍 Missing package detected: xeCJK
 💡 Auto-install? [Y/n]: y
@@ -389,7 +389,7 @@ Administrator privileges required, please enter password...
 ```bash
 lazitex --help     # Show help
 lazitex --version  # Show version
-lazitex --check    # Check LaTeX environment
+lazitex --check    # Check LaTex environment
 lazitex --repl     # REPL mode (interactive)
 lazitex --tui      # Terminal UI mode (Coming Soon)
 ```
@@ -398,10 +398,10 @@ lazitex --tui      # Terminal UI mode (Coming Soon)
 
 ```bash
 lazitex> help                      # Show available commands
-lazitex> check                     # Check LaTeX environment
-lazitex> install                   # Install or update LaTeX environment
-lazitex> uninstall                 # Uninstall LaTeX environment
-lazitex> build main.tex -o out/ -s # Build LaTeX document with show and output path
+lazitex> check                     # Check LaTex environment
+lazitex> install                   # Install or update LaTex environment
+lazitex> uninstall                 # Uninstall LaTex environment
+lazitex> build main.tex -o out/ -s # Build LaTex document with show and output path
 lazitex> lang zh                   # Switch to Chinese
 lazitex> lang en                   # Switch to English
 lazitex> lang                      # Show current language
@@ -440,7 +440,7 @@ lazitex/
 ├── 📁 bin/                        # Build output directory
 │
 ├── 🧠 core/                       # Core logic - the brain of LaziTex
-│   ├── 🌍 environment.go          # Environment detection, installer interface & install/uninstall logic
+│   ├── 🌍 env.go                  # Environment detection, installer interface & install/uninstall logic
 │   ├── 🔨 build.go                # Build workflow (cross-platform)
 │   ├── 📦 package.go              # Auto package detection & installation
 │   └── 👀 watcher.go              # File watching for live preview
@@ -450,9 +450,6 @@ lazitex/
 │
 ├── ⚙️  config/                     # Configuration management
 │   └── config.go                  # User preferences & settings
-│
-├── 📐 model/                      # Shared data models
-│   └── language.go                # Language type definitions
 │
 ├── 🎯 target/                     # Platform-specific implementations
 │   ├── 🪟 win/                    # Windows-specific detection
@@ -471,9 +468,14 @@ lazitex/
 ├── 🖥️  cmd/                       # Command-line interface
 │   └── 🚀 lazitex-cli/
 │       ├── 📄 main.go             # CLI entry point: parses commands and routes to modes
-│       └── 🎨 modes/              # Different interaction modes
+│       ├── 🎯 tasks/              # Task execution layer (unified command execution logic)
+│       │   ├── 🌍 env.go          # Environment operations (check, install, uninstall)
+│       │   ├── 🔨 build.go        # Build functionality
+│       │   ├── 👀 preview.go      # Live preview functionality
+│       │   └── 📖 help.go         # Help information
+│       └── 🎨 ui/                 # User interface layer (interaction mode implementation)
 │           ├── 🖼️  tui.go         # Terminal UI mode with Bubble Tea
-│           └── 💬 repl.go         # Interactive REPL mode (check, install, uninstall, language switching)
+│           └── 💬 repl.go         # Interactive REPL mode (command parsing, completion, history)
 │
 ├── 📖 README.md                   # English documentation (You're reading it!)
 ├── 📖 README_zh.md                # Chinese documentation
@@ -482,18 +484,32 @@ lazitex/
 
 ### Architecture Highlights
 
-- **Layered Architecture**: Clean dependency hierarchy - `model` (base) → `config` (layer 1) → `lang` (layer 2) → `core` (business logic)
-- **Modular Design**: Separated concerns with dedicated packages for i18n (`lang/`), configuration (`config/`), and shared models (`model/`)
-- **Dependency Injection**: Platform-specific checkers are created in `main.go` and injected into core logic, avoiding circular dependencies
-- **Interface-Driven**: `EnvironmentChecker` interface allows easy platform extensibility
-- **Priority System**: Tools are categorized by priority (⭐ Core, 🔹 Important, 🔸 Optional)
-- **Type Safety**: Shared data structures (like `Language`) are defined in `model/` to prevent circular imports
+- **Layered Architecture**: Clean dependency hierarchy - `config`/`lang` (support) → `core` (business logic) → `tasks` (command execution) → `ui` (interaction)
+
+- **Separation of Concerns**:
+  - `core/` - Core business logic (environment detection, build, package management), completely independent of CLI, reusable by other applications
+  - `tasks/` - Command execution layer, unified management of all command execution logic (environment, build, preview, help), shared by `main.go` and `ui/repl.go`
+  - `ui/` - User interface layer, responsible for interaction mode implementation (REPL command parsing, completion, history, TUI state management)
+  - `lang/` - Internationalization module, manages multi-language support and language preferences (contains `Language` type definition)
+  - `config/` - Configuration management, handles user preference settings
+
+- **Code Reusability**: The refactored architecture eliminates code duplication. Functions in `tasks/` package (like `CheckEnvironment()`, `BuildLaTex()`, `InstallLaTexEnvironment()`) are shared by both CLI mode and REPL mode
+
+- **Modular Design**: Independent packages for i18n and configuration with clear responsibilities, easy to maintain and extend
+
+- **Dependency Injection**: Platform-specific checkers and installers are created in `tasks/` and injected into core logic, avoiding circular dependencies
+
+- **Interface-Driven**: `EnvironmentChecker` and `EnvironmentInstaller` interfaces allow easy platform extensibility. Adding a new platform only requires implementing the interfaces
+
+- **Priority System**: Tools are categorized by priority (⭐ Core, 🔹 Important, 🔸 Optional), helping users understand tool importance
+
+- **Type Safety**: Shared data structures (like `Language`) are defined in `lang/` package, simplifying architecture and avoiding unnecessary abstraction layers
 
 ---
 
-## 🔍 Detected LaTeX Tools
+## 🔍 Detected LaTex Tools
 
-LaziTex can detect **23 LaTeX tools** across 7 categories:
+LaziTex can detect **23 LaTex tools** across 7 categories:
 
 | Category | Tools | Count |
 |----------|-------|-------|
@@ -540,11 +556,11 @@ LaziTex can detect **23 LaTeX tools** across 7 categories:
 ### Completed ✅
 
 - [x] Environment detection for Windows, Linux, macOS
-- [x] Comprehensive LaTeX tool checking (23 tools)
-- [x] macOS LaTeX environment auto-install/update
-- [x] macOS LaTeX environment auto-uninstall
+- [x] Comprehensive LaTex tool checking (23 tools)
+- [x] macOS LaTex environment auto-install/update
+- [x] macOS LaTex environment auto-uninstall
 - [x] Modern REPL interactive mode (History, Tab completion, Shell shortcuts, Full i18n, Live Preview command)
-- [x] LaTeX Build Engine (Basic: One-click .tex to PDF, smart working directory)
+- [x] LaTex Build Engine (Basic: One-click .tex to PDF, smart working directory)
 - [x] Smart Preview System (macOS Skim/Web & Windows SumatraPDF/Default auto-adapter)
 - [x] Live Preview Mode - Auto-trigger millisecond-level compilation and PDF refresh on save
 - [x] Auto Package Detection & Installation - Automatically detects missing packages from compilation errors and installs them via tlmgr/mpm
@@ -554,24 +570,24 @@ LaziTex can detect **23 LaTeX tools** across 7 categories:
 - [ ] Live Preview experience optimization (task preemption, compilation locks, enhanced error feedback, etc.)
 - [ ] Auto-Package Completion (Detect missing packages and install automatically)
 - [ ] Multi-pass Compilation (Handle cross-references and bibliographies)
-- [ ] Linux LaTeX environment auto-install/update
-- [ ] Linux LaTeX environment auto-uninstall
+- [ ] Linux LaTex environment auto-install/update
+- [ ] Linux LaTex environment auto-uninstall
 
 ### Planned 📋
 
-- [ ] Local AI integration for LaTeX assistance
+- [ ] Local AI integration for LaTex assistance
 - [ ] Multi-document project support
 - [ ] Custom compilation profiles
 
 ### Future 🔮
 
-- [ ] `lazitex init` Project Initialization - Minimalist startup experience similar to `uv init`, supporting fast fetching of high-quality LaTeX templates from Gitee/GitHub
+- [ ] `lazitex init` Project Initialization - Minimalist startup experience similar to `uv init`, supporting fast fetching of high-quality LaTex templates from Gitee/GitHub
 - [ ] TUI mode with live preview
 - [ ] Modern GUI support
-- [ ] Windows LaTeX environment auto-install/update (Windows installation is complex, lower priority)
-- [ ] Windows LaTeX environment auto-uninstall
+- [ ] Windows LaTex environment auto-install/update (Windows installation is complex, lower priority)
+- [ ] Windows LaTex environment auto-uninstall
 - [ ] **AI-Native Authoring Flow**: Bridging human creativity and AI intelligence with high-efficiency interaction and instantaneous feedback, realizing a "DocuGen-style Prompt2PDF" experience. Supporting end-to-end real-time PDF generation from natural language prompts, powered by Multi-Agent workflows for literature retrieval, outline planning, and content refinement
-- [ ] **LaziTex Server & Cloud Vertical Ecosystem**: Exploring server-side deployment solutions to provide "Prompt2PDF" online interactive generation services for vertical sectors such as finance, medical, and research. Supporting multi-modal recognition (e.g., hand-written formulas/charts to LaTeX), bridging unstructured intents to professional PDF documents, and building a distributed document platform that is "Free at Local, Intelligent in Cloud".
+- [ ] **LaziTex Server & Cloud Vertical Ecosystem**: Exploring server-side deployment solutions to provide "Prompt2PDF" online interactive generation services for vertical sectors such as finance, medical, and research. Supporting multi-modal recognition (e.g., hand-written formulas/charts to LaTex), bridging unstructured intents to professional PDF documents, and building a distributed document platform that is "Free at Local, Intelligent in Cloud".
 
 ---
 
@@ -598,19 +614,19 @@ See [LICENSE](LICENSE) file for details.
 ## 🙏 Acknowledgments
 
 - Built with [Bubble Tea](https://github.com/charmbracelet/bubbletea) for beautiful terminal UIs
-- Inspired by the LaTeX community's dedication to beautiful typesetting
+- Inspired by the LaTex community's dedication to beautiful typesetting
 
 ---
 
 ## 💡 FAQ
 
-### 1. Why can't LaziTex detect my LaTeX installation?
+### 1. Why can't LaziTex detect my LaTex installation?
 
-- **Windows**: Make sure the LaTeX installation path is added to your PATH environment variable
+- **Windows**: Make sure the LaTex installation path is added to your PATH environment variable
 - **Linux**: Try running `which pdflatex` to confirm the installation location
 - **macOS**: If using Homebrew, make sure you've run `brew link` command
 
-### 2. Which LaTeX distributions are supported?
+### 2. Which LaTex distributions are supported?
 
 Currently supported:
 
@@ -623,25 +639,25 @@ Currently supported:
 Method 1: Use LaziTex auto-install (Recommended)
 
 ```bash
-lazitex -i    # Auto-install or update LaTeX environment (macOS supported)
+lazitex -i    # Auto-install or update LaTex environment (macOS supported)
 ```
 
 **Method 2: Manual installation**
 After running `lazitex --check`, if tools are missing, the system will automatically display installation guides for your platform.
 
-### 4. How to uninstall LaTeX environment?
+### 4. How to uninstall LaTex environment?
 
 Use LaziTex one-click uninstall (Recommended, currently macOS):
 
 ```bash
-lazitex -u    # Auto-uninstall LaTeX environment (macOS supported)
+lazitex -u    # Auto-uninstall LaTex environment (macOS supported)
 ```
 
 **Features:**
 
 - Automatically detects installation method (Homebrew, MacPorts, MacTeX official, etc.)
 - Interactive confirmation to prevent accidental removal
-- Suggests using `-i` to install when LaTeX is not installed
+- Suggests using `-i` to install when LaTex is not installed
 
 **Manual uninstallation:**
 

@@ -1,4 +1,5 @@
 // cmd/lazitex-cli/ui/repl.go
+// REPL模式界面管理
 
 package ui
 
@@ -7,22 +8,14 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strings"
-	"time"
 
 	// 内部包
 	tasks "github.com/SJRnhqh/lazitex/cmd/lazitex-cli/tasks"
-	config "github.com/SJRnhqh/lazitex/config"
-	core "github.com/SJRnhqh/lazitex/core"
 	lang "github.com/SJRnhqh/lazitex/lang"
-	model "github.com/SJRnhqh/lazitex/model"
-	linux "github.com/SJRnhqh/lazitex/target/linux"
-	mac "github.com/SJRnhqh/lazitex/target/mac"
-	win "github.com/SJRnhqh/lazitex/target/win"
-	"github.com/charmbracelet/lipgloss"
+	lipgloss "github.com/charmbracelet/lipgloss"
 	readline "github.com/chzyer/readline"
-	"github.com/common-nighthawk/go-figure"
+	figure "github.com/common-nighthawk/go-figure"
 )
 
 // 创建补全器
@@ -300,13 +293,13 @@ func handleREPLCommand(input string) bool {
 		fmt.Println("LaziTex v0.0.1")
 
 	case "check":
-		checkREPLEnvironment()
+		tasks.CheckEnvironment()
 
 	case "install":
-		InstallLaTeXEnvironment()
+		tasks.InstallLaTexEnvironment()
 
 	case "uninstall":
-		UninstallLaTeXEnvironment()
+		tasks.UninstallLaTexEnvironment()
 
 	case "build":
 		if len(parts) < 2 {
@@ -347,14 +340,14 @@ func handleREPLCommand(input string) bool {
 		}
 
 		// 调用统一的构建入口
-		BuildLaTeX(filePath, outputPath, show)
+		tasks.BuildLaTex(filePath, outputPath, show)
 	case "preview":
 		if len(parts) < 2 {
 			fmt.Println(lang.T("repl.preview_usage"))
 			return false
 		}
 		filePath := parts[1]
-		StartLivePreview(filePath)
+		tasks.StartLivePreview(filePath)
 	case "lang", "language":
 		// 语言切换命令
 		if len(parts) < 2 {
@@ -385,96 +378,19 @@ func handleLanguageSwitch(langStr string) {
 
 	switch langStr {
 	case "zh", "chinese", "中文":
-		lang.SetLanguage(model.LangZH)
-		config.SaveLanguagePreference(model.LangZH)
+		lang.SetLanguage(lang.LangZH)
+		lang.SaveLanguagePreference(lang.LangZH)
 		fmt.Println(lang.T("repl.lang_switched"))
 
 	case "en", "english", "英文":
-		lang.SetLanguage(model.LangEN)
-		config.SaveLanguagePreference(model.LangEN)
+		lang.SetLanguage(lang.LangEN)
+		lang.SaveLanguagePreference(lang.LangEN)
 		fmt.Println(lang.T("repl.lang_switched"))
 
 	default:
 		fmt.Printf(lang.T("repl.lang_unsupported")+"\n", langStr)
 		fmt.Println(lang.T("repl.lang_available"))
 	}
-}
-
-// 检查 LaTeX 环境
-func checkREPLEnvironment() {
-	// 根据平台创建对应的检查器
-	var checker core.EnvironmentChecker
-
-	switch runtime.GOOS {
-	case "windows":
-		checker = win.NewChecker()
-	case "linux":
-		checker = linux.NewChecker()
-	case "darwin":
-		checker = mac.NewChecker()
-	default:
-		// 不支持的平台，使用一个简单的错误提示
-		fmt.Printf(lang.T("msg.unsupported_os")+"\n", runtime.GOOS)
-		return
-	}
-
-	// 执行检测
-	env := core.CheckLaTeXEnvironment(checker)
-	env.PrintEnvironment()
-}
-
-// InstallLaTeXEnvironment 安装 LaTeX 环境（共享函数，供 REPL 和命令行模式使用）
-func InstallLaTeXEnvironment() {
-	// 根据平台创建对应的安装器
-	var installer core.EnvironmentInstaller
-
-	switch runtime.GOOS {
-	case "windows":
-		// TODO: 后续实现 Windows 安装器
-		fmt.Printf(lang.T("msg.unsupported_os")+"\n", runtime.GOOS)
-		return
-	case "linux":
-		installer = linux.NewInstaller()
-	case "darwin":
-		installer = mac.NewInstaller()
-	default:
-		fmt.Printf(lang.T("msg.unsupported_os")+"\n", runtime.GOOS)
-		return
-	}
-
-	// 执行安装
-	if err := core.InstallLaTeXEnvironment(installer); err != nil {
-		fmt.Printf(lang.T("msg.install_failed")+": %v\n", err)
-		return
-	}
-	// 注意：成功消息由安装器内部输出，这里不需要再输出
-}
-
-// UninstallLaTeXEnvironment 卸载 LaTeX 环境（共享函数，供 REPL 和命令行模式使用）
-func UninstallLaTeXEnvironment() {
-	// 根据平台创建对应的安装器
-	var installer core.EnvironmentInstaller
-
-	switch runtime.GOOS {
-	case "windows":
-		// TODO: 后续实现 Windows 安装器
-		fmt.Printf(lang.T("msg.unsupported_os")+"\n", runtime.GOOS)
-		return
-	case "linux":
-		installer = linux.NewInstaller()
-	case "darwin":
-		installer = mac.NewInstaller()
-	default:
-		fmt.Printf(lang.T("msg.unsupported_os")+"\n", runtime.GOOS)
-		return
-	}
-
-	// 执行卸载
-	if err := core.UninstallLaTeXEnvironment(installer); err != nil {
-		fmt.Printf(lang.T("msg.uninstall_failed")+": %v\n", err)
-		return
-	}
-	// 注意：成功消息由卸载器内部输出，这里不需要再输出
 }
 
 // handleShellLikeCommands 处理 REPL 内置的简单 shell 类命令
@@ -554,78 +470,4 @@ func handleShellLikeCommands(parts []string) bool {
 	}
 
 	return false
-}
-
-// 构建 LaTeX 文档
-func BuildLaTeX(filePath string, outputPath string, show bool) {
-	opts := core.BuildOptions{
-		InputPath:  filePath,
-		OutputPath: outputPath,
-		Show:       show,
-	}
-
-	pdfPath, err := core.Build(opts)
-	if err != nil {
-		fmt.Printf(lang.T("msg.build_failed")+": %v\n", err)
-		return
-	}
-
-	if show && pdfPath != "" {
-		OpenPDF(pdfPath)
-	}
-}
-
-// OpenPDF 根据平台分发预览任务
-func OpenPDF(pdfPath string) {
-	var err error
-	switch runtime.GOOS {
-	case "darwin":
-		err = mac.PreviewPDF(pdfPath) // macOS 预览 PDF
-	case "windows":
-		err = win.PreviewPDF(pdfPath) // Windows 预览 PDF
-	case "linux":
-		fmt.Printf(lang.T("msg.unsupported_os")+"\n", runtime.GOOS)
-	default:
-		// 如果不支持，就打印个提示，不强求
-		fmt.Printf(lang.T("msg.unsupported_os")+"\n", runtime.GOOS)
-		return
-	}
-
-	if err != nil {
-		fmt.Printf(lang.T("msg.preview_failed")+"\n", err)
-	}
-}
-
-// StartLivePreview 启动实时预览模式
-// filePath: 要预览的 .tex 文件路径
-func StartLivePreview(filePath string) {
-	// 1. 获取绝对路径，确保监听准确
-	absPath, err := filepath.Abs(filePath)
-	if err != nil {
-		fmt.Printf(lang.T("msg.err_abs_path")+"\n", filePath)
-		return
-	}
-
-	// 2. 启动后立即执行一次“初次构建并展示”
-	// 这里调用我们已有的 BuildLaTeX 函数，设置展示标志为 true
-	BuildLaTeX(absPath, "", true)
-
-	// 3. 打印监听提示（文案已在 i18n 中定义）
-	fmt.Printf(lang.T("msg.watching_file")+"\n", filepath.Base(absPath))
-
-	// 4. 调用 core 层的监听引擎
-	// 当文件变动时，它会回调执行我们定义的闭包函数
-	err = core.WatchAndAction(absPath, func() {
-		// 这里是文件变动后的动作
-		currentTime := time.Now().Format("15:04:05")
-		fmt.Printf("\n🔄 [%s] %s\n", currentTime, lang.T("msg.building_doc"))
-
-		// 重新执行编译和展示逻辑
-		BuildLaTeX(absPath, "", true)
-	})
-
-	// 5. 错误处理（如果监听器意外崩溃）
-	if err != nil {
-		fmt.Printf("Watcher error: %v\n", err)
-	}
 }

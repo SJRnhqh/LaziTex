@@ -1,5 +1,5 @@
 // core/environment.go
-// 核心业务：安装、卸载、检查LaTeX编译环境
+// 核心业务：安装、卸载、检查LaTex编译环境
 
 package core
 
@@ -45,11 +45,11 @@ type CompilerInfo struct {
 	Priority    int          // 优先级（用于排序，0=核心，1=重要，2=可选）
 }
 
-// LaTeXEnvironment 存储完整的 LaTeX 环境信息
-type LaTeXEnvironment struct {
+// LaTexEnvironment 存储完整的 LaTex 环境信息
+type LaTexEnvironment struct {
 	OS           string                  // 操作系统
 	Tools        map[string]CompilerInfo // 工具映射
-	Distribution string                  // LaTeX 发行版
+	Distribution string                  // LaTex 发行版
 	Checker      EnvironmentChecker      // 平台特定检查器
 }
 
@@ -61,35 +61,35 @@ type EnvironmentChecker interface {
 	// GetSearchPaths 获取平台特定的搜索路径
 	GetSearchPaths() []string
 
-	// DetectDistribution 检测 LaTeX 发行版
+	// DetectDistribution 检测 LaTex 发行版
 	DetectDistribution(tools map[string]CompilerInfo) string
 
 	// GetInstallGuide 获取安装指南
 	GetInstallGuide() string
 
 	// PostCheck 平台特定的后处理检查
-	PostCheck(env *LaTeXEnvironment)
+	PostCheck(env *LaTexEnvironment)
 }
 
 // EnvironmentInstaller 定义平台特定安装器接口
 type EnvironmentInstaller interface {
-	// Install 安装 LaTeX 环境
+	// Install 安装 LaTex 环境
 	Install() error
 
-	// Uninstall 卸载 LaTeX 环境
+	// Uninstall 卸载 LaTex 环境
 	Uninstall() error
 }
 
-// InstallLaTeXEnvironment 安装 LaTeX 环境（使用平台特定安装器）
-func InstallLaTeXEnvironment(installer EnvironmentInstaller) error {
+// InstallLaTexEnvironment 安装 LaTex 环境（使用平台特定安装器）
+func InstallLaTexEnvironment(installer EnvironmentInstaller) error {
 	if installer == nil {
 		return fmt.Errorf("installer is nil")
 	}
 	return installer.Install()
 }
 
-// UninstallLaTeXEnvironment 卸载 LaTeX 环境（使用平台特定安装器）
-func UninstallLaTeXEnvironment(installer EnvironmentInstaller) error {
+// UninstallLaTexEnvironment 卸载 LaTex 环境（使用平台特定安装器）
+func UninstallLaTexEnvironment(installer EnvironmentInstaller) error {
 	if installer == nil {
 		return fmt.Errorf("installer is nil")
 	}
@@ -100,10 +100,10 @@ func UninstallLaTeXEnvironment(installer EnvironmentInstaller) error {
 func GetAllTools() []CompilerInfo {
 	return []CompilerInfo{
 		// 核心编译器 (Priority 0)
-		{Name: "pdflatex", DisplayName: "PDFLaTeX", Category: CategoryCompiler, Priority: 0, Description: "desc.pdflatex"},
-		{Name: "xelatex", DisplayName: "XeLaTeX", Category: CategoryCompiler, Priority: 0, Description: "desc.xelatex"},
-		{Name: "lualatex", DisplayName: "LuaLaTeX", Category: CategoryCompiler, Priority: 0, Description: "desc.lualatex"},
-		{Name: "latex", DisplayName: "LaTeX", Category: CategoryCompiler, Priority: 0, Description: "desc.latex"},
+		{Name: "pdflatex", DisplayName: "PDFLaTex", Category: CategoryCompiler, Priority: 0, Description: "desc.pdflatex"},
+		{Name: "xelatex", DisplayName: "XeLaTex", Category: CategoryCompiler, Priority: 0, Description: "desc.xelatex"},
+		{Name: "lualatex", DisplayName: "LuaLaTex", Category: CategoryCompiler, Priority: 0, Description: "desc.lualatex"},
+		{Name: "latex", DisplayName: "LaTex", Category: CategoryCompiler, Priority: 0, Description: "desc.latex"},
 
 		// 其他编译器 (Priority 1)
 		{Name: "pdftex", DisplayName: "PDFTeX", Category: CategoryCompiler, Priority: 1, Description: "desc.pdftex"},
@@ -126,7 +126,7 @@ func GetAllTools() []CompilerInfo {
 		{Name: "dvisvgm", DisplayName: "dvisvgm", Category: CategoryConverter, Priority: 2, Description: "desc.dvisvgm"},
 
 		// 自动化工具 (Priority 0)
-		{Name: "latexmk", DisplayName: "LaTeXmk", Category: CategoryAutomation, Priority: 0, Description: "desc.latexmk"},
+		{Name: "latexmk", DisplayName: "LaTexmk", Category: CategoryAutomation, Priority: 0, Description: "desc.latexmk"},
 
 		// 包管理器 (Priority 1)
 		{Name: "tlmgr", DisplayName: "TeX Live Manager", Category: CategoryPackageManager, Priority: 1, Description: "desc.tlmgr"},
@@ -140,12 +140,12 @@ func GetAllTools() []CompilerInfo {
 	}
 }
 
-// CheckLaTeXEnvironment 检测 LaTeX 编译环境（使用平台特定检查器）
+// CheckLaTexEnvironment 检测 LaTex 编译环境（使用平台特定检查器）
 // 注意：checker 由外部传入，避免循环依赖
 // 优化：使用并发检测提升性能，限制并发数避免资源竞争
 // 快速模式：只对核心工具获取版本信息，其他工具跳过版本查询
-func CheckLaTeXEnvironment(checker EnvironmentChecker) *LaTeXEnvironment {
-	env := &LaTeXEnvironment{
+func CheckLaTexEnvironment(checker EnvironmentChecker) *LaTexEnvironment {
+	env := &LaTexEnvironment{
 		OS:      runtime.GOOS,
 		Tools:   make(map[string]CompilerInfo),
 		Checker: checker,
@@ -322,7 +322,7 @@ func getDisplayWidth(s string) int {
 }
 
 // PrintEnvironment 打印环境信息
-func (env *LaTeXEnvironment) PrintEnvironment() {
+func (env *LaTexEnvironment) PrintEnvironment() {
 	title := lang.T("title.env_check")
 	titleWidth := getDisplayWidth(title)
 
@@ -430,7 +430,7 @@ func (env *LaTeXEnvironment) PrintEnvironment() {
 
 // getToolsByCategory 获取指定分类的工具（按优先级排序）
 // 优化：使用标准库排序替代冒泡排序
-func (env *LaTeXEnvironment) getToolsByCategory(category ToolCategory) []CompilerInfo {
+func (env *LaTexEnvironment) getToolsByCategory(category ToolCategory) []CompilerInfo {
 	var tools []CompilerInfo
 	for _, info := range env.Tools {
 		if info.Category == category {
@@ -459,7 +459,7 @@ func getPriorityIcon(priority int) string {
 }
 
 // HasRequiredCompilers 检查是否有必要的核心编译器
-func (env *LaTeXEnvironment) HasRequiredCompilers() bool {
+func (env *LaTexEnvironment) HasRequiredCompilers() bool {
 	requiredCompilers := []string{"pdflatex", "xelatex", "lualatex"}
 
 	for _, name := range requiredCompilers {
@@ -472,7 +472,7 @@ func (env *LaTeXEnvironment) HasRequiredCompilers() bool {
 }
 
 // GetInstalledCoreCompilers 获取已安装的核心编译器列表
-func (env *LaTeXEnvironment) GetInstalledCoreCompilers() []string {
+func (env *LaTexEnvironment) GetInstalledCoreCompilers() []string {
 	var compilers []string
 	for _, info := range env.Tools {
 		if info.Category == CategoryCompiler && info.Priority == 0 && info.Installed {

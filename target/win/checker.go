@@ -72,7 +72,7 @@ func (c *Checker) GetSearchPaths() []string {
 	return paths
 }
 
-// DetectDistribution 检测 LaTeX 发行版
+// DetectDistribution 检测 LaTex 发行版
 func (c *Checker) DetectDistribution(tools map[string]core.CompilerInfo) string {
 	if pdflatex, exists := tools["pdflatex"]; exists && pdflatex.Installed {
 		version := strings.ToLower(pdflatex.Version)
@@ -138,6 +138,6 @@ func (c *Checker) GetInstallGuide() string {
 }
 
 // PostCheck Windows 特定的后处理检查
-func (c *Checker) PostCheck(env *core.LaTeXEnvironment) {
+func (c *Checker) PostCheck(env *core.LaTexEnvironment) {
 	// Windows 特定检查可以在这里添加
 }

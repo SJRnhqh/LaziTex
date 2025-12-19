@@ -48,7 +48,7 @@ func (i *Installer) askForConfirmation(prompt string) (bool, error) {
 	}
 }
 
-// Install 安装或更新 LaTeX 环境
+// Install 安装或更新 LaTex 环境
 // 如果已安装则更新，如果未安装则安装
 func (i *Installer) Install() error {
 	// 1. 检查是否安装了 Homebrew
@@ -56,8 +56,8 @@ func (i *Installer) Install() error {
 		return errors.New(lang.T("msg.mac.brew_not_installed"))
 	}
 
-	// 2. 检查是否已经安装了 LaTeX
-	if i.isLaTeXInstalled() {
+	// 2. 检查是否已经安装了 LaTex
+	if i.isLaTexInstalled() {
 		// 已安装，询问是否更新
 		fmt.Println(lang.T("msg.mac.latex_already_installed"))
 
@@ -175,8 +175,8 @@ func (i *Installer) listUpdatablePackages() (string, []string, error) {
 	return string(output), pkgNames, nil
 }
 
-// isLaTeXInstalled 检查是否已安装 LaTeX
-func (i *Installer) isLaTeXInstalled() bool {
+// isLaTexInstalled 检查是否已安装 LaTex
+func (i *Installer) isLaTexInstalled() bool {
 	// 检查 pdflatex 是否存在
 	if _, err := exec.LookPath("pdflatex"); err == nil {
 		return true
@@ -265,7 +265,7 @@ func (i *Installer) findTlmgrPath() (string, error) {
 	return "", fmt.Errorf("tlmgr not found")
 }
 
-// detectInstallationMethod 检测 LaTeX 的安装方式
+// detectInstallationMethod 检测 LaTex 的安装方式
 func (i *Installer) detectInstallationMethod() string {
 	// 检查是否通过 Homebrew 安装
 	if _, err := exec.LookPath("brew"); err == nil {
@@ -328,10 +328,10 @@ func (i *Installer) cleanupResidual() {
 	}
 }
 
-// Uninstall 卸载 LaTeX 环境
+// Uninstall 卸载 LaTex 环境
 func (i *Installer) Uninstall() error {
-	// 1. 检查是否已安装 LaTeX
-	if !i.isLaTeXInstalled() {
+	// 1. 检查是否已安装 LaTex
+	if !i.isLaTexInstalled() {
 		// 未安装，提示用户
 		fmt.Println(lang.T("msg.mac.latex_not_installed"))
 		fmt.Println()
@@ -461,7 +461,7 @@ func (i *Installer) uninstallMacPorts() error {
 
 // uninstallGeneric 通用卸载方法（当无法确定安装方式时）
 func (i *Installer) uninstallGeneric() error {
-	fmt.Println("警告: 无法确定 LaTeX 的安装方式")
+	fmt.Println("警告: 无法确定 LaTex 的安装方式")
 	fmt.Println("请手动卸载，或使用以下命令：")
 	fmt.Println("  - Homebrew: brew uninstall --cask basictex 或 brew uninstall --cask mactex")
 	fmt.Println("  - MacPorts: sudo port uninstall texlive")

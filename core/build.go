@@ -1,5 +1,5 @@
 // core/build.go
-// 核心业务：编译LaTeX文档
+// 核心业务：编译LaTex编译器相关业务
 
 package core
 
@@ -24,7 +24,7 @@ type BuildOptions struct {
 	Show       bool   // 编译完是否展示PDF
 }
 
-// Build 执行 LaTeX 编译
+// Build 执行 LaTex 编译
 func Build(opts BuildOptions) (string, error) {
 	// 1. 获取输入文件的绝对路径
 	absPath, err := filepath.Abs(opts.InputPath)

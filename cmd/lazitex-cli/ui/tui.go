@@ -1,4 +1,5 @@
 // cmd/lazitex-cli/ui/tui.go
+// TUI模式界面管理
 
 package ui
 
