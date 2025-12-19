@@ -160,6 +160,7 @@ func init() {
 		"msg.err_invalid_ext":    "错误: 无效的文件类型 '%s' (仅支持 .tex 文件)",
 		"msg.err_file_not_found": "错误: 找不到文件 '%s'",
 		"msg.preview_usage":      "用法: lazitex -p <文件名.tex>",
+		"msg.preview_failed":     "⚠️  警告: 预览失败: %v",
 		"msg.watching_file":      "👀 正在实时监听文件: %s (按 Ctrl+C 退出监听)",
 
 		// 包管理相关
@@ -338,6 +339,7 @@ func init() {
 		"msg.err_invalid_ext":    "Error: Invalid file type '%s' (only .tex files supported)",
 		"msg.err_file_not_found": "Error: File not found '%s'",
 		"msg.preview_usage":      "Usage: lazitex -p <file.tex>",
+		"msg.preview_failed":     "⚠️  Warning: Preview failed: %v",
 		"msg.watching_file":      "👀 Watching file: %s (press Ctrl+C to stop)",
 
 		// Package management related

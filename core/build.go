@@ -1,4 +1,5 @@
 // core/build.go
+// 编译LaTeX文档
 
 package core
 
@@ -16,7 +17,7 @@ import (
 type BuildOptions struct {
 	InputPath  string // 输入的 .tex 文件路径
 	OutputPath string // 输出的 PDF 文件路径
-	Preview    bool   // 是否预览
+	Show       bool   // 编译完是否展示PDF
 }
 
 // Build 执行 LaTeX 编译

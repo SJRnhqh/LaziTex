@@ -1,4 +1,6 @@
 // core/package.go
+// 核心业务内部，编译LaTeX文档时检测并处理缺失的包
+
 package core
 
 import (

@@ -494,11 +494,11 @@ func handleShellLikeCommands(parts []string) bool {
 }
 
 // 构建 LaTeX 文档
-func BuildLaTeX(filePath string, outputPath string, preview bool) {
+func BuildLaTeX(filePath string, outputPath string, show bool) {
 	opts := core.BuildOptions{
 		InputPath:  filePath,
 		OutputPath: outputPath,
-		Preview:    preview,
+		Show:       show,
 	}
 
 	pdfPath, err := core.Build(opts)
@@ -507,7 +507,7 @@ func BuildLaTeX(filePath string, outputPath string, preview bool) {
 		return
 	}
 
-	if preview && pdfPath != "" {
+	if show && pdfPath != "" {
 		OpenPDF(pdfPath)
 	}
 }
@@ -529,7 +529,7 @@ func OpenPDF(pdfPath string) {
 	}
 
 	if err != nil {
-		fmt.Printf("Warning: Failed to open preview: %v\n", err)
+		fmt.Printf(core.T("msg.preview_failed")+"\n", err)
 	}
 }
 
