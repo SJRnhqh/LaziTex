@@ -106,6 +106,8 @@ func StartLivePreview(filePath string) {
 		// 更新服务器中的PDF路径
 		if newPdfPath != "" {
 			server.SetPDFPath(newPdfPath)
+			// 广播消息给所有SSE客户端
+			server.BroadcastSSE("refresh")
 		}
 	})
 

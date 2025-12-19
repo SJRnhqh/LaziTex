@@ -22,7 +22,7 @@ Instant LaTex compilation across platforms — powered by Go with local AI to he
 - 💬 **Interactive REPL** - Interactive commands for check, install, uninstall, language switching, and more
 - 🔄 **Adaptive Multi-Pass Compilation** - Automatically detects and handles multiple compilation passes for cross-references, table of contents, bibliographies, indexes, and glossaries
 - 📦 **Auto Package Management** - Automatically detects missing packages from compilation errors and installs them via tlmgr/mpm
-- 🌐 **Web Preview Mode** - Local HTTP server + browser preview, Overleaf-style web preview experience
+- 🌐 **Web Preview Mode** - Local HTTP server + browser preview, SSE real-time auto-refresh, double-buffering optimization, Overleaf-style web preview experience
 - 🧠 **AI-Powered** (Coming Soon) - Local AI assistance for writing and refining LaTex documents
 - 🎨 **Multiple Modes** - TUI (Terminal UI) and REPL modes for different workflows
 
@@ -120,6 +120,7 @@ Edit the config file directly or use `--lang` parameter to update automatically.
 - Auto package detection & installation - Detects missing packages from compilation errors and installs them automatically
 - Adaptive multi-pass compilation - Automatically handles cross-references, TOC, bibliographies, indexes, etc.
 - Smart preview - Automatically opens PDF after successful build (macOS prioritizes Skim, Windows prioritizes SumatraPDF)
+- Web preview mode - Local HTTP server + browser preview, SSE real-time auto-refresh, zero-latency update experience
 - Custom output - Supports specifying output directory or full path
 
 **Build Example:**
@@ -131,6 +132,19 @@ $ lazitex -b report.tex -s
 ... (compiler output) ...
 ✨ Build successful!
 (Automatically opening show window)
+```
+
+**Web Preview Mode:**
+
+```bash
+$ lazitex -p report.tex
+🚀 Building LaTex document: report.tex
+✨ Build successful!
+🔗 Opening browser: http://localhost:8080
+🌐 Server starting on port 8080
+👀 Watching file: report.tex (press Ctrl+C to stop)
+
+# After modifying the file, the browser will automatically refresh to show the latest PDF
 ```
 
 ### REPL Mode
@@ -210,11 +224,22 @@ lazitex/
 │       ├── 📦 package.go           # Auto package detection & installation
 │       └── 🔄 passes.go            # Adaptive multi-pass compilation detection
 │
-├── 🌐 lang/                       # Internationalization module
+├── 📚 lang/                       # Internationalization module
 │   └── i18n.go                    # Multi-language support (English/Chinese)
 │
 ├── ⚙️  config/                     # Configuration management
 │   └── config.go                  # User preferences & settings
+│
+├── 🗄️  backend/                    # Web server backend
+│   ├── server.go                  # HTTP server core
+│   ├── handlers.go                # HTTP request handlers (index, PDF)
+│   ├── routes.go                  # Route registration
+│   └── sse.go                     # Server-Sent Events real-time push
+│
+├── 🌐 web/                        # Web frontend resources
+│   ├── embed.go                   # Static resource embedding
+│   └── static/                    # Static files
+│       └── index.html             # Preview page (double-buffering optimized)
 │
 ├── 🎯 target/                     # Platform-specific implementations
 │   ├── 🪟 win/                    # Windows-specific detection
@@ -230,7 +255,7 @@ lazitex/
 │       ├── 📦 installer.go        # macOS installer (✅ Implemented)
 │       └── 🛠️  builder.go         # macOS build & preview logic (✅ Implemented)
 │
-├── 🖥️  cmd/                       # Command-line interface
+├── 💻 cmd/                       # Command-line interface
 │   └── 🚀 lazitex-cli/
 │       ├── 📄 main.go             # CLI entry point: parses commands and routes to modes
 │       ├── 📋 tasks/              # Task execution layer (unified command execution logic)
@@ -252,6 +277,8 @@ lazitex/
 - **Compilation Strategy Pattern** - Uses Strategy Pattern (`compileStrategy` interface) to handle different compilation scenarios. Default strategy automatically handles package errors and multi-pass compilation. Future AI-powered strategies can be easily added without modifying the core compilation loop
 
 - **Compilation Error Handling Module** - `core/errors/` modularly handles compilation issues: automatic package detection & installation, adaptive multi-pass compilation detection (covers 6 scenarios: TOC, cross-refs, bibliographies, indexes, glossaries, PDF bookmarks)
+
+- **Web Preview Architecture** - Lightweight HTTP server based on Go standard library, using Server-Sent Events (SSE) for real-time push, frontend double-buffering eliminates refresh flicker, providing smooth preview experience
 
 - **Tool Priority System** - Tools categorized by priority (⭐ Core, 🔹 Important, 🔸 Optional), helping users quickly identify critical tools
 
@@ -294,7 +321,7 @@ lazitex/
 - [x] **REPL Interactive Mode** - Command history, Tab completion, Shell shortcuts, full i18n support
 - [x] **Build & Preview System** - One-click compilation, smart preview (macOS Skim/Windows SumatraPDF), live preview watching
 - [x] **Smart Compilation Optimization** - Auto package detection & installation, adaptive multi-pass compilation (cross-refs, TOC, bibliographies, etc.)
-- [x] **Web Preview Mode** - Local HTTP server + browser preview, Overleaf-style web preview experience
+- [x] **Web Preview Mode** - Local HTTP server + browser preview, SSE real-time auto-refresh, double-buffering optimization, Overleaf-style web preview experience
 
 ### In Progress 🚧
 

@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"sync"
 )
 
 // Server HTTP服务器
@@ -14,6 +15,10 @@ type Server struct {
 	mux        *http.ServeMux
 	pdfPath    string
 	errorMsg   string // PDF文件不存在的错误消息（支持国际化）
+
+	// SSE 客户端管理（新增）
+	sseClients map[chan string]bool // SSE 客户端通道映射
+	sseMu      sync.Mutex           // 保护 sseClients 的互斥锁
 }
 
 // NewServer 创建新的HTTP服务器
@@ -28,9 +33,11 @@ func NewServer(port int, pdfPath string, errorMsg string) *Server {
 			Addr:    fmt.Sprintf(":%d", port),
 			Handler: mux,
 		},
-		mux:      mux,
-		pdfPath:  pdfPath,
-		errorMsg: errorMsg,
+		mux:        mux,
+		pdfPath:    pdfPath,
+		errorMsg:   errorMsg,
+		sseClients: make(map[chan string]bool),
+		sseMu:      sync.Mutex{},
 	}
 
 	// 注册路由

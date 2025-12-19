@@ -9,4 +9,7 @@ func (s *Server) RegisterRoutes() {
 
 	// PDF文件路由（使用 Server 的方法）
 	s.mux.HandleFunc("/pdf", s.HandlePDF)
+
+	// SSE 事件流路由（新增）
+	s.mux.HandleFunc("/events", s.HandleSSE)
 }

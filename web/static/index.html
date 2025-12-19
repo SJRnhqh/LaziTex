@@ -17,18 +17,84 @@
             justify-content: center;
             align-items: center;
             background: #2d2d2d;
+            position: relative;
         }
-        #pdf-viewer {
+        .pdf-viewer {
             width: 100%;
             height: 100%;
             border: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .pdf-viewer.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .pdf-viewer.visible {
+            opacity: 1;
+            pointer-events: auto;
         }
     </style>
 </head>
 <body>
     <div id="pdf-container">
-        <iframe id="pdf-viewer" src="/pdf"></iframe>
+        <iframe id="pdf-viewer-1" class="pdf-viewer visible" src="/pdf"></iframe>
+        <iframe id="pdf-viewer-2" class="pdf-viewer hidden" src=""></iframe>
     </div>
+    <script>
+        let currentViewer = 1; // 当前显示的 iframe (1 或 2)
+        
+        // Server-Sent Events (SSE) 客户端
+        const eventSource = new EventSource('/events');
+        
+        // 当收到服务器消息时
+        eventSource.onmessage = function(event) {
+            if (event.data === 'refresh') {
+                console.log('PDF updated, refreshing...');
+                
+                // 确定哪个 iframe 是当前显示的，哪个是后台的
+                const currentId = `pdf-viewer-${currentViewer}`;
+                const nextId = `pdf-viewer-${currentViewer === 1 ? 2 : 1}`;
+                
+                const currentViewerEl = document.getElementById(currentId);
+                const nextViewerEl = document.getElementById(nextId);
+                
+                // 在后台 iframe 中加载新的 PDF
+                const newSrc = '/pdf?t=' + Date.now();
+                nextViewerEl.src = newSrc;
+                
+                // 等待后台 iframe 加载完成
+                nextViewerEl.onload = function() {
+                    // 隐藏当前 iframe，显示新的 iframe
+                    currentViewerEl.classList.remove('visible');
+                    currentViewerEl.classList.add('hidden');
+                    
+                    nextViewerEl.classList.remove('hidden');
+                    nextViewerEl.classList.add('visible');
+                    
+                    // 切换当前显示的 iframe 编号
+                    currentViewer = currentViewer === 1 ? 2 : 1;
+                    
+                    console.log('PDF refreshed smoothly');
+                };
+            }
+        };
+        
+        // 连接错误处理
+        eventSource.onerror = function(error) {
+            console.error('SSE connection error:', error);
+            eventSource.close();
+            setTimeout(function() {
+                location.reload();
+            }, 3000);
+        };
+        
+        // 连接成功
+        eventSource.onopen = function() {
+            console.log('SSE connection established');
+        };
+    </script>
 </body>
 </html>
-
