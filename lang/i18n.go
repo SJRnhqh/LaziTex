@@ -16,12 +16,12 @@ import (
 // 继承 model.Language 类型
 type Language = model.Language
 
-// 定义中文和英文常量
-var LangZH = model.LangZH
-var LangEN = model.LangEN
+// 继承两个常量：中文和英文
+var lang_zh = model.LangZH
+var lang_en = model.LangEN
 
 // 全局当前语言
-var currentLang Language = LangZH
+var currentLang Language = lang_zh
 
 // SetLanguage 设置当前语言
 func SetLanguage(lang Language) {
@@ -44,9 +44,9 @@ func DetectSystemLanguage() Language {
 	// 1. 检查环境变量 LAZITEX_LANG
 	if lang := os.Getenv("LAZITEX_LANG"); lang != "" {
 		if strings.HasPrefix(strings.ToLower(lang), "zh") {
-			return LangZH
+			return lang_zh
 		}
-		return LangEN
+		return lang_en
 	}
 
 	// 2. 检查用户配置文件
@@ -59,16 +59,16 @@ func DetectSystemLanguage() Language {
 	for _, env := range []string{"LANG", "LANGUAGE", "LC_ALL", "LC_MESSAGES"} {
 		if val := os.Getenv(env); val != "" {
 			if strings.HasPrefix(strings.ToLower(val), "zh") {
-				return LangZH
+				return lang_zh
 			}
 			if strings.HasPrefix(strings.ToLower(val), "en") {
-				return LangEN
+				return lang_en
 			}
 		}
 	}
 
 	// 4. 默认英文
-	return LangEN
+	return lang_en
 }
 
 // I18n 国际化消息
@@ -99,8 +99,8 @@ func (i *I18n) Get(key string, lang Language) string {
 		}
 	}
 	// 回退到中文
-	if lang != LangZH {
-		if langMap, ok := i.messages[LangZH]; ok {
+	if lang != lang_zh {
+		if langMap, ok := i.messages[lang_zh]; ok {
 			if msg, ok := langMap[key]; ok {
 				return msg
 			}
@@ -118,7 +118,7 @@ func (i *I18n) Register(lang Language, messages map[string]string) {
 // 初始化所有翻译
 func init() {
 	// 注册中文翻译
-	i18n.Register(LangZH, map[string]string{
+	i18n.Register(lang_zh, map[string]string{
 		// 标题和边框
 		"title.env_check":  "LaTeX 编译环境检测结果",
 		"label.os":         "🖥️  操作系统",
@@ -297,7 +297,7 @@ func init() {
 	})
 
 	// 注册英文翻译
-	i18n.Register(LangEN, map[string]string{
+	i18n.Register(lang_en, map[string]string{
 		// Titles and borders
 		"title.env_check":  "LaTeX Environment Check Results",
 		"label.os":         "🖥️  Operating System",
