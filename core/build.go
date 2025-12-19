@@ -3,7 +3,9 @@
 package core
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -74,14 +76,35 @@ func Build(opts BuildOptions) (string, error) {
 	}
 	cmd := exec.Command("xelatex", args...)
 	cmd.Dir = workDir
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
 
 	fmt.Printf(T("msg.building_doc")+"\n", fileName)
 	fmt.Printf(T("msg.working_dir")+"\n", workDir)
 
-	// 5. 执行编译
-	if err := cmd.Run(); err != nil {
+	// 5. 捕获编译输出（同时显示给用户和保存用于错误分析）
+	var logOutput bytes.Buffer
+	multiWriter := io.MultiWriter(os.Stdout, &logOutput)
+	cmd.Stdout = multiWriter
+	cmd.Stderr = multiWriter
+
+	// 执行编译
+	err = cmd.Run()
+	if err != nil {
+		// 编译失败，尝试检测缺失的包
+		logStr := logOutput.String()
+		handled, handleErr := handleMissingPackages(logStr)
+
+		if handleErr != nil {
+			// 处理包管理时出错，返回原始编译错误
+			return "", err
+		}
+
+		if handled {
+			// 包已安装，重新编译
+			fmt.Println(T("msg.package_retry_build"))
+			return Build(opts) // 递归调用，但只重试一次（因为 handleMissingPackages 已经处理了）
+		}
+
+		// 没有缺失包或用户取消安装，返回原始编译错误
 		return "", err
 	}
 

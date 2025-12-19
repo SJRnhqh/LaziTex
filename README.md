@@ -344,6 +344,11 @@ lazitex -b main.tex -o res.pdf  # Specify custom output filename
 **Features:**
 
 - 🚀 **One-Click Build** - Automatically runs the compiler (XeLaTeX) with optimal settings
+- 🔍 **Auto Package Detection & Installation** - Automatically detects missing LaTeX packages (`.sty` and `.cls` files) from compilation errors and offers to install them via `tlmgr` or `mpm`
+  - **Smart Package Name Resolution** - Automatically finds the correct package name (e.g., `xeCJK.sty` → `xecjk` package)
+  - **Batch Installation** - Installs all missing packages at once to minimize password prompts
+  - **Intelligent Permission Handling** - Tries installation without sudo first, then prompts for password only when needed
+  - **Auto Retry** - Automatically recompiles after successful package installation
 - 👁️ **Smart Show (`-s`)** - Opens the PDF automatically upon successful build.
   - **macOS**: Prioritizes **Skim.app** (supporting silent refresh) if installed; otherwise, falls back to the system default browser or viewer.
   - **Windows**: Prioritizes **SumatraPDF** (supporting silent refresh and instance reuse) if installed; otherwise, falls back to the system default viewer.
@@ -362,6 +367,21 @@ $ lazitex -b report.tex -s
 ... (compiler output) ...
 ✨ Build successful!
 (Automatically opening show window)
+```
+
+**Auto Package Installation Example:**
+
+```bash
+$ lazitex -b document.tex
+🚀 Building LaTeX document: document.tex
+... (compilation fails) ...
+🔍 Missing package detected: xeCJK
+💡 Auto-install? [Y/n]: y
+📦 Installing xeCJK...
+Administrator privileges required, please enter password...
+✅ Installation successful!
+🔄 Retrying build...
+✨ Build successful!
 ```
 
 ### Other Commands
@@ -515,6 +535,7 @@ LaziTex can detect **23 LaTeX tools** across 7 categories:
 - [x] LaTeX Build Engine (Basic: One-click .tex to PDF, smart working directory)
 - [x] Smart Preview System (macOS Skim/Web & Windows SumatraPDF/Default auto-adapter)
 - [x] Live Preview Mode - Auto-trigger millisecond-level compilation and PDF refresh on save
+- [x] Auto Package Detection & Installation - Automatically detects missing packages from compilation errors and installs them via tlmgr/mpm
 
 ### In Progress 🚧
 

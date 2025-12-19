@@ -162,6 +162,17 @@ func init() {
 		"msg.preview_usage":      "用法: lazitex -p <文件名.tex>",
 		"msg.watching_file":      "👀 正在实时监听文件: %s (按 Ctrl+C 退出监听)",
 
+		// 包管理相关
+		"msg.package_missing":             "🔍 检测到缺失的包: %s",
+		"msg.package_install_prompt":      "💡 是否自动安装？[Y/n]: ",
+		"msg.package_installing":          "📦 正在安装 %s...",
+		"msg.package_install_success":     "✅ 安装成功！",
+		"msg.package_install_failed":      "❌ 安装失败: %v",
+		"msg.package_retry_build":         "🔄 重新编译中...",
+		"msg.package_no_manager":          "⚠️  未找到包管理器 (tlmgr/mpm)，无法自动安装",
+		"msg.package_need_sudo":           "需要管理员权限，请输入密码...",
+		"msg.package_unsupported_manager": "不支持的包管理器: %s",
+
 		// macOS 安装相关消息
 		"msg.mac.brew_not_installed":       "错误: 未安装 Homebrew。请先安装 Homebrew: https://brew.sh",
 		"msg.mac.latex_already_installed":  "检测到 LaTeX 已安装",
@@ -328,6 +339,17 @@ func init() {
 		"msg.err_file_not_found": "Error: File not found '%s'",
 		"msg.preview_usage":      "Usage: lazitex -p <file.tex>",
 		"msg.watching_file":      "👀 Watching file: %s (press Ctrl+C to stop)",
+
+		// Package management related
+		"msg.package_missing":             "🔍 Missing package detected: %s",
+		"msg.package_install_prompt":      "💡 Auto-install? [Y/n]: ",
+		"msg.package_installing":          "📦 Installing %s...",
+		"msg.package_install_success":     "✅ Installation successful!",
+		"msg.package_install_failed":      "❌ Installation failed: %v",
+		"msg.package_retry_build":         "🔄 Retrying build...",
+		"msg.package_no_manager":          "⚠️  No package manager (tlmgr/mpm) found, cannot auto-install",
+		"msg.package_need_sudo":           "Administrator privileges required, please enter password...",
+		"msg.package_unsupported_manager": "Unsupported package manager: %s",
 
 		// macOS installation messages
 		"msg.mac.brew_not_installed":       "Error: Homebrew is not installed. Please install Homebrew first: https://brew.sh",
