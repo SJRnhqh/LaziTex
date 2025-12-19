@@ -9,7 +9,8 @@ import (
 	"strings"
 
 	// 内部包
-	modes "github.com/SJRnhqh/lazitex/cmd/lazitex-cli/modes"
+	tasks "github.com/SJRnhqh/lazitex/cmd/lazitex-cli/tasks"
+	ui "github.com/SJRnhqh/lazitex/cmd/lazitex-cli/ui"
 	config "github.com/SJRnhqh/lazitex/config"
 	core "github.com/SJRnhqh/lazitex/core"
 	lang "github.com/SJRnhqh/lazitex/lang"
@@ -17,8 +18,6 @@ import (
 	linux "github.com/SJRnhqh/lazitex/target/linux"
 	mac "github.com/SJRnhqh/lazitex/target/mac"
 	win "github.com/SJRnhqh/lazitex/target/win"
-	lipgloss "github.com/charmbracelet/lipgloss"
-	figure "github.com/common-nighthawk/go-figure"
 )
 
 func main() {
@@ -27,23 +26,22 @@ func main() {
 
 	// 如果没有参数，显示帮助
 	if len(args) == 0 {
-		showHelp()
+		tasks.ShowHelp()
 		return
 	}
 
 	// 简单处理第一个参数
 	switch args[0] {
 	case "-h", "--help":
-		showHelp()
+		tasks.ShowHelp()
 	case "-v", "--version":
 		fmt.Println("LaziTex v0.0.1")
 	case "-c", "--check":
 		checkEnvironment()
 	case "-t", "--tui":
-		modes.StartTUI()
+		ui.StartTUI()
 	case "-r", "--repl":
-		printLogo()
-		modes.StartREPL()
+		ui.StartREPL()
 	case "-i", "--install":
 		installLaTeXEnvironment()
 	case "-u", "--uninstall":
@@ -92,7 +90,7 @@ func main() {
 			return
 		}
 
-		modes.BuildLaTeX(filePath, outputPath, show)
+		ui.BuildLaTeX(filePath, outputPath, show)
 	case "-p", "--preview":
 		if len(args) < 2 {
 			// 如果没传文件名，显示用法
@@ -100,10 +98,10 @@ func main() {
 			return
 		}
 		filePath := args[1]
-		modes.StartLivePreview(filePath)
+		ui.StartLivePreview(filePath)
 	default:
 		fmt.Printf(lang.T("msg.unknown_command")+"\n", args[0])
-		showHelp()
+		tasks.ShowHelp()
 	}
 }
 
@@ -144,114 +142,6 @@ func processLanguageFlag() []string {
 	return newArgs
 }
 
-// 显示命令帮助
-func showHelp() {
-	fmt.Println(lang.T("help.description"))
-	fmt.Println()
-	fmt.Println(lang.T("help.usage"))
-	fmt.Println("  lazitex [command]")
-	fmt.Println()
-	fmt.Println(lang.T("help.commands"))
-	fmt.Printf("  %-38s %s\n", "-h, --help", lang.T("help.show_help"))
-	fmt.Printf("  %-38s %s\n", "-v, --version", lang.T("help.show_version"))
-	fmt.Printf("  %-38s %s\n", "-c, --check", lang.T("help.check_env"))
-	fmt.Printf("  %-38s %s\n", "-r, --repl", lang.T("help.start_repl"))
-	fmt.Printf("  %-38s %s\n", "-t, --tui", lang.T("help.start_tui"))
-	fmt.Printf("  %-38s %s\n", "-i, --install", lang.T("help.install_latex"))
-	fmt.Printf("  %-38s %s\n", "-u, --uninstall", lang.T("help.uninstall_latex"))
-	fmt.Printf("  %-38s %s\n", "-b, --build <file> [-o path] [-s]", lang.T("help.build_latex"))
-	fmt.Printf("  %-38s %s\n", "-p, --preview <file>", lang.T("help.live_preview"))
-	fmt.Printf("  %-38s %s\n", "-l, --lang <lang>", lang.T("help.set_language"))
-}
-
-// 打印Logo
-func printLogo() {
-	// 定义科技感颜色样式
-	orangeStyle := lipgloss.NewStyle().
-		Foreground(lipgloss.Color("#FF8C00")).
-		Background(lipgloss.Color("#1a1a1a")).
-		Bold(true) // 橙色，深色背景，粗体
-
-	blueStyle := lipgloss.NewStyle().
-		Foreground(lipgloss.Color("#00BFFF")).
-		Background(lipgloss.Color("#1a1a1a")).
-		Bold(true) // 亮蓝色，深色背景，粗体
-
-	greenStyle := lipgloss.NewStyle().
-		Foreground(lipgloss.Color("#00FF7F")).
-		Background(lipgloss.Color("#1a1a1a")).
-		Bold(true) // 亮绿色，深色背景，粗体
-
-	// 生成每个字母的ASCII艺术字
-	letters := []string{"L", "a", "z", "i", "t", "e", "x"}
-	styles := []lipgloss.Style{orangeStyle, blueStyle, orangeStyle, blueStyle, greenStyle, greenStyle, greenStyle}
-
-	// 存储每个字母的艺术字行
-	var letterLines [][]string
-	maxHeight := 0
-	maxWidth := 0
-
-	// 生成每个字母的艺术字
-	for _, letter := range letters {
-		fig := figure.NewFigure(letter, "", true)
-		lines := strings.Split(fig.String(), "\n")
-		// 移除空行并计算最大宽度
-		var cleanLines []string
-		for _, line := range lines {
-			if strings.TrimSpace(line) != "" {
-				cleanLines = append(cleanLines, line)
-				if len(line) > maxWidth {
-					maxWidth = len(line)
-				}
-			}
-		}
-		letterLines = append(letterLines, cleanLines)
-		if len(cleanLines) > maxHeight {
-			maxHeight = len(cleanLines)
-		}
-	}
-
-	// 打印带白色横条背景的Logo
-	// fmt.Println()
-
-	// 计算总宽度
-	// totalWidth := (maxWidth+1)*len(letters) - 1
-
-	// 白色横条样式
-	// whiteBarStyle := lipgloss.NewStyle().
-	// 	Background(lipgloss.Color("#FFFFFF")).
-	// 	Foreground(lipgloss.Color("#000000"))
-
-	// 顶部白色横条
-	// topBar := strings.Repeat(" ", totalWidth)
-	// fmt.Println(whiteBarStyle.Render(topBar))
-
-	// 打印彩色Logo
-	for i := 0; i < maxHeight; i++ {
-		var line string
-		for j, letterLine := range letterLines {
-			if i < len(letterLine) {
-				// 右对齐填充到固定宽度
-				paddedLine := fmt.Sprintf("%-*s", maxWidth, letterLine[i])
-				line += styles[j].Render(paddedLine)
-			} else {
-				// 如果当前字母的行数不够，用空格填充
-				line += strings.Repeat(" ", maxWidth)
-			}
-			// 字母之间添加一个空格
-			if j < len(letterLines)-1 {
-				line += " "
-			}
-		}
-		fmt.Println(line)
-	}
-
-	// 底部白色横条
-	// bottomBar := strings.Repeat(" ", totalWidth)
-	// fmt.Println(whiteBarStyle.Render(bottomBar))
-	// fmt.Println()
-}
-
 // 检查 LaTeX 环境
 func checkEnvironment() {
 	// 根据平台创建对应的检查器
@@ -277,10 +167,10 @@ func checkEnvironment() {
 
 // 安装 LaTeX 环境
 func installLaTeXEnvironment() {
-	modes.InstallLaTeXEnvironment()
+	ui.InstallLaTeXEnvironment()
 }
 
 // 卸载 LaTeX 环境
 func uninstallLaTeXEnvironment() {
-	modes.UninstallLaTeXEnvironment()
+	ui.UninstallLaTeXEnvironment()
 }

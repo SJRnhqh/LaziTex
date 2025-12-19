@@ -1,6 +1,6 @@
-// cmd/lazitex-cli/modes/tui.go
+// cmd/lazitex-cli/ui/tui.go
 
-package modes
+package ui
 
 import (
 	"fmt"

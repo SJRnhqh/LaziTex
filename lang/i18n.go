@@ -33,6 +33,18 @@ func GetLanguage() Language {
 	return currentLang
 }
 
+// GetCurrentLanguageName 获取当前语言的友好名称
+func GetCurrentLanguageName() string {
+	switch GetLanguage() {
+	case model.LangZH:
+		return "中文 (Chinese)"
+	case model.LangEN:
+		return "English"
+	default:
+		return "English"
+	}
+}
+
 // DetectSystemLanguage 检测系统语言
 func DetectSystemLanguage() Language {
 	// 优先级：

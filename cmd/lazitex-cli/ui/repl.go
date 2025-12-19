@@ -1,6 +1,6 @@
-// cmd/lazitex-cli/modes/repl.go
+// cmd/lazitex-cli/ui/repl.go
 
-package modes
+package ui
 
 import (
 	// 外部包
@@ -12,6 +12,7 @@ import (
 	"time"
 
 	// 内部包
+	tasks "github.com/SJRnhqh/lazitex/cmd/lazitex-cli/tasks"
 	config "github.com/SJRnhqh/lazitex/config"
 	core "github.com/SJRnhqh/lazitex/core"
 	lang "github.com/SJRnhqh/lazitex/lang"
@@ -19,7 +20,9 @@ import (
 	linux "github.com/SJRnhqh/lazitex/target/linux"
 	mac "github.com/SJRnhqh/lazitex/target/mac"
 	win "github.com/SJRnhqh/lazitex/target/win"
+	"github.com/charmbracelet/lipgloss"
 	readline "github.com/chzyer/readline"
+	"github.com/common-nighthawk/go-figure"
 )
 
 // 创建补全器
@@ -143,6 +146,7 @@ func (c *LaTexCompleter) Do(line []rune, pos int) (newLine [][]rune, length int)
 
 // StartREPL 启动 REPL 模式
 func StartREPL() {
+	printLogo()
 	printREPLWelcome()
 
 	// 1. 配置历史记录文件的路径
@@ -183,6 +187,94 @@ func StartREPL() {
 	fmt.Println(lang.T("repl.goodbye"))
 }
 
+// 打印Logo
+func printLogo() {
+	// 定义科技感颜色样式
+	orangeStyle := lipgloss.NewStyle().
+		Foreground(lipgloss.Color("#FF8C00")).
+		Background(lipgloss.Color("#1a1a1a")).
+		Bold(true) // 橙色，深色背景，粗体
+
+	blueStyle := lipgloss.NewStyle().
+		Foreground(lipgloss.Color("#00BFFF")).
+		Background(lipgloss.Color("#1a1a1a")).
+		Bold(true) // 亮蓝色，深色背景，粗体
+
+	greenStyle := lipgloss.NewStyle().
+		Foreground(lipgloss.Color("#00FF7F")).
+		Background(lipgloss.Color("#1a1a1a")).
+		Bold(true) // 亮绿色，深色背景，粗体
+
+	// 生成每个字母的ASCII艺术字
+	letters := []string{"L", "a", "z", "i", "t", "e", "x"}
+	styles := []lipgloss.Style{orangeStyle, blueStyle, orangeStyle, blueStyle, greenStyle, greenStyle, greenStyle}
+
+	// 存储每个字母的艺术字行
+	var letterLines [][]string
+	maxHeight := 0
+	maxWidth := 0
+
+	// 生成每个字母的艺术字
+	for _, letter := range letters {
+		fig := figure.NewFigure(letter, "", true)
+		lines := strings.Split(fig.String(), "\n")
+		// 移除空行并计算最大宽度
+		var cleanLines []string
+		for _, line := range lines {
+			if strings.TrimSpace(line) != "" {
+				cleanLines = append(cleanLines, line)
+				if len(line) > maxWidth {
+					maxWidth = len(line)
+				}
+			}
+		}
+		letterLines = append(letterLines, cleanLines)
+		if len(cleanLines) > maxHeight {
+			maxHeight = len(cleanLines)
+		}
+	}
+
+	// 打印带白色横条背景的Logo
+	// fmt.Println()
+
+	// 计算总宽度
+	// totalWidth := (maxWidth+1)*len(letters) - 1
+
+	// 白色横条样式
+	// whiteBarStyle := lipgloss.NewStyle().
+	// 	Background(lipgloss.Color("#FFFFFF")).
+	// 	Foreground(lipgloss.Color("#000000"))
+
+	// 顶部白色横条
+	// topBar := strings.Repeat(" ", totalWidth)
+	// fmt.Println(whiteBarStyle.Render(topBar))
+
+	// 打印彩色Logo
+	for i := 0; i < maxHeight; i++ {
+		var line string
+		for j, letterLine := range letterLines {
+			if i < len(letterLine) {
+				// 右对齐填充到固定宽度
+				paddedLine := fmt.Sprintf("%-*s", maxWidth, letterLine[i])
+				line += styles[j].Render(paddedLine)
+			} else {
+				// 如果当前字母的行数不够，用空格填充
+				line += strings.Repeat(" ", maxWidth)
+			}
+			// 字母之间添加一个空格
+			if j < len(letterLines)-1 {
+				line += " "
+			}
+		}
+		fmt.Println(line)
+	}
+
+	// 底部白色横条
+	// bottomBar := strings.Repeat(" ", totalWidth)
+	// fmt.Println(whiteBarStyle.Render(bottomBar))
+	// fmt.Println()
+}
+
 // StartREPL 启动 REPL 模式
 func handleREPLCommand(input string) bool {
 	// 解析命令和参数
@@ -202,7 +294,7 @@ func handleREPLCommand(input string) bool {
 		return true // 返回 true 表示退出 REPL
 
 	case "help":
-		showREPLHelp()
+		tasks.ShowREPLHelp()
 
 	case "version":
 		fmt.Println("LaziTex v0.0.1")
@@ -267,7 +359,7 @@ func handleREPLCommand(input string) bool {
 		// 语言切换命令
 		if len(parts) < 2 {
 			fmt.Println(lang.T("repl.lang_usage"))
-			fmt.Println(lang.T("repl.lang_current") + getCurrentLanguageName())
+			fmt.Println(lang.T("repl.lang_current") + lang.GetCurrentLanguageName())
 		} else {
 			handleLanguageSwitch(parts[1])
 		}
@@ -285,18 +377,6 @@ func printREPLWelcome() {
 	fmt.Println(lang.T("repl.welcome"))
 	fmt.Println(lang.T("repl.help_hint"))
 	fmt.Println()
-}
-
-// getCurrentLanguageName 获取当前语言的友好名称
-func getCurrentLanguageName() string {
-	switch lang.GetLanguage() {
-	case model.LangZH:
-		return "中文 (Chinese)"
-	case model.LangEN:
-		return "English"
-	default:
-		return "English"
-	}
 }
 
 // handleLanguageSwitch 处理语言切换
@@ -318,28 +398,6 @@ func handleLanguageSwitch(langStr string) {
 		fmt.Printf(lang.T("repl.lang_unsupported")+"\n", langStr)
 		fmt.Println(lang.T("repl.lang_available"))
 	}
-}
-
-// showREPLHelp 显示帮助信息
-func showREPLHelp() {
-	fmt.Println(lang.T("repl.help_title"))
-	fmt.Printf("  %-30s - %s\n", "help", lang.T("repl.help_desc"))
-	fmt.Printf("  %-30s - %s\n", "version", lang.T("repl.version_desc"))
-	fmt.Printf("  %-30s - %s\n", "check", lang.T("repl.check_desc"))
-	fmt.Printf("  %-30s - %s\n", "install", lang.T("repl.install_desc"))
-	fmt.Printf("  %-30s - %s\n", "uninstall", lang.T("repl.uninstall_desc"))
-	fmt.Printf("  %-30s - %s\n", "build <file> [-o path] [-s]", lang.T("repl.build_desc"))
-	fmt.Printf("  %-30s - %s\n", "preview <file>", lang.T("repl.preview_desc"))
-	fmt.Printf("  %-30s - %s\n", "lang <zh|en>", lang.T("repl.lang_desc"))
-	fmt.Printf("  %-30s - %s\n", "lang", lang.T("repl.lang_current")+getCurrentLanguageName())
-	fmt.Printf("  %-30s - %s\n", "quit / exit", lang.T("repl.quit_desc"))
-	fmt.Println()
-	fmt.Println(lang.T("repl.shell_title") + ":")
-	fmt.Printf("  %-30s - %s\n", "cd [path]", lang.T("repl.help_cd"))
-	fmt.Printf("  %-30s - %s\n", "ls [path]", lang.T("repl.help_ls"))
-	fmt.Printf("  %-30s - %s\n", "pwd", lang.T("repl.help_pwd"))
-	fmt.Printf("  %-30s - %s\n", "clear", lang.T("repl.help_clear"))
-	fmt.Printf("  %-30s - %s\n", "cat <file>", lang.T("repl.help_cat"))
 }
 
 // 检查 LaTeX 环境
