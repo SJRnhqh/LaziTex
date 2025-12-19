@@ -6,15 +6,34 @@ package tasks
 import (
 	//外部包
 	"fmt"
+	"os/exec"
 	"path/filepath"
+	"runtime"
 	"time"
 
 	//内部包
+	"github.com/SJRnhqh/lazitex/backend"
 	core "github.com/SJRnhqh/lazitex/core"
 	lang "github.com/SJRnhqh/lazitex/lang"
 )
 
-// StartLivePreview 启动实时预览模式
+// openBrowser 打开浏览器（跨平台）
+func openBrowser(url string) error {
+	var cmd *exec.Cmd
+	switch runtime.GOOS {
+	case "windows":
+		cmd = exec.Command("cmd", "/c", "start", "", url)
+	case "darwin":
+		cmd = exec.Command("open", url)
+	case "linux":
+		cmd = exec.Command("xdg-open", url)
+	default:
+		return fmt.Errorf("unsupported platform")
+	}
+	return cmd.Start()
+}
+
+// StartLivePreview 启动实时预览模式（Web模式）
 // filePath: 要预览的 .tex 文件路径
 func StartLivePreview(filePath string) {
 	// 1. 获取绝对路径，确保监听准确
@@ -24,26 +43,79 @@ func StartLivePreview(filePath string) {
 		return
 	}
 
-	// 2. 启动后立即执行一次“初次构建并展示”
-	// 这里调用我们已有的 BuildLaTex 函数，设置展示标志为 true
-	BuildLaTex(absPath, "", true)
+	// 2. 启动后立即执行一次"初次构建"
+	opts := core.BuildOptions{
+		InputPath:  absPath,
+		OutputPath: "",
+		Show:       false, // Web模式下不打开本地PDF
+	}
 
-	// 3. 打印监听提示（文案已在 i18n 中定义）
+	pdfPath, err := core.Build(opts)
+	if err != nil {
+		fmt.Printf(lang.T("msg.build_failed")+": %v\n", err)
+		return
+	}
+
+	if pdfPath == "" {
+		fmt.Println(lang.T("msg.build_failed"))
+		return
+	}
+
+	// 3. 创建并启动Web服务器
+	port := 8080
+	server := backend.NewServer(port, pdfPath, lang.T("msg.pdf_not_found"))
+
+	// 在goroutine中启动服务器
+	go func() {
+		fmt.Printf(lang.T("msg.server_starting")+"\n", port)
+		if err := server.Start(); err != nil {
+			fmt.Printf(lang.T("msg.server_error")+"\n", err)
+		}
+	}()
+
+	// 4. 打开浏览器
+	url := fmt.Sprintf("http://localhost:%d", port)
+	fmt.Printf(lang.T("msg.opening_browser")+"\n", url)
+	time.Sleep(500 * time.Millisecond) // 等待服务器启动
+	if err := openBrowser(url); err != nil {
+		fmt.Printf(lang.T("msg.browser_error")+"\n", err)
+		fmt.Printf(lang.T("msg.manual_open")+"\n", url)
+	}
+
+	// 5. 打印监听提示
 	fmt.Printf(lang.T("msg.watching_file")+"\n", filepath.Base(absPath))
 
-	// 4. 调用 core 层的监听引擎
-	// 当文件变动时，它会回调执行我们定义的闭包函数
+	// 6. 监听文件变化并重新编译
 	err = core.WatchAndAction(absPath, func() {
-		// 这里是文件变动后的动作
 		currentTime := time.Now().Format(time.TimeOnly)
 		fmt.Printf("\n🔄 [%s] %s\n", currentTime, lang.T("msg.building_doc"))
 
-		// 重新执行编译和展示逻辑
-		BuildLaTex(absPath, "", true)
+		// 重新编译
+		opts := core.BuildOptions{
+			InputPath:  absPath,
+			OutputPath: "",
+			Show:       false,
+		}
+
+		newPdfPath, err := core.Build(opts)
+		if err != nil {
+			fmt.Printf(lang.T("msg.build_failed")+": %v\n", err)
+			return
+		}
+
+		// 更新服务器中的PDF路径
+		if newPdfPath != "" {
+			server.SetPDFPath(newPdfPath)
+		}
 	})
 
-	// 5. 错误处理（如果监听器意外崩溃）
+	// 7. 错误处理
 	if err != nil {
 		fmt.Printf(lang.T("msg.watcher_error")+": %v\n", err)
 	}
+
+	// 8. 保持运行（等待 Ctrl+C）
+	// 注意：这里需要处理信号来优雅关闭服务器
+	// 暂时先保持简单，后续可以添加信号处理
+	select {} // 阻塞等待
 }

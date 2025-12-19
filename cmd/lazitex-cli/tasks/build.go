@@ -13,14 +13,14 @@ import (
 	win "github.com/SJRnhqh/lazitex/target/win"
 )
 
-// openPDF 根据平台分发预览任务
-func openPDF(pdfPath string) {
+// showPDF 根据平台分发展示任务
+func showPDF(pdfPath string) {
 	var err error
 	switch runtime.GOOS {
 	case "darwin":
-		err = mac.PreviewPDF(pdfPath) // macOS 预览 PDF
+		err = mac.ShowPDF(pdfPath) // macOS 展示 PDF
 	case "windows":
-		err = win.PreviewPDF(pdfPath) // Windows 预览 PDF
+		err = win.ShowPDF(pdfPath) // Windows 展示 PDF
 	case "linux":
 		fmt.Printf(lang.T("msg.unsupported_os")+"\n", runtime.GOOS)
 	default:
@@ -30,7 +30,7 @@ func openPDF(pdfPath string) {
 	}
 
 	if err != nil {
-		fmt.Printf(lang.T("msg.preview_failed")+"\n", err)
+		fmt.Printf(lang.T("msg.show_failed")+"\n", err)
 	}
 }
 
@@ -49,6 +49,6 @@ func BuildLaTex(filePath string, outputPath string, show bool) {
 	}
 
 	if show && pdfPath != "" {
-		openPDF(pdfPath)
+		showPDF(pdfPath)
 	}
 }

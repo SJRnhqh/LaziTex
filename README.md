@@ -22,6 +22,7 @@ Instant LaTex compilation across platforms — powered by Go with local AI to he
 - 💬 **Interactive REPL** - Interactive commands for check, install, uninstall, language switching, and more
 - 🔄 **Adaptive Multi-Pass Compilation** - Automatically detects and handles multiple compilation passes for cross-references, table of contents, bibliographies, indexes, and glossaries
 - 📦 **Auto Package Management** - Automatically detects missing packages from compilation errors and installs them via tlmgr/mpm
+- 🌐 **Web Preview Mode** - Local HTTP server + browser preview, Overleaf-style web preview experience
 - 🧠 **AI-Powered** (Coming Soon) - Local AI assistance for writing and refining LaTex documents
 - 🎨 **Multiple Modes** - TUI (Terminal UI) and REPL modes for different workflows
 
@@ -293,10 +294,10 @@ lazitex/
 - [x] **REPL Interactive Mode** - Command history, Tab completion, Shell shortcuts, full i18n support
 - [x] **Build & Preview System** - One-click compilation, smart preview (macOS Skim/Windows SumatraPDF), live preview watching
 - [x] **Smart Compilation Optimization** - Auto package detection & installation, adaptive multi-pass compilation (cross-refs, TOC, bibliographies, etc.)
+- [x] **Web Preview Mode** - Local HTTP server + browser preview, Overleaf-style web preview experience
 
 ### In Progress 🚧
 
-- [ ] **Web Preview Mode** - Local HTTP server + browser preview, Overleaf-style web preview experience
 - [ ] **Live Preview Optimization** - Task preemption, compilation locks, enhanced error feedback
 - [ ] **Linux Environment Management** - Auto install/update/uninstall
 

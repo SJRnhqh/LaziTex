@@ -198,9 +198,17 @@ func init() {
 		"msg.err_invalid_ext":    "错误: 无效的文件类型 '%s' (仅支持 .tex 文件)",
 		"msg.err_file_not_found": "错误: 找不到文件 '%s'",
 		"msg.preview_usage":      "用法: lazitex -p <文件名.tex>",
-		"msg.preview_failed":     "⚠️  警告: 预览失败: %v",
+		"msg.show_failed":        "⚠️  警告: 展示失败: %v",
 		"msg.watching_file":      "👀 正在实时监听文件: %s (按 Ctrl+C 退出监听)",
 		"msg.watcher_error":      "错误: 监听器意外崩溃: %v",
+
+		// Web预览相关
+		"msg.server_starting": "🌐 服务器启动在端口 %d",
+		"msg.server_error":    "❌ 服务器错误: %v",
+		"msg.opening_browser": "🔗 正在打开浏览器: %s",
+		"msg.browser_error":   "⚠️  无法打开浏览器: %v",
+		"msg.manual_open":     "💡 请手动打开浏览器访问: %s",
+		"msg.pdf_not_found":   "PDF文件不存在",
 
 		// 包管理相关
 		"msg.package_missing":             "🔍 检测到缺失的包: %s",
@@ -386,9 +394,17 @@ func init() {
 		"msg.err_invalid_ext":    "Error: Invalid file type '%s' (only .tex files supported)",
 		"msg.err_file_not_found": "Error: File not found '%s'",
 		"msg.preview_usage":      "Usage: lazitex -p <file.tex>",
-		"msg.preview_failed":     "⚠️  Warning: Preview failed: %v",
+		"msg.show_failed":        "⚠️  Warning: Show failed: %v",
 		"msg.watching_file":      "👀 Watching file: %s (press Ctrl+C to stop)",
 		"msg.watcher_error":      "Error: Watcher unexpectedly crashed: %v",
+
+		// Web preview related
+		"msg.server_starting": "🌐 Server starting on port %d",
+		"msg.server_error":    "❌ Server error: %v",
+		"msg.opening_browser": "🔗 Opening browser: %s",
+		"msg.browser_error":   "⚠️  Failed to open browser: %v",
+		"msg.manual_open":     "💡 Please manually open browser: %s",
+		"msg.pdf_not_found":   "PDF file not found",
 
 		// Package management related
 		"msg.package_missing":             "🔍 Missing package detected: %s",

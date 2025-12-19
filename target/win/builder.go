@@ -39,8 +39,8 @@ func findSumatraPDF() string {
 	return ""
 }
 
-// PreviewPDF 在 Windows 上打开 PDF 预览
-func PreviewPDF(pdfPath string) error {
+// ShowPDF 在 Windows 上展示 PDF
+func ShowPDF(pdfPath string) error {
 	sumatraPath := findSumatraPDF()
 
 	if sumatraPath != "" {

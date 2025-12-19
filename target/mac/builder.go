@@ -19,9 +19,9 @@ func isSkimInstalled() bool {
 	return err == nil && len(output) > 0
 }
 
-// PreviewPDF 在 macOS 上打开 PDF 预览
+// ShowPDF 在 macOS 上展示 PDF
 // 目前使用系统默认程序（open 命令），后续可扩展为优先调用 Skim
-func PreviewPDF(pdfPath string) error {
+func ShowPDF(pdfPath string) error {
 	if isSkimInstalled() {
 		return exec.Command("open", "-a", "Skim.app", pdfPath).Run()
 	}
