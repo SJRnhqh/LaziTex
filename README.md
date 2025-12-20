@@ -71,7 +71,7 @@ Download pre-built binaries from [Releases](https://github.com/SJRnhqh/lazitex/r
 | `-c, --check` | Check LaTeX environment | `lazitex -c` |
 | `-i, --install` | Install/update LaTeX | `lazitex -i` |
 | `-u, --uninstall` | Uninstall LaTeX | `lazitex -u` |
-| `-b, --build` | Build LaTeX document (supports `-o` output, `-s` show, `-q` quiet) | `lazitex -b main.tex [-o out/] [-s] [-q]` |
+| `-b, --build` | Build LaTeX document (supports `-o` output, `-s` show, `-q` quiet, `-t` tidy) | `lazitex -b main.tex [-o out/] [-s] [-q] [-t]` |
 | `-p, --preview` | Live preview PDF (watches for saves and refreshes) | `lazitex -p main.tex` |
 | `-o, --ollama` | Ollama management (`-c` check, `-i` install, `-u` uninstall) | `lazitex -o -c` |
 | `-r, --repl` | Start REPL mode | `lazitex -r` |
@@ -157,6 +157,7 @@ lazitex> ollama -u     # Uninstall
 - Web preview mode - Local HTTP server + browser preview, SSE real-time auto-refresh, zero-latency update experience
 - Custom output - Supports specifying output directory or full path
 - Quiet mode - Use `-q` flag to suppress compiler verbose output, showing only key information and errors
+- Tidy mode - Use `-t` flag to automatically clean auxiliary files (.log, .aux, .toc, .out, etc.) after successful compilation, keeping only the PDF
 
 **Build Example:**
 
@@ -178,6 +179,19 @@ $ lazitex -b report.tex -q
 ✨ Build successful!
 # Compiler verbose output is suppressed, only key information is shown
 ```
+
+**Tidy Mode Example:**
+
+```bash
+$ lazitex -b report.tex -t
+🚀 Building LaTeX document: report.tex
+📁 Working directory: /Users/user/projects/paper
+✨ Build successful!
+🧹 Auxiliary files cleaned
+# Automatically removes .log, .aux, .toc, .out, etc., keeping only the PDF
+```
+
+**Note:** The `-t/--tidy` flag only cleans auxiliary files when compilation succeeds. If compilation fails, all files are preserved for debugging.
 
 **Web Preview Mode:**
 
@@ -210,7 +224,7 @@ lazitex> uninstall                 # Uninstall LaTeX environment
 lazitex> ollama -c                 # Check if Ollama is installed
 lazitex> ollama -i                 # Install Ollama (Windows via winget)
 lazitex> ollama -u                 # Uninstall Ollama
-lazitex> build main.tex -o out/ -s -q # Build LaTeX document with show, output path, and quiet mode
+lazitex> build main.tex -o out/ -s -q -t # Build LaTeX document with show, output path, and quiet mode, and tidy up auxiliary files
 lazitex> lang zh                   # Switch to Chinese
 lazitex> lang en                   # Switch to English
 lazitex> lang                      # Show current language

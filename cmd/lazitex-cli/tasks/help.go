@@ -27,7 +27,7 @@ func ShowHelp() {
 	fmt.Printf("  %-38s %s\n", "-i, --install", lang.T("help.install_latex"))
 	fmt.Printf("  %-38s %s\n", "-u, --uninstall", lang.T("help.uninstall_latex"))
 	fmt.Printf("  %-38s %s\n", "-o, --ollama <check|install|uninstall>", lang.T("help.ollama"))
-	fmt.Printf("  %-38s %s\n", "-b, --build <file> [-o|--output path] [-s|--show] [-q|--quiet]", lang.T("help.build_latex"))
+	fmt.Printf("  %-38s %s\n", "-b, --build <file> [-o|--output path] [-s|--show] [-q|--quiet] [-t|--tidy]", lang.T("help.build_latex"))
 	fmt.Printf("  %-38s %s\n", "-p, --preview <file>", lang.T("help.live_preview"))
 	fmt.Printf("  %-38s %s\n", "-l, --lang <lang>", lang.T("help.set_language"))
 }
@@ -41,7 +41,7 @@ func ShowREPLHelp() {
 	fmt.Printf("  %-30s - %s\n", "install", lang.T("repl.install_desc"))
 	fmt.Printf("  %-30s - %s\n", "uninstall", lang.T("repl.uninstall_desc"))
 	fmt.Printf("  %-30s - %s\n", "ollama <check|install|uninstall>", lang.T("repl.ollama_check_desc"))
-	fmt.Printf("  %-30s - %s\n", "build <file> [-o|--output path] [-s|--show] [-q|--quiet]", lang.T("repl.build_desc"))
+	fmt.Printf("  %-30s - %s\n", "build <file> [-o|--output path] [-s|--show] [-q|--quiet] [-t|--tidy]", lang.T("repl.build_desc"))
 	fmt.Printf("  %-30s - %s\n", "preview <file>", lang.T("repl.preview_desc"))
 	fmt.Printf("  %-30s - %s\n", "lang <zh|en>", lang.T("repl.lang_desc"))
 	fmt.Printf("  %-30s - %s\n", "lang", lang.T("repl.lang_current")+lang.GetCurrentLanguageName())

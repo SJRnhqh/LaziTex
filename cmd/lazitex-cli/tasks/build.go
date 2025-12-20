@@ -35,12 +35,13 @@ func showPDF(pdfPath string) {
 }
 
 // 构建 LaTeX 文档
-func BuildLaTeX(filePath string, outputPath string, show bool, quiet bool) {
+func BuildLaTeX(filePath string, outputPath string, show bool, quiet bool, tidy bool) {
 	opts := core.BuildOptions{
 		InputPath:  filePath,
 		OutputPath: outputPath,
 		Show:       show,
 		Quiet:      quiet,
+		Tidy:       tidy,
 	}
 
 	pdfPath, err := core.Build(opts)

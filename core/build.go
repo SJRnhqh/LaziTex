@@ -24,6 +24,7 @@ type BuildOptions struct {
 	OutputPath string // 输出的 PDF 文件路径
 	Show       bool   // 编译完是否展示PDF
 	Quiet      bool   // 是否安静模式，不输出日志
+	Tidy       bool   // 是否清理辅助文件（仅在编译成功时）
 }
 
 // compileContext 编译上下文，封装编译过程中的所有信息
@@ -63,7 +64,22 @@ func Build(opts BuildOptions) (string, error) {
 	strategy := &defaultStrategy{}
 
 	// 执行编译流程
-	return buildWithStrategy(ctx, strategy)
+	pdfPath, err := buildWithStrategy(ctx, strategy)
+	if err != nil {
+		return "", err
+	}
+
+	// 如果启用了 tidy 选项且编译成功，清理辅助文件
+	if opts.Tidy {
+		if err := tidyAuxFiles(ctx.outDir, ctx.jobName); err != nil {
+			// 清理失败不影响构建成功，只打印警告
+			fmt.Printf(lang.T("msg.tidy_warning")+": %v\n", err)
+		} else {
+			fmt.Println(lang.T("msg.tidy_success"))
+		}
+	}
+
+	return pdfPath, nil
 }
 
 // prepareContext 准备编译上下文
@@ -316,5 +332,25 @@ func runTool(toolName, workDir, jobName string, quiet bool) error {
 		fmt.Printf(lang.T("msg.tool_failed")+"\n", toolName, err)
 		return err
 	}
+	return nil
+}
+
+// tidyAuxFiles 清理 LaTeX 编译生成的辅助文件，只保留 PDF
+func tidyAuxFiles(outDir, jobName string) error {
+	// LaTeX 编译可能生成的辅助文件扩展名列表
+	auxExtensions := []string{
+		".log", ".aux", ".toc", ".out", ".idx", ".ilg", ".ind",
+		".glo", ".gls", ".glg", ".bbl", ".blg", ".fdb_latexmk",
+		".fls", ".synctex.gz", ".nav", ".snm", ".vrb",
+	}
+
+	for _, ext := range auxExtensions {
+		filePath := filepath.Join(outDir, jobName+ext)
+		if err := os.Remove(filePath); err != nil && !os.IsNotExist(err) {
+			// 如果文件不存在，忽略错误；其他错误返回
+			return fmt.Errorf(lang.T("msg.tidy_remove_failed"), filePath, err)
+		}
+	}
+
 	return nil
 }

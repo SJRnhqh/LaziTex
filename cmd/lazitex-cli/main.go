@@ -67,6 +67,7 @@ func main() {
 		var outputPath string
 		show := false
 		quiet := false
+		tidy := false
 		pendingOutput := false // 标记是否正在等待输出路径值
 
 		// 灵活解析：遍历 -b 之后的所有参数
@@ -76,6 +77,8 @@ func main() {
 				show = true
 			} else if arg == "-q" || arg == "--quiet" {
 				quiet = true
+			} else if arg == "-t" || arg == "--tidy" {
+				tidy = true
 			} else if arg == "-o" || arg == "--output" {
 				pendingOutput = true
 			} else if strings.HasPrefix(arg, "-") {
@@ -104,7 +107,7 @@ func main() {
 			return
 		}
 
-		tasks.BuildLaTeX(filePath, outputPath, show, quiet)
+		tasks.BuildLaTeX(filePath, outputPath, show, quiet, tidy)
 	case "-p", "--preview":
 		if len(args) < 2 {
 			// 如果没传文件名，显示用法

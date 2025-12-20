@@ -329,7 +329,7 @@ func handleREPLCommand(input string) bool {
 		show := false
 		pendingOutput := false
 		quiet := false
-
+		tidy := false
 		// 解析参数：build <file> [-s] [-o output_path]
 		for i := 1; i < len(parts); i++ {
 			arg := parts[i]
@@ -339,6 +339,8 @@ func handleREPLCommand(input string) bool {
 				pendingOutput = true
 			} else if arg == "-q" || arg == "--quiet" {
 				quiet = true
+			} else if arg == "-t" || arg == "--tidy" {
+				tidy = true
 			} else if strings.HasPrefix(arg, "-") {
 				// 严谨处理：未知标志位报错
 				fmt.Printf(lang.T("repl.unknown_command")+"\n", arg)
@@ -360,7 +362,7 @@ func handleREPLCommand(input string) bool {
 		}
 
 		// 调用统一的构建入口
-		tasks.BuildLaTeX(filePath, outputPath, show, quiet)
+		tasks.BuildLaTeX(filePath, outputPath, show, quiet, tidy)
 	case "preview":
 		if len(parts) < 2 {
 			fmt.Println(lang.T("repl.preview_usage"))

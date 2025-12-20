@@ -71,7 +71,7 @@ go build -o lazitex ./cmd/lazitex-cli
 | `-c, --check` | 检查 LaTeX 环境 | `lazitex -c` |
 | `-i, --install` | 安装/更新 LaTeX | `lazitex -i` |
 | `-u, --uninstall` | 卸载 LaTeX | `lazitex -u` |
-| `-b, --build` | 构建 LaTeX 文档 (支持 `-o` 输出, `-s` 编译后展示, `-q` 静默模式) | `lazitex -b main.tex [-o out/] [-s] [-q]` |
+| `-b, --build` | 构建 LaTeX 文档 (支持 `-o` 输出, `-s` 编译后展示, `-q` 静默模式, `-t` 清理辅助文件) | `lazitex -b main.tex [-o out/] [-s] [-q] [-t]` |
 | `-p, --preview` | 实时预览 PDF 文档 (监听保存动作并自动刷新) | `lazitex -p main.tex` |
 | `-o, --ollama` | Ollama 管理 (`-c` 检查, `-i` 安装, `-u` 卸载) | `lazitex -o -c` |
 | `-r, --repl` | 启动 REPL 模式 | `lazitex -r` |
@@ -157,6 +157,7 @@ lazitex> ollama -u     # 卸载
 - Web 预览模式 - 本地 HTTP 服务器 + 浏览器预览，SSE 实时自动刷新，零延迟更新体验
 - 自定义输出 - 支持指定输出目录或完整路径
 - 静默模式 - 使用 `-q` 参数可隐藏编译器详细输出，只显示关键信息和错误
+- 清理模式 - 使用 `-t` 参数可在编译成功后自动清理辅助文件（.log, .aux, .toc, .out 等），只保留 PDF
 
 **构建示例：**
 
@@ -178,6 +179,19 @@ $ lazitex -b report.tex -q
 ✨ 构建成功！
 # 编译器详细输出已被隐藏，只显示关键信息
 ```
+
+**清理辅助文件示例：**
+
+```bash
+$ lazitex -b report.tex -t
+🚀 正在构建 LaTeX 文档: report.tex
+📁 工作目录: /Users/user/projects/paper
+✨ 构建成功！
+🧹 已清理辅助文件
+# 自动删除 .log, .aux, .toc, .out 等辅助文件，只保留 PDF
+```
+
+**注意：** `-t/--tidy` 参数仅在编译成功时清理辅助文件。如果编译失败，所有文件都会保留以便调试。
 
 **Web 预览模式：**
 
@@ -207,7 +221,7 @@ lazitex> help                      # 显示可用命令
 lazitex> check                     # 检查 LaTeX 环境
 lazitex> install                   # 安装或更新 LaTeX 环境
 lazitex> uninstall                 # 卸载 LaTeX 环境
-lazitex> build main.tex -o out/ -s -q # 构建 LaTeX 文档，指定输出目录、展示并启用静默模式
+lazitex> build main.tex -o out/ -s -q -t # 构建 LaTeX 文档，指定输出目录、展示、静默模式并清理辅助文件
 lazitex> ollama -c                    # 检查 Ollama 是否安装
 lazitex> ollama -i                    # 安装 Ollama（Windows 通过 winget）
 lazitex> ollama -u                    # 卸载 Ollama
