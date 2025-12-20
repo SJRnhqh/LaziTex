@@ -185,12 +185,20 @@ $ lazitex -b report.tex -q
 $ lazitex -p report.tex
 🚀 Building LaTeX document: report.tex
 ✨ Build successful!
-🔗 Opening browser: http://localhost:8080
+💡 Vue Frontend: http://localhost:5173
+💡 Backend API: http://localhost:8080
+🔗 Opening browser: http://localhost:5173
 🌐 Server starting on port 8080
 👀 Watching file: report.tex (press Ctrl+C to stop)
 
 # After modifying the file, the browser will automatically refresh to show the latest PDF
 ```
+
+**Development Setup:**
+
+- Frontend (Vue 3 + Vite): Run `npm run dev` in `frontend/vue/` directory
+- Backend (Go): Run `lazitex -p report.tex`
+- The frontend automatically connects to the backend via Vite proxy
 
 ### REPL Mode
 
@@ -285,10 +293,20 @@ lazitex/
 │   ├── routes.go                  # Route registration
 │   └── sse.go                     # Server-Sent Events real-time push
 │
-├── 🌐 web/                        # Web frontend resources
-│   ├── embed.go                   # Static resource embedding
-│   └── static/                    # Static files
-│       └── index.html             # Preview page (double-buffering optimized)
+├── 🌐 frontend/                   # Frontend resources
+│   ├── embed.go                   # Static resource embedding (legacy)
+│   ├── static/                    # Legacy static files
+│   │   └── index.html             # Legacy preview page (double-buffering optimized)
+│   └── vue/                       # Vue 3 frontend (modern)
+│       ├── src/                   # Vue source files
+│       │   ├── components/        # Vue components
+│       │   │   └── PDFViewer.vue  # PDF preview component
+│       │   ├── App.vue            # Root component
+│       │   └── main.js            # Entry point
+│       ├── public/                # Public assets
+│       ├── index.html             # HTML template
+│       ├── vite.config.js         # Vite configuration
+│       └── package.json           # Dependencies
 │
 ├── 🎯 target/                     # Platform-specific implementations
 │   ├── 🪟 win/                    # Windows-specific detection
@@ -374,6 +392,7 @@ lazitex/
 - [x] **Build & Preview System** - One-click compilation, smart preview (macOS Skim/Windows SumatraPDF), live preview watching
 - [x] **Smart Compilation Optimization** - Auto package detection & installation, adaptive multi-pass compilation (cross-refs, TOC, bibliographies, etc.)
 - [x] **Web Preview Mode** - Local HTTP server + browser preview, SSE real-time auto-refresh, double-buffering optimization, Overleaf-style web preview experience
+- [x] **Vue 3 Frontend (Development)** - Modern Vue 3 frontend with PDF.js integration, real-time updates via SSE, adaptive scaling, smooth refresh experience
 - [x] **Ollama Management (Windows & macOS)** - One-click check, install, and uninstall Ollama. Windows: automatic winget installation. macOS: Homebrew or official script installation. Smart detection of installation status and service running status
 
 ### In Progress 🚧

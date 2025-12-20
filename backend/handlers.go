@@ -7,14 +7,14 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/SJRnhqh/lazitex/web"
+	frontend "github.com/SJRnhqh/lazitex/frontend"
 )
 
 // HandleIndex 处理首页请求
 func HandleIndex(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
-	w.Write(web.IndexHTML)
+	w.Write(frontend.IndexHTML)
 }
 
 // HandlePDF 处理PDF文件请求

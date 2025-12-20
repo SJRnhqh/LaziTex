@@ -1,17 +1,26 @@
+# ====================
 # 编译产物
+# ====================
 bin/
 *.exe
+dist/
 
+# ====================
 # Go 相关
+# ====================
 *.test
 *.out
 *.prof
 
+# ====================
 # 操作系统相关
+# ====================
 .DS_Store
 Thumbs.db
 
+# ====================
 # IDE 相关
+# ====================
 .idea/
 .vscode/
 .cursor/
@@ -19,9 +28,28 @@ Thumbs.db
 *.swo
 *~
 
+# ====================
 # 临时文件
+# ====================
 *.tmp
 *.log
 
+# ====================
 # 测试文件
+# ====================
 test/
+
+# ====================
+# Vue 前端相关
+# ====================
+frontend/vue/node_modules/
+frontend/vue/.env
+frontend/vue/.env.local
+frontend/vue/.env.*.local
+frontend/vue/npm-debug.log*
+frontend/vue/yarn-debug.log*
+frontend/vue/yarn-error.log*
+frontend/vue/pnpm-debug.log*
+frontend/vue/.pnpm-debug.log*
+
+# 注意：frontend/vue/dist/ 已经被上面的 dist/ 规则覆盖了

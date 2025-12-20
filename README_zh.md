@@ -185,12 +185,20 @@ $ lazitex -b report.tex -q
 $ lazitex -p report.tex
 🚀 正在构建 LaTeX 文档: report.tex
 ✨ 构建成功！
-🔗 正在打开浏览器: http://localhost:8080
+💡 提示：Vue 前端地址: http://localhost:5173
+💡 后端 API 地址: http://localhost:8080
+🔗 正在打开浏览器: http://localhost:5173
 🌐 服务器启动在端口 8080
 👀 正在实时监听文件: report.tex (按 Ctrl+C 退出监听)
 
-# 修改文件后，浏览器会自动刷新显示最新 PDF
+# 修改文件后，浏览器会自动刷新显示最新的 PDF
 ```
+
+**开发环境设置：**
+
+- 前端（Vue 3 + Vite）：在 `frontend/vue/` 目录运行 `npm run dev`
+- 后端（Go）：运行 `lazitex -p report.tex`
+- 前端通过 Vite 代理自动连接到后端
 
 ### REPL 模式
 
@@ -285,10 +293,20 @@ lazitex/
 │   ├── routes.go                  # 路由注册
 │   └── sse.go                     # Server-Sent Events 实时推送
 │
-├── 🌐 web/                        # Web 前端资源
-│   ├── embed.go                   # 静态资源嵌入
-│   └── static/                    # 静态文件
-│       └── index.html             # 预览页面（双缓冲优化）
+├── 🌐 frontend/                   # 前端资源
+│   ├── embed.go                   # 静态资源嵌入（旧版）
+│   ├── static/                    # 旧版静态文件
+│   │   └── index.html             # 旧版预览页面（双缓冲优化）
+│   └── vue/                       # Vue 3 前端（新版）
+│       ├── src/                   # Vue 源码文件
+│       │   ├── components/        # Vue 组件
+│       │   │   └── PDFViewer.vue  # PDF 预览组件
+│       │   ├── App.vue            # 根组件
+│       │   └── main.js            # 入口文件
+│       ├── public/                # 公共资源
+│       ├── index.html             # HTML 模板
+│       ├── vite.config.js         # Vite 配置
+│       └── package.json           # 依赖配置
 │
 ├── 🎯 target/                     # 平台特定实现
 │   ├── 🪟 win/                    # Windows 平台
@@ -375,6 +393,7 @@ lazitex/
 - [x] **编译与预览系统** - 一键编译、智能预览（macOS Skim/Windows SumatraPDF）、实时预览监听
 - [x] **智能编译优化** - 自动包检测与安装、自适应多轮编译（交叉引用、目录、参考文献等）
 - [x] **Web 预览模式** - 本地 HTTP 服务器 + 浏览器预览，SSE 实时自动刷新，双缓冲优化，提供 Overleaf 风格的 Web 预览体验
+- [x] **Vue 3 前端（开发中）** - 基于 Vue 3 的现代前端，集成 PDF.js，通过 SSE 实现实时更新，自适应缩放，平滑刷新体验
 - [x] **Ollama 管理（Windows & macOS）** - 一键检查、安装、卸载 Ollama。Windows：通过 winget 自动安装。macOS：通过 Homebrew 或官方脚本安装。智能检测安装状态和服务运行状态
 
 ### 进行中 🚧
@@ -384,6 +403,12 @@ lazitex/
 
 ### 计划中 📋
 
+- [ ] **Vue 前端生产构建** - 构建 Vue 前端并通过 Go `embed` 嵌入到二进制文件中，实现单一二进制部署
+- [ ] **文件管理模块** - 文件列表/树形结构、创建/删除/重命名文件、文件切换
+- [ ] **代码编辑器（Monaco Editor）** - LaTeX 语法高亮、代码补全、错误提示、多文件编辑
+- [ ] **终端集成（xterm.js）** - 内置终端、执行 LaTeX 命令、查看编译日志
+- [ ] **AI 聊天界面** - 集成 Ollama、AI 辅助写作、错误诊断建议
+- [ ] **UI 布局增强** - 分栏布局（编辑器 + PDF 预览）、可调整面板大小、响应式布局
 - [ ] **AI Agent 环境管理** - 将 AI Agent 作为类似 conda 环境一样管理，支持多 Agent 创建、切换和配置。通过 `ai` 命令管理 Agent（创建、列表、切换 LLM），通过 `agent` 命令调用 Agent（ask、chat、generate）。每个 Agent 可配置独立的 LLM 提供者、工具集和系统提示，实现不同场景的快速切换（编译专家、写作助手、错误诊断等）
 - [ ] **AI 集成（CLI 内部）** - 编译错误诊断、代码生成与优化、智能补全。CLI 通过 `-a` 快速调用当前配置的 Agent，REPL 提供完整的 Agent 管理和调用功能
 - [ ] **静默模式错误格式化** - 在静默模式下，提取并格式化编译错误，使用 LaziTex 风格的错误提示（带图标）替代原始编译器输出

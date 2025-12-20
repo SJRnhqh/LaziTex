@@ -73,13 +73,22 @@ func StartLivePreview(filePath string) {
 		}
 	}()
 
-	// 4. 打开浏览器
-	url := fmt.Sprintf("http://localhost:%d", port)
-	fmt.Printf(lang.T("msg.opening_browser")+"\n", url)
+	// 4. 打开浏览器（Vue 前端地址）
+	// 注意：后端在 :8080，Vue 前端在 :5173（开发模式）或 :8080（生产模式）
+	// 开发模式：打开 Vue 前端
+	// 生产模式：前端会嵌入到后端，打开后端地址
+	vueDevURL := "http://localhost:5173"
+	backendURL := fmt.Sprintf("http://localhost:%d", port)
+
+	// 尝试打开 Vue 前端（开发模式）
+	// 如果 Vue 前端未运行，用户可以手动打开
+	fmt.Printf("💡 提示：Vue 前端地址: %s\n", vueDevURL)
+	fmt.Printf("💡 后端 API 地址: %s\n", backendURL)
+	fmt.Printf("🔗 正在打开浏览器: %s\n", vueDevURL)
 	time.Sleep(500 * time.Millisecond) // 等待服务器启动
-	if err := openBrowser(url); err != nil {
+	if err := openBrowser(vueDevURL); err != nil {
 		fmt.Printf(lang.T("msg.browser_error")+"\n", err)
-		fmt.Printf(lang.T("msg.manual_open")+"\n", url)
+		fmt.Printf("请手动打开: %s\n", vueDevURL)
 	}
 
 	// 5. 打印监听提示

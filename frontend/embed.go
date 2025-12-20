@@ -1,7 +1,7 @@
-// web/embed.go
+// frontend/embed.go
 // 嵌入静态前端资源
 
-package web
+package frontend
 
 import (
 	_ "embed"
