@@ -1,6 +1,6 @@
 # LaziTex 🧸
 
-Instant LaTex compilation across platforms — powered by Go with local AI to help you write and refine.
+Instant LaTeX compilation across platforms — powered by Go with local AI to help you write and refine.
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Go Version](https://img.shields.io/badge/Go-1.25%2B-00ADD8)](https://go.dev/)
@@ -13,9 +13,9 @@ Instant LaTex compilation across platforms — powered by Go with local AI to he
 
 ## ✨ Features
 
-- 🔍 **Smart Environment Detection** - Automatically detects your LaTex installation and provides detailed diagnostics
-- 📦 **Auto Install/Update** - One-click installation or update of LaTex environments (macOS supported)
-- 🗑️ **Auto Uninstall** - One-click uninstallation of LaTex environments with smart installation method detection (macOS supported)
+- 🔍 **Smart Environment Detection** - Automatically detects your LaTeX installation and provides detailed diagnostics
+- 📦 **Auto Install/Update** - One-click installation or update of LaTeX environments (macOS supported)
+- 🗑️ **Auto Uninstall** - One-click uninstallation of LaTeX environments with smart installation method detection (macOS supported)
 - 🌍 **Cross-Platform** - Seamless support for Windows, Linux, and macOS
 - 🎯 **Zero Configuration** - Works out of the box with TeX Live, MiKTeX, and MacTeX
 - 🚀 **Fast & Lightweight** - Built with Go for blazing-fast compilation
@@ -23,8 +23,8 @@ Instant LaTex compilation across platforms — powered by Go with local AI to he
 - 🔄 **Adaptive Multi-Pass Compilation** - Automatically detects and handles multiple compilation passes for cross-references, table of contents, bibliographies, indexes, and glossaries
 - 📦 **Auto Package Management** - Automatically detects missing packages from compilation errors and installs them via tlmgr/mpm
 - 🌐 **Web Preview Mode** - Local HTTP server + browser preview, SSE real-time auto-refresh, double-buffering optimization, Overleaf-style web preview experience
-- 🦙 **Ollama Management** - One-click check, install, and uninstall Ollama (Windows supported), providing foundation for AI features
-- 🧠 **AI-Powered** (Coming Soon) - Local AI assistance for writing and refining LaTex documents
+- 🦙 **Ollama Management** - One-click check, install, and uninstall Ollama (Windows & macOS supported), providing foundation for AI features
+- 🧠 **AI-Powered** (Coming Soon) - Local AI assistance for writing and refining LaTeX documents
 - 🎨 **Multiple Modes** - TUI (Terminal UI) and REPL modes for different workflows
 
 ---
@@ -68,10 +68,10 @@ Download pre-built binaries from [Releases](https://github.com/SJRnhqh/lazitex/r
 
 | Command | Description | Example |
 |---------|-------------|---------|
-| `-c, --check` | Check LaTex environment | `lazitex -c` |
-| `-i, --install` | Install/update LaTex | `lazitex -i` |
-| `-u, --uninstall` | Uninstall LaTex | `lazitex -u` |
-| `-b, --build` | Build LaTex document (supports `-o` output, `-s` show, `-q` quiet) | `lazitex -b main.tex [-o out/] [-s] [-q]` |
+| `-c, --check` | Check LaTeX environment | `lazitex -c` |
+| `-i, --install` | Install/update LaTeX | `lazitex -i` |
+| `-u, --uninstall` | Uninstall LaTeX | `lazitex -u` |
+| `-b, --build` | Build LaTeX document (supports `-o` output, `-s` show, `-q` quiet) | `lazitex -b main.tex [-o out/] [-s] [-q]` |
 | `-p, --preview` | Live preview PDF (watches for saves and refreshes) | `lazitex -p main.tex` |
 | `-o, --ollama` | Ollama management (`-c` check, `-i` install, `-u` uninstall) | `lazitex -o -c` |
 | `-r, --repl` | Start REPL mode | `lazitex -r` |
@@ -119,10 +119,11 @@ Edit the config file directly or use `--lang` parameter to update automatically.
 **Features:**
 
 - One-click Check - Detect if Ollama is installed and version information
-- One-click Install - Auto-install Ollama via winget (Windows)
-- One-click Uninstall - Auto-uninstall Ollama via winget (Windows)
+- One-click Install - Auto-install Ollama via winget (Windows) or Homebrew/official script (macOS)
+- One-click Uninstall - Auto-uninstall Ollama via winget (Windows) or Homebrew (macOS)
 - Smart Detection - Automatically detect installation status and service running status
 - Path Detection - Can detect installation even if not in PATH
+- Multi-Platform Support - Windows and macOS supported
 
 **Usage Examples:**
 
@@ -140,7 +141,8 @@ lazitex> ollama -u     # Uninstall
 
 **Notes:**
 
-- Windows version includes GUI, but CLI tools are also available
+- **Windows**: Version includes GUI, but CLI tools are also available. Installation via winget.
+- **macOS**: Supports installation via Homebrew (recommended) or official installation script. Auto-detects installation method for uninstall.
 - You may need to restart the terminal after installation to recognize the `ollama` command
 - If installed but not in PATH, you'll be prompted to restart the terminal
 
@@ -148,7 +150,7 @@ lazitex> ollama -u     # Uninstall
 
 **Features:**
 
-- One-click build - Automatically invokes XeLaTex compiler
+- One-click build - Automatically invokes XeLaTeX compiler
 - Auto package detection & installation - Detects missing packages from compilation errors and installs them automatically
 - Adaptive multi-pass compilation - Automatically handles cross-references, TOC, bibliographies, indexes, etc.
 - Smart preview - Automatically opens PDF after successful build (macOS prioritizes Skim, Windows prioritizes SumatraPDF)
@@ -160,7 +162,7 @@ lazitex> ollama -u     # Uninstall
 
 ```bash
 $ lazitex -b report.tex -s
-🚀 Building LaTex document: report.tex
+🚀 Building LaTeX document: report.tex
 📁 Working directory: /Users/user/projects/paper
 ... (compiler output) ...
 ✨ Build successful!
@@ -171,7 +173,7 @@ $ lazitex -b report.tex -s
 
 ```bash
 $ lazitex -b report.tex -q
-🚀 Building LaTex document: report.tex
+🚀 Building LaTeX document: report.tex
 📁 Working directory: /Users/user/projects/paper
 ✨ Build successful!
 # Compiler verbose output is suppressed, only key information is shown
@@ -181,7 +183,7 @@ $ lazitex -b report.tex -q
 
 ```bash
 $ lazitex -p report.tex
-🚀 Building LaTex document: report.tex
+🚀 Building LaTeX document: report.tex
 ✨ Build successful!
 🔗 Opening browser: http://localhost:8080
 🌐 Server starting on port 8080
@@ -194,13 +196,13 @@ $ lazitex -p report.tex
 
 ```bash
 lazitex> help                      # Show available commands
-lazitex> check                     # Check LaTex environment
-lazitex> install                   # Install or update LaTex environment
-lazitex> uninstall                 # Uninstall LaTex environment
+lazitex> check                     # Check LaTeX environment
+lazitex> install                   # Install or update LaTeX environment
+lazitex> uninstall                 # Uninstall LaTeX environment
 lazitex> ollama -c                 # Check if Ollama is installed
 lazitex> ollama -i                 # Install Ollama (Windows via winget)
 lazitex> ollama -u                 # Uninstall Ollama
-lazitex> build main.tex -o out/ -s -q # Build LaTex document with show, output path, and quiet mode
+lazitex> build main.tex -o out/ -s -q # Build LaTeX document with show, output path, and quiet mode
 lazitex> lang zh                   # Switch to Chinese
 lazitex> lang en                   # Switch to English
 lazitex> lang                      # Show current language
@@ -224,9 +226,9 @@ lazitex> cat file.log              # View file content (supports .tex, .log, .au
 
 Language switching in REPL is instant and persists for future sessions!
 
-### Detected LaTex Tools
+### Detected LaTeX Tools
 
-LaziTex can detect **23 LaTex tools** across 7 categories:
+LaziTex can detect **23 LaTeX tools** across 7 categories:
 
 | Category | Tools | Count |
 |----------|-------|-------|
@@ -356,6 +358,7 @@ lazitex/
 - Shows macOS version information
 - **Auto Install/Update** - One-click BasicTeX installation via Homebrew
 - **Auto Uninstall** - Smart detection of installation method with one-click uninstallation
+- **Ollama Management** - One-click check, install, and uninstall Ollama via Homebrew or official script
 - Provides optimized installation guides based on detected package managers
 - Supports both Intel and Apple Silicon chips
 
@@ -371,7 +374,7 @@ lazitex/
 - [x] **Build & Preview System** - One-click compilation, smart preview (macOS Skim/Windows SumatraPDF), live preview watching
 - [x] **Smart Compilation Optimization** - Auto package detection & installation, adaptive multi-pass compilation (cross-refs, TOC, bibliographies, etc.)
 - [x] **Web Preview Mode** - Local HTTP server + browser preview, SSE real-time auto-refresh, double-buffering optimization, Overleaf-style web preview experience
-- [x] **Ollama Management (Windows)** - One-click check, install, and uninstall Ollama, supports automatic winget installation, smart detection of installation status and service running status
+- [x] **Ollama Management (Windows & macOS)** - One-click check, install, and uninstall Ollama. Windows: automatic winget installation. macOS: Homebrew or official script installation. Smart detection of installation status and service running status
 
 ### In Progress 🚧
 
@@ -419,19 +422,19 @@ See [LICENSE](LICENSE) file for details.
 ## 🙏 Acknowledgments
 
 - Built with [Bubble Tea](https://github.com/charmbracelet/bubbletea) for beautiful terminal UIs
-- Inspired by the LaTex community's dedication to beautiful typesetting
+- Inspired by the LaTeX community's dedication to beautiful typesetting
 
 ---
 
 ## 💡 FAQ
 
-### 1. Why can't LaziTex detect my LaTex installation?
+### 1. Why can't LaziTex detect my LaTeX installation?
 
-- **Windows**: Make sure the LaTex installation path is added to your PATH environment variable
+- **Windows**: Make sure the LaTeX installation path is added to your PATH environment variable
 - **Linux**: Try running `which pdflatex` to confirm the installation location
 - **macOS**: If using Homebrew, make sure you've run `brew link` command
 
-### 2. Which LaTex distributions are supported?
+### 2. Which LaTeX distributions are supported?
 
 Currently supported:
 
@@ -444,26 +447,26 @@ Currently supported:
 Method 1: Use LaziTex auto-install (Recommended)
 
 ```bash
-lazitex -i    # Auto-install or update LaTex environment (macOS supported)
+lazitex -i    # Auto-install or update LaTeX environment (macOS supported)
 ```
 
 Method 2: Manual installation
 
 After running `lazitex --check`, if tools are missing, the system will automatically display installation guides for your platform.
 
-### 4. How to uninstall LaTex environment?
+### 4. How to uninstall LaTeX environment?
 
 Use LaziTex one-click uninstall (Recommended, currently macOS):
 
 ```bash
-lazitex -u    # Auto-uninstall LaTex environment (macOS supported)
+lazitex -u    # Auto-uninstall LaTeX environment (macOS supported)
 ```
 
 **Features:**
 
 - Automatically detects installation method (Homebrew, MacPorts, MacTeX official, etc.)
 - Interactive confirmation to prevent accidental removal
-- Suggests using `-i` to install when LaTex is not installed
+- Suggests using `-i` to install when LaTeX is not installed
 
 **Manual uninstallation:**
 

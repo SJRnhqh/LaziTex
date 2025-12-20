@@ -1,5 +1,5 @@
 // core/build.go
-// 核心业务：编译LaTex编译器相关业务
+// 核心业务：编译LaTeX编译器相关业务
 
 package core
 
@@ -51,7 +51,7 @@ type compileStrategy interface {
 	shouldContinue(ctx *compileContext, logStr string, passInfo errors.PassInfo) bool
 }
 
-// Build 执行 LaTex 编译
+// Build 执行 LaTeX 编译
 func Build(opts BuildOptions) (string, error) {
 	// 1-3. 准备编译上下文
 	ctx, err := prepareContext(opts)

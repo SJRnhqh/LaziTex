@@ -45,10 +45,10 @@ var replCompleter = readline.NewPrefixCompleter(
 	readline.PcItem("cat"),
 )
 
-type LaTexCompleter struct{}
+type LaTeXCompleter struct{}
 
 // Do 实现 readline.AutoCompleter 接口，支持跨目录的文件补全
-func (c *LaTexCompleter) Do(line []rune, pos int) (newLine [][]rune, length int) {
+func (c *LaTeXCompleter) Do(line []rune, pos int) (newLine [][]rune, length int) {
 	strLine := string(line[:pos])
 	parts := strings.Fields(strLine)
 
@@ -150,7 +150,7 @@ func StartREPL() {
 	rl, err := readline.NewEx(&readline.Config{
 		Prompt:          lang.T("repl.prompt"),
 		HistoryFile:     historyFile,
-		AutoComplete:    &LaTexCompleter{},
+		AutoComplete:    &LaTeXCompleter{},
 		InterruptPrompt: "^C",
 		EOFPrompt:       "exit",
 	})
@@ -296,10 +296,10 @@ func handleREPLCommand(input string) bool {
 		tasks.CheckEnvironment()
 
 	case "install":
-		tasks.InstallLaTexEnvironment()
+		tasks.InstallLaTeXEnvironment()
 
 	case "uninstall":
-		tasks.UninstallLaTexEnvironment()
+		tasks.UninstallLaTeXEnvironment()
 
 	case "ollama":
 		if len(parts) < 2 {
@@ -360,7 +360,7 @@ func handleREPLCommand(input string) bool {
 		}
 
 		// 调用统一的构建入口
-		tasks.BuildLaTex(filePath, outputPath, show, quiet)
+		tasks.BuildLaTeX(filePath, outputPath, show, quiet)
 	case "preview":
 		if len(parts) < 2 {
 			fmt.Println(lang.T("repl.preview_usage"))

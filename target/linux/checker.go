@@ -109,7 +109,7 @@ func (c *Checker) GetSearchPaths() []string {
 	return paths
 }
 
-// DetectDistribution 检测 LaTex 发行版
+// DetectDistribution 检测 LaTeX 发行版
 func (c *Checker) DetectDistribution(tools map[string]core.CompilerInfo) string {
 	// 优先检查 pdflatex 的版本信息
 	if pdflatex, exists := tools["pdflatex"]; exists && pdflatex.Installed {
@@ -219,7 +219,7 @@ func (c *Checker) GetInstallGuide() string {
 }
 
 // PostCheck Linux 特定的后处理检查
-func (c *Checker) PostCheck(env *core.LaTexEnvironment) {
+func (c *Checker) PostCheck(env *core.LaTeXEnvironment) {
 	// 检查是否通过包管理器安装
 	isPkgInstalled := false
 	if pdflatex, exists := env.Tools["pdflatex"]; exists && pdflatex.Installed {
@@ -240,7 +240,7 @@ func (c *Checker) PostCheck(env *core.LaTexEnvironment) {
 
 	// 检查字体配置
 	if xelatex, exists := env.Tools["xelatex"]; exists && xelatex.Installed {
-		// XeLaTex 依赖系统字体，可以检查 fontconfig
+		// XeLaTeX 依赖系统字体，可以检查 fontconfig
 		if _, err := exec.LookPath("fc-list"); err != nil {
 			// fontconfig 未安装
 		}

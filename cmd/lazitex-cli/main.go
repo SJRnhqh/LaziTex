@@ -38,9 +38,9 @@ func main() {
 	case "-r", "--repl":
 		ui.StartREPL()
 	case "-i", "--install":
-		tasks.InstallLaTexEnvironment()
+		tasks.InstallLaTeXEnvironment()
 	case "-u", "--uninstall":
-		tasks.UninstallLaTexEnvironment()
+		tasks.UninstallLaTeXEnvironment()
 	case "-o", "--ollama":
 		if len(args) < 2 {
 			fmt.Println(lang.T("msg.ollama_usage"))
@@ -104,7 +104,7 @@ func main() {
 			return
 		}
 
-		tasks.BuildLaTex(filePath, outputPath, show, quiet)
+		tasks.BuildLaTeX(filePath, outputPath, show, quiet)
 	case "-p", "--preview":
 		if len(args) < 2 {
 			// 如果没传文件名，显示用法

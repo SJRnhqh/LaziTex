@@ -1,5 +1,5 @@
 // core/errors/package.go
-// 核心业务内部，编译LaTex文档时检测并处理缺失的包
+// 核心业务内部，编译LaTeX文档时检测并处理缺失的包
 
 package errors
 
@@ -18,10 +18,10 @@ import (
 
 // extractMissingPackages 从编译日志中提取缺失的包名
 func extractMissingPackages(logOutput string) []string {
-	// 正则表达式：匹配 ! LaTex Error: File 'xxx.sty' not found 或 File `xxx.cls` not found
-	// 注意：LaTex 错误信息可能使用单引号或反引号，末尾可能有句号
-	// 使用普通字符串以便正确处理反引号
-	pattern := "! LaTex Error: File ['`](.+?)\\.(sty|cls)['`] not found\\.?"
+	// 正则表达式：匹配 ! LaTeX Error: File 'xxx.sty' not found 或 File `xxx.cls` not found
+	// 注意：LaTeX 错误信息可能使用单引号或反引号，末尾可能有句号
+	// 使用不区分大小写匹配以兼容不同格式
+	pattern := "(?i)! LaTeX Error: File ['`](.+?)\\.(sty|cls)['`] not found\\.?"
 	re := regexp.MustCompile(pattern)
 
 	// 查找所有匹配

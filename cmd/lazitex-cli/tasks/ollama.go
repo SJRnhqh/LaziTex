@@ -11,6 +11,7 @@ import (
 	// 内部包
 	core "github.com/SJRnhqh/lazitex/core"
 	lang "github.com/SJRnhqh/lazitex/lang"
+	mac "github.com/SJRnhqh/lazitex/target/mac"
 	win "github.com/SJRnhqh/lazitex/target/win"
 )
 
@@ -21,6 +22,8 @@ func CheckOllama() {
 	switch runtime.GOOS {
 	case "windows":
 		manager = win.NewOllamaManager()
+	case "darwin":
+		manager = mac.NewOllamaManager()
 	default:
 		fmt.Printf(lang.T("msg.unsupported_os")+"\n", runtime.GOOS)
 		return
@@ -50,6 +53,8 @@ func InstallOllama() {
 	switch runtime.GOOS {
 	case "windows":
 		manager = win.NewOllamaManager()
+	case "darwin":
+		manager = mac.NewOllamaManager()
 	default:
 		fmt.Printf(lang.T("msg.unsupported_os")+"\n", runtime.GOOS)
 		return
@@ -69,6 +74,8 @@ func UninstallOllama() {
 	switch runtime.GOOS {
 	case "windows":
 		manager = win.NewOllamaManager()
+	case "darwin":
+		manager = mac.NewOllamaManager()
 	default:
 		fmt.Printf(lang.T("msg.unsupported_os")+"\n", runtime.GOOS)
 		return

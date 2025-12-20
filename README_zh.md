@@ -1,6 +1,6 @@
 # LaziTex 🧸
 
-跨平台即时 LaTex 编译工具 - 基于 Go 构建，集成本地 AI 助力写作与优化
+跨平台即时 LaTeX 编译工具 - 基于 Go 构建，集成本地 AI 助力写作与优化
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Go Version](https://img.shields.io/badge/Go-1.25%2B-00ADD8)](https://go.dev/)
@@ -13,9 +13,9 @@
 
 ## ✨ 特性
 
-- 🔍 **智能环境检测** - 自动检测 LaTex 安装并提供详细诊断报告
-- 📦 **自动安装/更新** - 一键安装或更新 LaTex 环境（macOS 已支持）
-- 🗑️ **自动卸载** - 一键卸载 LaTex 环境，智能检测安装方式（macOS 已支持）
+- 🔍 **智能环境检测** - 自动检测 LaTeX 安装并提供详细诊断报告
+- 📦 **自动安装/更新** - 一键安装或更新 LaTeX 环境（macOS 已支持）
+- 🗑️ **自动卸载** - 一键卸载 LaTeX 环境，智能检测安装方式（macOS 已支持）
 - 🌍 **跨平台支持** - 无缝支持 Windows、Linux 和 macOS
 - 🎯 **零配置启动** - 开箱即用，完美兼容 TeX Live、MiKTeX 和 MacTeX
 - 🚀 **快速轻量** - 基于 Go 构建，编译速度极快
@@ -23,8 +23,8 @@
 - 🔄 **自适应多轮编译** - 自动检测并处理交叉引用、目录、参考文献、索引、术语表等需要多次编译的场景
 - 📦 **自动包管理** - 从编译错误中自动检测缺失的包并通过 tlmgr/mpm 安装
 - 🌐 **Web 预览模式** - 本地 HTTP 服务器 + 浏览器预览，SSE 实时自动刷新，提供 Overleaf 风格的 Web 预览体验
-- 🦙 **Ollama 管理** - 一键检查、安装、卸载 Ollama（Windows 已支持），为 AI 功能提供基础支持
-- 🧠 **AI 增强** (即将推出) - 本地 AI 助手，帮助撰写和优化 LaTex 文档
+- 🦙 **Ollama 管理** - 一键检查、安装、卸载 Ollama（Windows & macOS 已支持），为 AI 功能提供基础支持
+- 🧠 **AI 增强** (即将推出) - 本地 AI 助手，帮助撰写和优化 LaTeX 文档
 - 🎨 **多种模式** - 支持 TUI（终端界面）和 REPL 模式，适应不同工作流
 
 ---
@@ -68,10 +68,10 @@ go build -o lazitex ./cmd/lazitex-cli
 
 | 命令 | 说明 | 示例 |
 |------|------|------|
-| `-c, --check` | 检查 LaTex 环境 | `lazitex -c` |
-| `-i, --install` | 安装/更新 LaTex | `lazitex -i` |
-| `-u, --uninstall` | 卸载 LaTex | `lazitex -u` |
-| `-b, --build` | 构建 LaTex 文档 (支持 `-o` 输出, `-s` 编译后展示, `-q` 静默模式) | `lazitex -b main.tex [-o out/] [-s] [-q]` |
+| `-c, --check` | 检查 LaTeX 环境 | `lazitex -c` |
+| `-i, --install` | 安装/更新 LaTeX | `lazitex -i` |
+| `-u, --uninstall` | 卸载 LaTeX | `lazitex -u` |
+| `-b, --build` | 构建 LaTeX 文档 (支持 `-o` 输出, `-s` 编译后展示, `-q` 静默模式) | `lazitex -b main.tex [-o out/] [-s] [-q]` |
 | `-p, --preview` | 实时预览 PDF 文档 (监听保存动作并自动刷新) | `lazitex -p main.tex` |
 | `-o, --ollama` | Ollama 管理 (`-c` 检查, `-i` 安装, `-u` 卸载) | `lazitex -o -c` |
 | `-r, --repl` | 启动 REPL 模式 | `lazitex -r` |
@@ -119,10 +119,11 @@ lazitex --lang en --check  # 本次命令使用英文
 **功能特点：**
 
 - 一键检查 - 检测 Ollama 是否已安装及版本信息
-- 一键安装 - 通过 winget 自动安装 Ollama（Windows）
-- 一键卸载 - 通过 winget 自动卸载 Ollama（Windows）
+- 一键安装 - 通过 winget 自动安装 Ollama（Windows）或通过 Homebrew/官方脚本安装（macOS）
+- 一键卸载 - 通过 winget 自动卸载 Ollama（Windows）或通过 Homebrew 卸载（macOS）
 - 智能检测 - 自动检测安装状态和服务运行状态
 - 路径检测 - 即使不在 PATH 中也能检测到安装
+- 跨平台支持 - 支持 Windows 和 macOS
 
 **使用示例：**
 
@@ -140,7 +141,8 @@ lazitex> ollama -u     # 卸载
 
 **注意事项：**
 
-- Windows 版本包含 GUI 界面，但 CLI 工具同样可用
+- **Windows**: 版本包含 GUI 界面，但 CLI 工具同样可用。通过 winget 安装。
+- **macOS**: 支持通过 Homebrew（推荐）或官方安装脚本安装。自动检测安装方式以便卸载。
 - 安装后可能需要重启终端才能识别 `ollama` 命令
 - 如果检测到已安装但不在 PATH 中，会提示重启终端
 
@@ -148,7 +150,7 @@ lazitex> ollama -u     # 卸载
 
 **功能特点：**
 
-- 一键构建 - 自动调用 XeLaTex 编译器
+- 一键构建 - 自动调用 XeLaTeX 编译器
 - 自动包检测与安装 - 从编译错误中检测缺失包并自动安装
 - 自适应多轮编译 - 自动处理交叉引用、目录、参考文献、索引等场景
 - 智能预览 - 构建成功后自动打开 PDF（macOS 优先使用 Skim，Windows 优先使用 SumatraPDF）
@@ -160,7 +162,7 @@ lazitex> ollama -u     # 卸载
 
 ```bash
 $ lazitex -b report.tex -s
-🚀 正在构建 LaTex 文档: report.tex
+🚀 正在构建 LaTeX 文档: report.tex
 📁 工作目录: /Users/user/projects/paper
 ... (编译器输出) ...
 ✨ 构建成功！
@@ -171,7 +173,7 @@ $ lazitex -b report.tex -s
 
 ```bash
 $ lazitex -b report.tex -q
-🚀 正在构建 LaTex 文档: report.tex
+🚀 正在构建 LaTeX 文档: report.tex
 📁 工作目录: /Users/user/projects/paper
 ✨ 构建成功！
 # 编译器详细输出已被隐藏，只显示关键信息
@@ -181,7 +183,7 @@ $ lazitex -b report.tex -q
 
 ```bash
 $ lazitex -p report.tex
-🚀 正在构建 LaTex 文档: report.tex
+🚀 正在构建 LaTeX 文档: report.tex
 ✨ 构建成功！
 🔗 正在打开浏览器: http://localhost:8080
 🌐 服务器启动在端口 8080
@@ -194,10 +196,10 @@ $ lazitex -p report.tex
 
 ```bash
 lazitex> help                      # 显示可用命令
-lazitex> check                     # 检查 LaTex 环境
-lazitex> install                   # 安装或更新 LaTex 环境
-lazitex> uninstall                 # 卸载 LaTex 环境
-lazitex> build main.tex -o out/ -s -q # 构建 LaTex 文档，指定输出目录、展示并启用静默模式
+lazitex> check                     # 检查 LaTeX 环境
+lazitex> install                   # 安装或更新 LaTeX 环境
+lazitex> uninstall                 # 卸载 LaTeX 环境
+lazitex> build main.tex -o out/ -s -q # 构建 LaTeX 文档，指定输出目录、展示并启用静默模式
 lazitex> ollama -c                    # 检查 Ollama 是否安装
 lazitex> ollama -i                    # 安装 Ollama（Windows 通过 winget）
 lazitex> ollama -u                    # 卸载 Ollama
@@ -224,9 +226,9 @@ lazitex> cat file.log              # 查看文件内容（支持 .tex, .log, .au
 
 REPL 中的语言切换即时生效，并且会保存偏好设置供下次使用！
 
-### 可检测的 LaTex 工具
+### 可检测的 LaTeX 工具
 
-LaziTex 可以检测 **23 个 LaTex 工具**，涵盖 7 大类别：
+LaziTex 可以检测 **23 个 LaTeX 工具**，涵盖 7 大类别：
 
 | 类别 | 工具 | 数量 |
 |------|------|------|
@@ -357,6 +359,7 @@ lazitex/
 - 显示 macOS 版本信息
 - **自动安装/更新** - 通过 Homebrew 一键安装 BasicTeX
 - **自动卸载** - 智能检测安装方式并一键卸载
+- **Ollama 管理** - 通过 Homebrew 或官方脚本一键检查、安装、卸载 Ollama
 - 根据检测到的包管理器提供优化的安装指南
 - 支持 Intel 和 Apple Silicon 芯片
 
@@ -372,6 +375,7 @@ lazitex/
 - [x] **编译与预览系统** - 一键编译、智能预览（macOS Skim/Windows SumatraPDF）、实时预览监听
 - [x] **智能编译优化** - 自动包检测与安装、自适应多轮编译（交叉引用、目录、参考文献等）
 - [x] **Web 预览模式** - 本地 HTTP 服务器 + 浏览器预览，SSE 实时自动刷新，双缓冲优化，提供 Overleaf 风格的 Web 预览体验
+- [x] **Ollama 管理（Windows & macOS）** - 一键检查、安装、卸载 Ollama。Windows：通过 winget 自动安装。macOS：通过 Homebrew 或官方脚本安装。智能检测安装状态和服务运行状态
 
 ### 进行中 🚧
 
@@ -388,7 +392,7 @@ lazitex/
 
 ### 后续计划 🔮
 
-- [ ] **项目初始化** - `lazitex init` 极简启动，快速拉取优质 LaTex 模板
+- [ ] **项目初始化** - `lazitex init` 极简启动，快速拉取优质 LaTeX 模板
 - [ ] **GUI 图形界面** - 现代化图形界面支持
 - [ ] **Windows 环境管理** - 自动安装/更新/卸载（优先级较低）
 - [ ] **AI 原生创作流** - Prompt2PDF 体验，多智能体协同工作流
@@ -426,19 +430,19 @@ Apache License 2.0 - 包含明确的专利授权，保护开发者与用户。
 ## 🙏 致谢
 
 - 使用 [Bubble Tea](https://github.com/charmbracelet/bubbletea) 构建精美的终端 UI
-- 灵感来源于 LaTex 社区对优美排版的执着追求
+- 灵感来源于 LaTeX 社区对优美排版的执着追求
 
 ---
 
 ## 💡 常见问题
 
-### 1. 为什么检测不到我的 LaTex 安装？
+### 1. 为什么检测不到我的 LaTeX 安装？
 
-- **Windows**：确保 LaTex 安装路径已添加到 PATH 环境变量
+- **Windows**：确保 LaTeX 安装路径已添加到 PATH 环境变量
 - **Linux**：尝试运行 `which pdflatex` 确认安装位置
 - **macOS**：如果使用 Homebrew，确保已运行 `brew link` 命令
 
-### 2. 支持哪些 LaTex 发行版？
+### 2. 支持哪些 LaTeX 发行版？
 
 目前支持：
 
@@ -451,19 +455,19 @@ Apache License 2.0 - 包含明确的专利授权，保护开发者与用户。
 方法一：使用 LaziTex 自动安装（推荐）
 
 ```bash
-lazitex -i    # 自动安装或更新 LaTex 环境（目前支持 macOS）
+lazitex -i    # 自动安装或更新 LaTeX 环境（目前支持 macOS）
 ```
 
 方法二：手动安装
 
 运行 `lazitex --check` 后，如果有工具未安装，系统会自动显示针对你平台的安装指南。
 
-### 4. 如何卸载 LaTex 环境？
+### 4. 如何卸载 LaTeX 环境？
 
 使用 LaziTex 一键卸载（推荐，目前支持 macOS）：
 
 ```bash
-lazitex -u    # 自动卸载 LaTex 环境（目前支持 macOS）
+lazitex -u    # 自动卸载 LaTeX 环境（目前支持 macOS）
 ```
 
 **功能特点：**
