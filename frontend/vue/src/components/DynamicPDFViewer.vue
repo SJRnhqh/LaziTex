@@ -309,18 +309,19 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+/* Nord 配色方案 */
 .pdf-viewer {
   width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: #2d2d2d;
+  background: #2E3440; /* nord0 - 背景 */
   overflow: hidden;
 }
 
 .loading,
 .error {
-  color: #fff;
+  color: #D8DEE9; /* nord4 - 文字 */
   font-size: 16px;
   padding: 20px;
   display: flex;
@@ -330,7 +331,7 @@ onUnmounted(() => {
 }
 
 .error {
-  color: #ff6b6b;
+  color: #BF616A; /* nord11 - 错误颜色（红色） */
 }
 
 .canvas-container {
@@ -340,13 +341,14 @@ onUnmounted(() => {
   display: flex;
   justify-content: center;
   align-items: flex-start;
+  background: #2E3440; /* nord0 - 背景 */
   /* 平滑滚动 */
   scroll-behavior: smooth;
 }
 
 canvas {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-  background: #fff;
+  background: #ECEFF4; /* nord6 - canvas 背景（浅色以显示 PDF） */
   display: block;
   /* 确保canvas不会超出容器 */
   max-width: 100%;
