@@ -280,7 +280,8 @@ lazitex/
 │   │   ├── 📦 package.go           # Auto package detection & installation
 │   │   └── 🔄 passes.go            # Adaptive multi-pass compilation detection
 │   └── 🛠️  tools/                  # Compilation optimization tools module
-│       └── concurrent.go           # Concurrent optimization (parallel execution of intermediate tools)
+│       ├── concurrent.go           # Concurrent optimization (parallel execution of intermediate tools)
+│       └── lock.go                 # Compilation lock & task management (task preemption, timeout control)
 │
 ├── 📚 lang/                       # Internationalization module
 │   └── i18n.go                    # Multi-language support (English/Chinese)
@@ -414,8 +415,8 @@ lazitex/
 
 ### In Progress 🚧
 
-- [ ] **Live Preview Optimization** - Task preemption, compilation locks, enhanced error feedback
-- [x] **Compilation Performance Optimization** - Concurrent execution of intermediate tools, improving compilation speed by 30-50% in multi-tool scenarios
+- [ ] **Live Preview Optimization** - Enhanced error feedback
+- [x] **Compilation Performance Optimization** - Concurrent execution of intermediate tools, compilation locks with task preemption, and compilation timeout control, improving compilation speed by 30-50% in multi-tool scenarios and ensuring compilation stability
 - [ ] **Linux Environment Management** - Auto install/update/uninstall
 
 ### Planned 📋

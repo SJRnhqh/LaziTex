@@ -242,6 +242,11 @@ func init() {
 		"msg.tidy_warning":           "⚠️  警告：清理辅助文件失败",
 		"msg.tidy_remove_failed":     "删除文件 %s 失败: %v",
 
+		// 编译锁和任务管理相关
+		"msg.compile_cancelled":        "编译已取消",
+		"msg.cancelling_previous_task": "⚠️  取消之前的编译任务...",
+		"msg.compile_timeout":           "⏰ 编译超时（超过 %d 秒），已自动取消",
+
 		// macOS 安装相关消息
 		"msg.mac.brew_not_installed":       "错误: 未安装 Homebrew。请先安装 Homebrew: https://brew.sh",
 		"msg.mac.latex_already_installed":  "检测到 LaTeX 已安装",
@@ -506,6 +511,11 @@ func init() {
 		"msg.tidy_success":           "🧹 Cleaned up auxiliary files",
 		"msg.tidy_warning":           "⚠️  Warning: Failed to clean auxiliary files",
 		"msg.tidy_remove_failed":     "Failed to remove file %s: %v",
+
+		// Compilation lock and task management
+		"msg.compile_cancelled":        "Compilation cancelled",
+		"msg.cancelling_previous_task": "⚠️  Cancelling previous compilation task...",
+		"msg.compile_timeout":           "⏰ Compilation timeout (exceeded %d seconds), automatically cancelled",
 
 		// macOS installation messages
 		"msg.mac.brew_not_installed":       "Error: Homebrew is not installed. Please install Homebrew first: https://brew.sh",

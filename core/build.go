@@ -6,6 +6,7 @@ package core
 import (
 	// 外部包
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"os"
@@ -15,8 +16,8 @@ import (
 
 	// 内部包
 	errors "github.com/SJRnhqh/lazitex/core/errors"
-	lang "github.com/SJRnhqh/lazitex/lang"
 	tools "github.com/SJRnhqh/lazitex/core/tools"
+	lang "github.com/SJRnhqh/lazitex/lang"
 )
 
 // BuildOptions 编译选项，方便后续扩展
@@ -30,13 +31,14 @@ type BuildOptions struct {
 
 // compileContext 编译上下文，封装编译过程中的所有信息
 type compileContext struct {
-	workDir   string // 工作目录（源文件所在目录）
-	outDir    string // 输出目录
-	jobName   string // 作业名称（不含扩展名）
-	fileName  string // 源文件名
-	passCount int    // 当前编译次数
-	firstPass bool   // 是否是第一次编译
-	quiet     bool   // 是否安静模式，不输出日志
+	workDir   string          // 工作目录（源文件所在目录）
+	outDir    string          // 输出目录
+	jobName   string          // 作业名称（不含扩展名）
+	fileName  string          // 源文件名
+	passCount int             // 当前编译次数
+	firstPass bool            // 是否是第一次编译
+	quiet     bool            // 是否安静模式，不输出日志
+	ctx       context.Context // 上下文
 }
 
 // compileStrategy 编译策略接口，定义不同场景的处理方式
@@ -55,11 +57,26 @@ type compileStrategy interface {
 
 // Build 执行 LaTeX 编译
 func Build(opts BuildOptions) (string, error) {
+	// 0. 获取编译管理器
+	manager := tools.GetCompileManager()
+
+	// 开始编译任务（带锁和任务抢占）
+	buildCtx, cancel := manager.StartBuild(opts.InputPath)
+	defer func() {
+		// 确保在函数结束时释放锁
+		manager.FinishBuild()
+		// 取消 context（如果还在运行）
+		cancel()
+	}()
+
 	// 1-3. 准备编译上下文
 	ctx, err := prepareContext(opts)
 	if err != nil {
 		return "", err
 	}
+
+	// 将 buildCtx 添加到编译上下文中
+	ctx.ctx = buildCtx
 
 	// 使用默认策略（处理包缺失和多轮编译）
 	strategy := &defaultStrategy{}
@@ -67,6 +84,15 @@ func Build(opts BuildOptions) (string, error) {
 	// 执行编译流程
 	pdfPath, err := buildWithStrategy(ctx, strategy)
 	if err != nil {
+		// 先检查是否是超时（DeadlineExceeded）
+		if buildCtx.Err() == context.DeadlineExceeded {
+			timeoutSeconds := int(manager.GetTimeout().Seconds())
+			return "", fmt.Errorf(lang.T("msg.compile_timeout"), timeoutSeconds)
+		}
+		// 再检查是否是手动取消（Canceled）
+		if buildCtx.Err() == context.Canceled {
+			return "", fmt.Errorf("%s", lang.T("msg.compile_cancelled"))
+		}
 		return "", err
 	}
 
@@ -143,6 +169,21 @@ func prepareContext(opts BuildOptions) (*compileContext, error) {
 // buildWithStrategy 使用策略执行编译流程
 func buildWithStrategy(ctx *compileContext, strategy compileStrategy) (string, error) {
 	for {
+		// 检查 context 是否已被取消
+		if ctx.ctx != nil {
+			select {
+			case <-ctx.ctx.Done():
+				// 区分超时和取消
+				if ctx.ctx.Err() == context.DeadlineExceeded {
+					timeoutSeconds := int(tools.GetCompileManager().GetTimeout().Seconds())
+					return "", fmt.Errorf(lang.T("msg.compile_timeout"), timeoutSeconds)
+				}
+				return "", fmt.Errorf("%s", lang.T("msg.compile_cancelled"))
+			default:
+				// 继续执行
+			}
+		}
+
 		// 更新编译次数
 		ctx.passCount++
 
@@ -255,13 +296,31 @@ func (s *defaultStrategy) shouldContinue(ctx *compileContext, logStr string, pas
 
 // compileOnce 执行单次编译，返回日志和错误
 func compileOnce(ctx *compileContext, isFirstPass bool) (string, error) {
+	// 检查 context 是否已被取消
+	if ctx.ctx != nil {
+		select {
+		case <-ctx.ctx.Done():
+			return "", fmt.Errorf("%s", lang.T("msg.compile_cancelled"))
+		default:
+			// 继续执行
+		}
+	}
+
 	args := []string{
 		"-interaction=nonstopmode",
 		"-jobname=" + ctx.jobName,
 		"-output-directory=" + ctx.outDir,
 		ctx.fileName,
 	}
-	cmd := exec.Command("xelatex", args...)
+
+	// 使用 context 创建命令（支持取消）
+	var cmd *exec.Cmd
+	if ctx.ctx != nil {
+		cmd = exec.CommandContext(ctx.ctx, "xelatex", args...)
+	} else {
+		cmd = exec.Command("xelatex", args...)
+	}
+	// cmd := exec.Command("xelatex", args...)
 	cmd.Dir = ctx.workDir
 
 	// 只在第一次编译时打印详细信息
@@ -290,6 +349,20 @@ func compileOnce(ctx *compileContext, isFirstPass bool) (string, error) {
 	}
 
 	err := cmd.Run()
+
+	// 检查是否是因为取消或超时导致的错误
+	if err != nil && ctx.ctx != nil {
+		if ctx.ctx.Err() == context.DeadlineExceeded {
+			// 超时
+			timeoutSeconds := int(tools.GetCompileManager().GetTimeout().Seconds())
+			return logOutput.String(), fmt.Errorf(lang.T("msg.compile_timeout"), timeoutSeconds)
+		}
+		if ctx.ctx.Err() == context.Canceled {
+			// 手动取消
+			return logOutput.String(), fmt.Errorf("%s", lang.T("msg.compile_cancelled"))
+		}
+	}
+
 	return logOutput.String(), err
 }
 
