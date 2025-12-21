@@ -245,7 +245,7 @@ func init() {
 		// 编译锁和任务管理相关
 		"msg.compile_cancelled":        "编译已取消",
 		"msg.cancelling_previous_task": "⚠️  取消之前的编译任务...",
-		"msg.compile_timeout":           "⏰ 编译超时（超过 %d 秒），已自动取消",
+		"msg.compile_timeout":          "⏰ 编译超时（超过 %d 秒），已自动取消",
 
 		// macOS 安装相关消息
 		"msg.mac.brew_not_installed":       "错误: 未安装 Homebrew。请先安装 Homebrew: https://brew.sh",
@@ -347,8 +347,8 @@ func init() {
 		"help.start_tui":       "启动终端 UI",
 		"help.install_latex":   "安装或更新 LaTeX 环境",
 		"help.uninstall_latex": "卸载 LaTeX 环境",
-		"help.build_latex":     "一键构建 LaTeX 文档为 PDF (使用 -o 指定输出， -s 编译后展示， -q 静默模式， -t 清理辅助文件)",
-		"help.live_preview":    "一键实时预览 PDF 文档 (使用 -p 指定文件名，-q 静默模式，-t 清理辅助文件，-d 开发模式，:端口号 指定端口)",
+		"help.build_latex":     "构建 LaTeX 文档为 PDF",
+		"help.live_preview":    "实时预览 PDF 文档",
 		"help.set_language":    "设置语言 (zh/en)",
 		"help.ollama":          "Ollama 管理 (check/install/uninstall)",
 		"help.description":     "LaziTex: 零配置 LaTeX 编译工具，支持 AI 辅助",
@@ -515,7 +515,7 @@ func init() {
 		// Compilation lock and task management
 		"msg.compile_cancelled":        "Compilation cancelled",
 		"msg.cancelling_previous_task": "⚠️  Cancelling previous compilation task...",
-		"msg.compile_timeout":           "⏰ Compilation timeout (exceeded %d seconds), automatically cancelled",
+		"msg.compile_timeout":          "⏰ Compilation timeout (exceeded %d seconds), automatically cancelled",
 
 		// macOS installation messages
 		"msg.mac.brew_not_installed":       "Error: Homebrew is not installed. Please install Homebrew first: https://brew.sh",
@@ -617,8 +617,8 @@ func init() {
 		"help.start_tui":       "Start terminal UI",
 		"help.install_latex":   "Install or update LaTeX environment",
 		"help.uninstall_latex": "Uninstall LaTeX environment",
-		"help.build_latex":     "Build LaTeX document to PDF (use -o for output, -s to show after build, -q to quiet mode, -t to tidy mode)",
-		"help.live_preview":    "Live preview PDF document (use -p for file name, -q for quiet mode, -t for tidy mode, -d for dev mode, :port for custom port)",
+		"help.build_latex":     "Build LaTeX document to PDF",
+		"help.live_preview":    "Live preview PDF document",
 		"help.set_language":    "Set language (zh/en)",
 		"help.ollama":          "Ollama management (check/install/uninstall)",
 		"help.description":     "LaziTex: Zero-config LaTeX compilation with AI assistance",
