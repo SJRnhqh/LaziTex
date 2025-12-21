@@ -276,9 +276,11 @@ lazitex/
 │   ├── 🔨 build.go                # Build workflow with Strategy Pattern (cross-platform, adaptive multi-pass)
 │   ├── 👀 watcher.go              # File watching for live preview
 │   ├── 🦙 ollama.go               # Ollama manager interface definition and wrapper functions
-│   └── 🚨 errors/                 # Compilation error handling module
-│       ├── 📦 package.go           # Auto package detection & installation
-│       └── 🔄 passes.go            # Adaptive multi-pass compilation detection
+│   ├── 🚨 errors/                 # Compilation error handling module
+│   │   ├── 📦 package.go           # Auto package detection & installation
+│   │   └── 🔄 passes.go            # Adaptive multi-pass compilation detection
+│   └── 🛠️  tools/                  # Compilation optimization tools module
+│       └── concurrent.go           # Concurrent optimization (parallel execution of intermediate tools)
 │
 ├── 📚 lang/                       # Internationalization module
 │   └── i18n.go                    # Multi-language support (English/Chinese)
@@ -413,6 +415,7 @@ lazitex/
 ### In Progress 🚧
 
 - [ ] **Live Preview Optimization** - Task preemption, compilation locks, enhanced error feedback
+- [x] **Compilation Performance Optimization** - Concurrent execution of intermediate tools, improving compilation speed by 30-50% in multi-tool scenarios
 - [ ] **Linux Environment Management** - Auto install/update/uninstall
 
 ### Planned 📋

@@ -16,6 +16,7 @@ import (
 	// 内部包
 	errors "github.com/SJRnhqh/lazitex/core/errors"
 	lang "github.com/SJRnhqh/lazitex/lang"
+	tools "github.com/SJRnhqh/lazitex/core/tools"
 )
 
 // BuildOptions 编译选项，方便后续扩展
@@ -183,7 +184,8 @@ func buildWithStrategy(ctx *compileContext, strategy compileStrategy) (string, e
 
 		// 运行中间工具（如果需要）
 		if strategy.shouldRunIntermediateTools(ctx, passInfo) {
-			runIntermediateTools(ctx.workDir, ctx.jobName, passInfo, ctx.quiet)
+			tools.RunIntermediateToolsConcurrent(ctx.workDir, ctx.jobName, passInfo, ctx.quiet)
+			// runIntermediateTools(ctx.workDir, ctx.jobName, passInfo, ctx.quiet)
 		}
 
 		// 判断是否继续编译
@@ -292,48 +294,48 @@ func compileOnce(ctx *compileContext, isFirstPass bool) (string, error) {
 }
 
 // runIntermediateTools 运行中间工具（bibtex、biber、makeindex等）
-func runIntermediateTools(workDir, jobName string, passInfo errors.PassInfo, quiet bool) {
-	if passInfo.NeedsBibtex {
-		fmt.Println(lang.T("msg.running_bibtex"))
-		runTool("bibtex", workDir, jobName, quiet)
-	} else if passInfo.NeedsBiber {
-		fmt.Println(lang.T("msg.running_biber"))
-		runTool("biber", workDir, jobName, quiet)
-	}
+// func runIntermediateTools(workDir, jobName string, passInfo errors.PassInfo, quiet bool) {
+// 	if passInfo.NeedsBibtex {
+// 		fmt.Println(lang.T("msg.running_bibtex"))
+// 		runTool("bibtex", workDir, jobName, quiet)
+// 	} else if passInfo.NeedsBiber {
+// 		fmt.Println(lang.T("msg.running_biber"))
+// 		runTool("biber", workDir, jobName, quiet)
+// 	}
 
-	if passInfo.NeedsMakeindex {
-		fmt.Println(lang.T("msg.running_makeindex"))
-		runTool("makeindex", workDir, jobName, quiet)
-	}
+// 	if passInfo.NeedsMakeindex {
+// 		fmt.Println(lang.T("msg.running_makeindex"))
+// 		runTool("makeindex", workDir, jobName, quiet)
+// 	}
 
-	if passInfo.NeedsMakeglossaries {
-		fmt.Println(lang.T("msg.running_makeglossaries"))
-		runTool("makeglossaries", workDir, jobName, quiet)
-	}
-}
+// 	if passInfo.NeedsMakeglossaries {
+// 		fmt.Println(lang.T("msg.running_makeglossaries"))
+// 		runTool("makeglossaries", workDir, jobName, quiet)
+// 	}
+// }
 
 // runTool 运行单个工具
-func runTool(toolName, workDir, jobName string, quiet bool) error {
-	cmd := exec.Command(toolName, jobName)
-	cmd.Dir = workDir
+// func runTool(toolName, workDir, jobName string, quiet bool) error {
+// 	cmd := exec.Command(toolName, jobName)
+// 	cmd.Dir = workDir
 
-	if quiet {
-		// 静默模式：只捕获输出，不打印
-		var logOutput bytes.Buffer
-		cmd.Stdout = &logOutput
-		cmd.Stderr = &logOutput
-	} else {
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-	}
+// 	if quiet {
+// 		// 静默模式：只捕获输出，不打印
+// 		var logOutput bytes.Buffer
+// 		cmd.Stdout = &logOutput
+// 		cmd.Stderr = &logOutput
+// 	} else {
+// 		cmd.Stdout = os.Stdout
+// 		cmd.Stderr = os.Stderr
+// 	}
 
-	if err := cmd.Run(); err != nil {
-		// 错误信息仍然显示（即使是静默模式，错误也是重要信息）
-		fmt.Printf(lang.T("msg.tool_failed")+"\n", toolName, err)
-		return err
-	}
-	return nil
-}
+// 	if err := cmd.Run(); err != nil {
+// 		// 错误信息仍然显示（即使是静默模式，错误也是重要信息）
+// 		fmt.Printf(lang.T("msg.tool_failed")+"\n", toolName, err)
+// 		return err
+// 	}
+// 	return nil
+// }
 
 // tidyAuxFiles 清理 LaTeX 编译生成的辅助文件，只保留 PDF
 func tidyAuxFiles(outDir, jobName string) error {
