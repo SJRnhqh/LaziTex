@@ -68,16 +68,17 @@ Download pre-built binaries from [Releases](https://github.com/SJRnhqh/lazitex/r
 
 | Command | Description | Example |
 |---------|-------------|---------|
+| `-h, --help` | Show this help | `lazitex -h` |
+| `-v, --version` | Show version | `lazitex -v` |
 | `-c, --check` | Check LaTeX environment | `lazitex -c` |
-| `-i, --install` | Install/update LaTeX | `lazitex -i` |
-| `-u, --uninstall` | Uninstall LaTeX | `lazitex -u` |
+| `-r, --repl` | Start REPL mode | `lazitex -r` |
+| `-t, --tui` | Start terminal UI | `lazitex -t` |
+| `-i, --install` | Install or update LaTeX environment | `lazitex -i` |
+| `-u, --uninstall` | Uninstall LaTeX environment | `lazitex -u` |
+| `-o, --ollama` | Ollama management (use `-c/-i/-u` flags) | `lazitex -o -c` |
 | `-b, --build` | Build LaTeX document (supports `-o` output, `-s` show, `-q` quiet, `-t` tidy) | `lazitex -b main.tex [-o out/] [-s] [-q] [-t]` |
 | `-p, --preview` | Live preview PDF (supports `-q` quiet mode, `-t` tidy mode, `:port` custom port) | `lazitex -p main.tex [-q] [-t] [:port]` |
-| `-o, --ollama` | Ollama management (use `-c/-i/-u` flags) | `lazitex -o -c` |
-| `-r, --repl` | Start REPL mode | `lazitex -r` |
-| `-l, --lang` | Set language | `lazitex -l zh` |
-| `-h, --help` | Show help | `lazitex -h` |
-| `-v, --version` | Show version | `lazitex -v` |
+| `-l, --lang` | Set language (zh/en) | `lazitex -l zh` |
 
 ---
 

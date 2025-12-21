@@ -68,16 +68,17 @@ go build -o lazitex ./cmd/lazitex-cli
 
 | 命令 | 说明 | 示例 |
 |------|------|------|
+| `-h, --help` | 显示此帮助 | `lazitex -h` |
+| `-v, --version` | 显示版本号 | `lazitex -v` |
 | `-c, --check` | 检查 LaTeX 环境 | `lazitex -c` |
-| `-i, --install` | 安装/更新 LaTeX | `lazitex -i` |
-| `-u, --uninstall` | 卸载 LaTeX | `lazitex -u` |
+| `-r, --repl` | 启动 REPL 模式 | `lazitex -r` |
+| `-t, --tui` | 启动终端 UI | `lazitex -t` |
+| `-i, --install` | 安装或更新 LaTeX 环境 | `lazitex -i` |
+| `-u, --uninstall` | 卸载 LaTeX 环境 | `lazitex -u` |
+| `-o, --ollama` | Ollama 管理 (使用 `-c/-i/-u` 标志) | `lazitex -o -c` |
 | `-b, --build` | 构建 LaTeX 文档 (支持 `-o` 输出, `-s` 编译后展示, `-q` 静默模式, `-t` 清理辅助文件) | `lazitex -b main.tex [-o out/] [-s] [-q] [-t]` |
 | `-p, --preview` | 实时预览 PDF 文档 (支持 `-q` 静默模式, `-t` 清理辅助文件, `:端口号` 自定义端口) | `lazitex -p main.tex [-q] [-t] [:端口号]` |
-| `-o, --ollama` | Ollama management (use `-c/-i/-u` flags) | `lazitex -o -c` |
-| `-r, --repl` | 启动 REPL 模式 | `lazitex -r` |
-| `-l, --lang` | 设置语言 | `lazitex -l zh` |
-| `-h, --help` | 显示帮助 | `lazitex -h` |
-| `-v, --version` | 显示版本 | `lazitex -v` |
+| `-l, --lang` | 设置语言 (zh/en) | `lazitex -l zh` |
 
 ---
 
