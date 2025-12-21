@@ -3,6 +3,7 @@
 
 import {defineStore} from 'pinia'
 import {ref, computed} from 'vue'
+import { getConfig } from '../api/config'
 
 // ========== 常量定义 ==========
 // 模式常量
@@ -10,9 +11,6 @@ export const APP_MODE = {
     VIEW: 'view',
     WORKSPACE: 'workspace'
 }
-
-// API 路径
-const API_CONFIG_PATH = '/api/config'
 
 // ========== Store 定义 ==========
 export const useAppModeStore = defineStore('appMode', () => {
@@ -42,14 +40,11 @@ export const useAppModeStore = defineStore('appMode', () => {
         // 后端lazitex -p 参数会返回 {mode: "view"}
         // 后端lazitex -w 参数会返回 {mode: "workspace"}
         try {
-            const response = await fetch(API_CONFIG_PATH)
-            if (response.ok) {
-                const config = await response.json()
-                if (config.mode && [APP_MODE.VIEW, APP_MODE.WORKSPACE].includes(config.mode)) {
-                    currentMode.value = config.mode
-                    console.log('✅ 从后端获取模式:', config.mode)
-                    return // ✅ 立即退出函数，不执行后面的代码
-                }
+            const config = await getConfig()
+            if (config.mode && [APP_MODE.VIEW, APP_MODE.WORKSPACE].includes(config.mode)) {
+                currentMode.value = config.mode
+                console.log('✅ 从后端获取模式:', config.mode)
+                return // ✅ 立即退出函数，不执行后面的代码
             }
         } catch (error) {
             // API 不存在或失败，使用备用方案（URL 参数）

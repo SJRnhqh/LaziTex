@@ -1,3 +1,6 @@
+<!-- layouts/LaziViewLayout.vue -->
+<!-- LaziViewLayout.vue 是 LaziTeX 的视图布局组件，负责管理视图的布局和状态 -->
+
 <script setup>
 import DynamicPDFViewer from '../components/DynamicPDFViewer.vue'
 import ModeSwitcher from '../components/ModeSwitcher.vue'

@@ -1,3 +1,5 @@
+<!-- App.vue -->
+<!-- App.vue 是 Vue 应用的根组件，负责管理应用的布局和状态 -->
 <script setup>
 import { computed, onMounted } from 'vue'
 import { useAppModeStore } from './stores/appMode'

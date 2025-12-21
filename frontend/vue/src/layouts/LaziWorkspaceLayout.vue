@@ -1,3 +1,6 @@
+<!-- layouts/LaziWorkspaceLayout.vue -->
+<!-- LaziWorkspaceLayout.vue 是 LaziTeX 的工作区布局组件，负责管理工作区的布局和状态 -->
+
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import DynamicPDFViewer from '../components/DynamicPDFViewer.vue'

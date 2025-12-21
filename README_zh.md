@@ -298,6 +298,12 @@ lazitex/
 │   │   └── index.html             # 旧版预览页面（双缓冲优化）
 │   └── vue/                       # Vue 3 前端（新版）
 │       ├── src/                   # Vue 源码文件
+│       │   ├── api/               # API 层 - 统一管理后端 API 调用
+│       │   │   ├── pdf.js         # PDF 相关 API（下载、连接测试）
+│       │   │   ├── sse.js         # SSE 相关 API（实时推送）
+│       │   │   └── config.js      # 配置相关 API（应用模式）
+│       │   ├── utils/             # 工具函数 - 纯函数工具库
+│       │   │   └── pdf.js         # PDF 工具函数（解析、缩放、清理、错误格式化）
 │       │   ├── components/        # Vue 组件
 │       │   │   ├── DynamicPDFViewer.vue  # PDF 预览组件
 │       │   │   └── ModeSwitcher.vue      # 模式切换组件
@@ -306,6 +312,9 @@ lazitex/
 │       │   │   └── LaziWorkspaceLayout.vue # 完整工作区布局
 │       │   ├── stores/            # Pinia 状态管理
 │       │   │   └── appMode.js     # 应用模式状态管理
+│       │   ├── styles/            # 样式文件
+│       │   │   ├── theme.css      # 主题配色（Nord 配色方案）
+│       │   │   └── dynamic-pdf-viewer.module.css  # PDF 预览组件样式（CSS Modules）
 │       │   ├── App.vue            # 根组件（模式分发器）
 │       │   └── main.js            # 入口文件
 │       ├── public/                # 公共资源
@@ -354,6 +363,7 @@ lazitex/
 
 - **Web 预览架构** - 基于 Go 标准库的轻量级 HTTP 服务器，使用 Server-Sent Events (SSE) 实现实时推送，前端双缓冲技术消除刷新闪烁，提供流畅的预览体验。LaziHub 前端支持双模式架构：LaziView（仅 PDF）和 LaziWorkspace（完整工作区）
 - **前端状态管理** - 使用 Pinia 进行响应式状态管理，实现无缝模式切换和组件通信
+- **前端代码组织** - 采用清晰的目录结构：`api/` 统一管理后端 API 调用，`utils/` 提供纯函数工具库，`styles/` 集中管理样式，实现代码复用和易于维护
 
 - **工具优先级系统** - 工具按优先级分类（⭐ 核心、🔹 重要、🔸 可选），帮助用户快速识别关键工具
 
@@ -398,6 +408,7 @@ lazitex/
 - [x] **REPL 交互模式** - 历史记录、Tab 补全、Shell 快捷命令、全语言国际化
 - [x] **编译系统** - 一键编译、智能预览（macOS Skim/Windows SumatraPDF）、自动包检测与安装、自适应多轮编译（交叉引用、目录、参考文献等）
 - [x] **Web 预览与前端** - LaziHub 前端（Vue 3 + PDF.js），Web 预览模式支持 SSE 实时刷新、双模式架构（LaziView/LaziWorkspace）、预览模式支持 `-q/-t/-d/:端口号` 等参数
+- [x] **前端代码重构** - 代码组织优化：`api/` 目录统一管理后端 API 调用，`utils/` 目录提供纯函数工具库，`styles/` 目录集中管理样式，实现代码复用和易于维护
 - [x] **Ollama 管理（Windows & macOS）** - 一键检查、安装、卸载 Ollama，智能检测安装状态和服务运行状态
 
 ### 进行中 🚧

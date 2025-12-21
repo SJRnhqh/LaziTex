@@ -1,3 +1,5 @@
+// main.js
+// main.js 是 Vue 应用的入口文件，负责创建应用实例并挂载到 DOM 上
 import { createApp } from 'vue'// 导入Vue
 import { createPinia } from 'pinia'// 导入Pinia
 import App from './App.vue'// 导入根组件

@@ -298,6 +298,12 @@ lazitex/
 │   │   └── index.html             # Legacy preview page (double-buffering optimized)
 │   └── vue/                       # Vue 3 frontend (modern)
 │       ├── src/                   # Vue source files
+│       │   ├── api/               # API layer - unified backend API calls
+│       │   │   ├── pdf.js         # PDF-related APIs (download, connection test)
+│       │   │   ├── sse.js         # SSE-related APIs (real-time push)
+│       │   │   └── config.js      # Config-related APIs (application mode)
+│       │   ├── utils/             # Utility functions - pure function library
+│       │   │   └── pdf.js         # PDF utility functions (parse, scale, cleanup, error formatting)
 │       │   ├── components/        # Vue components
 │       │   │   ├── DynamicPDFViewer.vue  # PDF preview component
 │       │   │   └── ModeSwitcher.vue      # Mode switching component
@@ -306,6 +312,9 @@ lazitex/
 │       │   │   └── LaziWorkspaceLayout.vue # Full workspace layout
 │       │   ├── stores/            # Pinia state management
 │       │   │   └── appMode.js     # Application mode store
+│       │   ├── styles/            # Style files
+│       │   │   ├── theme.css      # Theme colors (Nord color scheme)
+│       │   │   └── dynamic-pdf-viewer.module.css  # PDF preview component styles (CSS Modules)
 │       │   ├── App.vue            # Root component (mode dispatcher)
 │       │   └── main.js            # Entry point
 │       ├── public/                # Public assets
@@ -354,6 +363,7 @@ lazitex/
 
 - **Web Preview Architecture** - Lightweight HTTP server based on Go standard library, using Server-Sent Events (SSE) for real-time push, frontend double-buffering eliminates refresh flicker, providing smooth preview experience. LaziHub frontend supports dual-mode architecture: LaziView (PDF-only) and LaziWorkspace (full workspace)
 - **Frontend State Management** - Uses Pinia for reactive state management, enabling seamless mode switching and component communication
+- **Frontend Code Organization** - Clean directory structure: `api/` for unified backend API calls, `utils/` for pure function utilities, `styles/` for centralized styling, enabling code reuse and maintainability
 
 - **Tool Priority System** - Tools categorized by priority (⭐ Core, 🔹 Important, 🔸 Optional), helping users quickly identify critical tools
 
@@ -397,6 +407,7 @@ lazitex/
 - [x] **REPL Interactive Mode** - Command history, Tab completion, Shell shortcuts, full i18n support
 - [x] **Build System** - One-click compilation, smart preview (macOS Skim/Windows SumatraPDF), auto package detection & installation, adaptive multi-pass compilation (cross-refs, TOC, bibliographies, etc.)
 - [x] **Web Preview & Frontend** - LaziHub frontend (Vue 3 + PDF.js), web preview mode with SSE real-time refresh, dual-mode architecture (LaziView/LaziWorkspace), preview mode supports `-q/-t/-d/:port` flags
+- [x] **Frontend Code Refactoring** - Code organization optimization: `api/` directory for unified backend API calls, `utils/` directory for pure function utilities, `styles/` directory for centralized styling, enabling code reuse and maintainability
 - [x] **Ollama Management (Windows & macOS)** - One-click check, install, and uninstall Ollama, smart detection of installation status and service running status
 
 ### In Progress 🚧
