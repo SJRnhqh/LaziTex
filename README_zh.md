@@ -133,105 +133,28 @@ lazitex> ollama -u     # 卸载
 
 ### 构建与预览
 
-**功能特点：**
-
-- 一键构建 - 自动调用 XeLaTeX 编译器
-- 自动包检测与安装 - 从编译错误中检测缺失包并自动安装
-- 自适应多轮编译 - 自动处理交叉引用、目录、参考文献、索引等场景
-- 智能预览 - 构建成功后自动打开 PDF（macOS 优先使用 Skim，Windows 优先使用 SumatraPDF）
-- Web 预览模式 - 本地 HTTP 服务器 + 浏览器预览，SSE 实时自动刷新，零延迟更新体验
-- 自定义输出 - 支持指定输出目录或完整路径
-- 静默模式 - 使用 `-q` 参数可隐藏编译器详细输出，只显示关键信息和错误
-- 清理模式 - 使用 `-t` 参数可在编译成功后自动清理辅助文件（.log, .aux, .toc, .out 等），只保留 PDF
-
-**构建示例：**
+一键构建 LaTeX 文档，支持自动包检测与安装、自适应多轮编译、智能预览和 Web 实时预览。支持静默模式（`-q`）和清理模式（`-t`）。
 
 ```bash
-$ lazitex -b report.tex -s
-🚀 正在构建 LaTeX 文档: report.tex
-📁 工作目录: /Users/user/projects/paper
-... (编译器输出) ...
-✨ 构建成功！
-(自动打开展示窗口)
-```
+# CLI 模式
+$ lazitex -b report.tex -s           # 构建并预览
+$ lazitex -b report.tex -q           # 静默构建
+$ lazitex -b report.tex -t            # 构建并清理辅助文件
+$ lazitex -p report.tex              # Web 预览模式（LaziView）
+$ lazitex -p report.tex :3000        # Web 预览模式（自定义端口）
+$ lazitex -p report.tex -d           # Web 预览模式（开发模式）
 
-**静默模式示例：**
-
-```bash
-$ lazitex -b report.tex -q
-🚀 正在构建 LaTeX 文档: report.tex
-📁 工作目录: /Users/user/projects/paper
-✨ 构建成功！
-# 编译器详细输出已被隐藏，只显示关键信息
-```
-
-**清理辅助文件示例：**
-
-```bash
-$ lazitex -b report.tex -t
-🚀 正在构建 LaTeX 文档: report.tex
-📁 工作目录: /Users/user/projects/paper
-✨ 构建成功！
-🧹 已清理辅助文件
-# 自动删除 .log, .aux, .toc, .out 等辅助文件，只保留 PDF
-```
-
-**注意：** `-t/--tidy` 参数仅在编译成功时清理辅助文件。如果编译失败，所有文件都会保留以便调试。
-
-**Web 预览模式：**
-
-LaziTex 前端（LaziHub）提供两种模式：
-
-- **LaziView 模式** (`-p`)：仅 PDF 预览界面，适合多屏幕场景或使用外部编辑器（如 VS Code 或 Neovim）
-- **LaziWorkspace 模式** (`-w`)：完整工作区，包含代码编辑器、AI 交流、文件浏览器和 PDF 预览（即将推出）
-
-```bash
-# 预览模式（LaziView - 仅 PDF）
-$ lazitex -p report.tex
-🚀 正在构建 LaTeX 文档: report.tex
-✨ 构建成功！
-💡 提示：Vue 前端地址: http://localhost:5173
-💡 后端 API 地址: http://localhost:8080
-🔗 正在打开浏览器: http://localhost:5173
-🌐 服务器启动在端口 8080
-👀 正在实时监听文件: report.tex (按 Ctrl+C 退出监听)
-
-# 预览模式（静默编译）
-$ lazitex -p report.tex -q
-
-# 预览模式（清理辅助文件）
-$ lazitex -p report.tex -t
-
-# 预览模式（自定义端口，默认 8080）
-$ lazitex -p report.tex :3000
-$ lazitex -p report.tex report.tex:3000  # 另一种格式
-$ lazitex -p report.tex -q -t :3000      # 端口参数可以放在任意位置
-
-# 预览模式（开发模式，使用 -d 标志）
-$ lazitex -p report.tex -d
-
-# 修改文件后，浏览器会自动刷新显示最新的 PDF
-```
-
-**前端架构：**
-
-- **双模式系统**：LaziHub 前端支持 LaziView（仅 PDF）和 LaziWorkspace（完整工作区）两种模式
-- **模式切换**：用户可以通过 UI 在运行时切换模式
-- **后端 API**：`/api/config` 接口根据 CLI 参数返回初始模式（`-p` 为预览模式）
-- **状态管理**：使用 Pinia 进行响应式状态管理
-- **布局组件**：模块化布局架构（LaziViewLayout, LaziWorkspaceLayout）
-
-### REPL 模式
-
-交互式命令行界面，支持命令历史、Tab 智能补全和全语言国际化。
-
-```bash
+# REPL 模式
 $ lazitex -r
 lazitex> build main.tex -o out/ -s    # 构建文档
 lazitex> preview main.tex -q          # 实时预览
-lazitex> ollama -c                    # 检查 Ollama
 lazitex> help                         # 显示帮助
 ```
+
+**Web 预览模式：**
+
+- **LaziView 模式** (`-p`)：仅 PDF 预览界面，适合多屏幕场景或使用外部编辑器
+- **LaziWorkspace 模式** (`-w`)：完整工作区（即将推出）
 
 ### 可检测的 LaTeX 工具
 
@@ -360,15 +283,11 @@ lazitex/
 
 ### 架构亮点
 
-- **编译策略模式** - 采用策略模式（`compileStrategy` 接口）处理不同编译场景，默认策略自动处理包错误和多轮编译，未来可轻松扩展 AI 驱动策略，无需修改核心编译循环
+- **自适应多轮编译检测** - 自动检测并处理 6 种需要多轮编译的场景（目录、交叉引用、参考文献、索引、术语表、PDF 书签），无需手动指定编译次数
 
-- **编译错误处理模块** - `core/errors/` 模块化处理编译问题：自动包检测与安装、自适应多轮编译检测（覆盖目录、交叉引用、参考文献、索引、术语表、PDF 书签等 6 种场景）
+- **自动包检测与安装** - 从编译错误中智能提取缺失的包名，自动通过 tlmgr/mpm 安装，实现真正的零配置编译体验
 
-- **Web 预览架构** - 基于 Go 标准库的轻量级 HTTP 服务器，使用 Server-Sent Events (SSE) 实现实时推送，前端双缓冲技术消除刷新闪烁，提供流畅的预览体验。LaziHub 前端支持双模式架构：LaziView（仅 PDF）和 LaziWorkspace（完整工作区）
-- **前端状态管理** - 使用 Pinia 进行响应式状态管理，实现无缝模式切换和组件通信
-- **前端代码组织** - 采用清晰的目录结构：`api/` 统一管理后端 API 调用，`utils/` 提供纯函数工具库，`styles/` 集中管理样式，实现代码复用和易于维护
-
-- **工具优先级系统** - 工具按优先级分类（⭐ 核心、🔹 重要、🔸 可选），帮助用户快速识别关键工具
+- **工具优先级系统** - 23 个 LaTeX 工具按优先级分类（⭐ 核心、🔹 重要、🔸 可选），帮助用户快速识别关键工具，优化安装建议
 
 ---
 
@@ -412,6 +331,7 @@ lazitex/
 - [x] **编译系统** - 一键编译、智能预览（macOS Skim/Windows SumatraPDF）、自动包检测与安装、自适应多轮编译（交叉引用、目录、参考文献等）
 - [x] **Web 预览与前端** - LaziHub 前端（Vue 3 + PDF.js），Web 预览模式支持 SSE 实时刷新、双模式架构（LaziView/LaziWorkspace）、预览模式支持 `-q/-t/-d/:端口号` 等参数
 - [x] **前端代码重构** - 代码组织优化：`api/` 目录统一管理后端 API 调用，`utils/` 目录提供纯函数工具库，`styles/` 目录集中管理样式，实现代码复用和易于维护
+- [x] **PDF 虚拟滚动** - 基于 Intersection Observer 实现的多页 PDF 虚拟滚动预览，只渲染可见页面，支持预加载相邻页面，大幅提升大文档浏览性能，预留分页导航模式接口
 - [x] **Ollama 管理（Windows & macOS）** - 一键检查、安装、卸载 Ollama，智能检测安装状态和服务运行状态
 
 ### 进行中 🚧
@@ -419,6 +339,7 @@ lazitex/
 - [ ] **实时预览优化** - 错误反馈增强
 - [x] **编译性能优化** - 中间工具并发执行、编译锁与任务抢占、编译超时控制，提升多工具场景编译速度（30-50% 性能提升）并确保编译稳定性
 - [ ] **Linux 环境管理** - 自动安装/更新/卸载
+- [ ] **PDF 预览增强** - 分页导航模式实现、页面跳转功能、缩放控制
 
 ### 计划中 📋
 

@@ -7,7 +7,14 @@ import styles from '../styles/dynamic-pdf-viewer.module.css'
 import * as pdfjsLib from 'pdfjs-dist'
 
 // 导入 PDF 工具函数
-import { parsePDF, calculateScale, cleanupPDF, formatPDFError } from '../utils/pdf'
+import { 
+  parsePDF, 
+  calculateScale, 
+  cleanupPDF, 
+  formatPDFError,
+  renderPageToCanvas,
+  calculatePageHeights
+} from '../utils/pdf'
 
 // 导入 SSE API
 import { createSSEConnection, closeSSEConnection } from '../api/sse'
@@ -19,20 +26,60 @@ import { fetchPDF, testBackendConnection } from '../api/pdf'
 import workerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
 
 // 配置 worker - 使用 Vite 的 URL 导入
-// 这样 Vite 会正确处理 worker 文件
 pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl
 console.log('✅ 配置 PDF.js worker (Vite URL):', workerUrl)
 
-const canvas = ref(null)
+// ========== 响应式数据 ==========
 const loading = ref(false)
 const error = ref('')
-const isInitialLoad = ref(true) // 标记是否是首次加载
-let eventSource = null
-let currentPdf = null // 保存当前 PDF 对象，用于清理
-let resizeObserver = null // 窗口大小变化监听器
+const isInitialLoad = ref(true)
 
-// 加载 PDF
-// isInitialLoad: 是否是首次加载（首次加载显示 loading，刷新时不显示）
+// 显示模式：'virtual' (虚拟滚动) 或 'pagination' (分页导航)
+// 预留接口，未来可以从配置或用户设置中读取
+const displayMode = ref('virtual') // 默认虚拟滚动
+
+// 分页模式相关（预留）
+const canvas = ref(null) // 分页模式需要
+const currentPageNum = ref(1) // 当前页码（分页模式）
+
+// PDF 相关
+let eventSource = null
+let currentPdf = null
+let resizeObserver = null
+let pageObserver = null // Intersection Observer
+
+// 页面状态管理（虚拟滚动）
+const pageHeights = ref([]) // 每页的高度
+const renderedPages = ref(new Set()) // 已渲染的页面
+const pageContainers = ref([]) // 页面容器 DOM 引用
+
+// DOM 引用
+const container = ref(null) // 滚动容器
+
+// ========== 清理资源 ==========
+function cleanup() {
+  // 清理 Intersection Observer
+  if (pageObserver) {
+    pageObserver.disconnect()
+    pageObserver = null
+  }
+  
+  // 清理 PDF
+  cleanupPDF(currentPdf)
+  currentPdf = null
+  
+  // 重置状态
+  pageHeights.value = []
+  renderedPages.value.clear()
+  pageContainers.value = []
+  
+  // 清空容器
+  if (container.value) {
+    container.value.innerHTML = ''
+  }
+}
+
+// ========== PDF 加载 ==========
 async function loadPDF(showLoading = true) {
   try {
     // 只在首次加载时显示 loading
@@ -41,36 +88,33 @@ async function loadPDF(showLoading = true) {
     }
     error.value = ''
     
-    // 使用 API 下载 PDF
+    // 清理旧的 PDF 和观察器
+    cleanup()
+    
+    // 下载 PDF
     console.log('⬇️ 正在下载 PDF 文件...')
     const pdfBlob = await fetchPDF()
     console.log('✅ PDF 文件下载成功，大小:', (pdfBlob.size / 1024).toFixed(2), 'KB')
     
-    // 将 Blob 转换为 ArrayBuffer
+    // 解析 PDF
     console.log('📥 开始通过 PDF.js 解析 PDF...')
     const pdfArrayBuffer = await pdfBlob.arrayBuffer()
-    
-    // 使用工具函数解析 PDF
     const pdf = await parsePDF(pdfArrayBuffer)
-    
-    // 清理旧的 PDF 对象（如果存在）
-    if (currentPdf) {
-      cleanupPDF(currentPdf)
-      currentPdf = null
-    }
     
     // 保存新的 PDF 对象
     currentPdf = pdf
     
     console.log('✅ PDF 解析成功，页数:', pdf.numPages)
-    console.log('🎨 开始渲染第一页...')
     
-    // 渲染第一页
-    await renderPage(pdf, 1)
+    // 根据显示模式初始化
+    if (displayMode.value === 'virtual') {
+      await initVirtualScroll(pdf)
+    } else {
+      await initPagination(pdf)
+    }
     
-    console.log('✨ PDF 渲染完成')
     loading.value = false
-    isInitialLoad.value = false // 标记首次加载完成
+    isInitialLoad.value = false
   } catch (err) {
     console.error('❌ PDF 加载错误:', err)
     console.error('📋 错误详情:', err.message)
@@ -84,47 +128,226 @@ async function loadPDF(showLoading = true) {
   }
 }
 
-// 渲染 PDF 页面
+// ========== 虚拟滚动模式 ==========
+async function initVirtualScroll(pdf) {
+  console.log('🎨 初始化虚拟滚动模式...')
+  
+  await nextTick()
+  if (!container.value) {
+    throw new Error('容器元素尚未挂载')
+  }
+  
+  const containerWidth = container.value.clientWidth - 40 // 减去 padding
+  
+  // 计算所有页面的高度
+  console.log('📏 计算页面高度...')
+  pageHeights.value = await calculatePageHeights(pdf, containerWidth)
+  
+  // 创建页面容器
+  await createPageContainers(pdf.numPages)
+  
+  // 设置 Intersection Observer
+  setupPageObserver()
+  
+  // 初始渲染可见页面
+  await renderVisiblePages()
+  
+  console.log('✨ 虚拟滚动初始化完成')
+}
+
+// 创建页面容器（占位符）
+async function createPageContainers(totalPages) {
+  await nextTick()
+  if (!container.value) return
+  
+  // 清空容器
+  container.value.innerHTML = ''
+  pageContainers.value = []
+  renderedPages.value.clear()
+  
+  // 为每一页创建容器
+  for (let i = 1; i <= totalPages; i++) {
+    const pageDiv = document.createElement('div')
+    pageDiv.className = styles.pageContainer
+    pageDiv.dataset.pageNum = i
+    
+    // 设置占位高度
+    const height = pageHeights.value[i - 1] || 800
+    pageDiv.style.height = `${height}px`
+    pageDiv.style.minHeight = `${height}px`
+    
+    // 创建占位符
+    const placeholder = document.createElement('div')
+    placeholder.className = styles.pagePlaceholder
+    placeholder.style.width = '100%'
+    placeholder.style.height = '100%'
+    placeholder.textContent = `页面 ${i}`
+    pageDiv.appendChild(placeholder)
+    
+    container.value.appendChild(pageDiv)
+    pageContainers.value.push(pageDiv)
+  }
+}
+
+// 设置 Intersection Observer
+function setupPageObserver() {
+  // 清理旧的观察器
+  if (pageObserver) {
+    pageObserver.disconnect()
+  }
+  
+  // 创建新的观察器
+  // rootMargin: '200px' 表示提前 200px 预加载
+  pageObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      const pageNum = parseInt(entry.target.dataset.pageNum)
+      
+      if (entry.isIntersecting) {
+        // 页面进入视口，渲染它
+        if (!renderedPages.value.has(pageNum)) {
+          renderPageVirtual(pageNum)
+        }
+      }
+      // 页面离开视口时，保留已渲染的页面（不清理，提升体验）
+    })
+  }, {
+    root: container.value,
+    rootMargin: '200px', // 提前 200px 预加载
+    threshold: 0 // 一进入就触发
+  })
+  
+  // 观察所有页面容器
+  pageContainers.value.forEach(pageDiv => {
+    pageObserver.observe(pageDiv)
+  })
+}
+
+// 渲染单个页面（虚拟滚动版）
+async function renderPageVirtual(pageNum) {
+  if (!currentPdf || renderedPages.value.has(pageNum)) {
+    return
+  }
+  
+  try {
+    const pageDiv = pageContainers.value[pageNum - 1]
+    if (!pageDiv) return
+    
+    // 创建 canvas
+    const canvas = document.createElement('canvas')
+    canvas.className = styles.canvas
+    
+    // 获取容器宽度
+    const containerWidth = container.value.clientWidth - 40
+    
+    // 渲染页面
+    await renderPageToCanvas(currentPdf, pageNum, canvas, containerWidth)
+    
+    // 替换占位符
+    const placeholder = pageDiv.querySelector(`.${styles.pagePlaceholder}`)
+    if (placeholder) {
+      pageDiv.removeChild(placeholder)
+    }
+    pageDiv.appendChild(canvas)
+    
+    // 标记为已渲染
+    renderedPages.value.add(pageNum)
+    
+    console.log(`✅ 页面 ${pageNum} 渲染完成`)
+  } catch (err) {
+    console.error(`❌ 渲染页面 ${pageNum} 失败:`, err)
+  }
+}
+
+// 初始渲染可见页面
+async function renderVisiblePages() {
+  // 渲染第一页（通常可见）
+  if (pageContainers.value.length > 0) {
+    await renderPageVirtual(1)
+  }
+}
+
+// ========== 分页导航模式（预留） ==========
+async function initPagination(pdf) {
+  console.log('🎨 初始化分页导航模式...')
+  
+  await nextTick()
+  if (!container.value) {
+    throw new Error('容器元素尚未挂载')
+  }
+  
+  // 创建单页容器
+  container.value.innerHTML = ''
+  const pageDiv = document.createElement('div')
+  pageDiv.className = styles.pageContainer
+  pageDiv.dataset.pageNum = 1
+  
+  // 创建 canvas
+  const canvasEl = document.createElement('canvas')
+  canvasEl.className = styles.canvas
+  
+  const containerWidth = container.value.clientWidth - 40
+  await renderPageToCanvas(pdf, 1, canvasEl, containerWidth)
+  
+  pageDiv.appendChild(canvasEl)
+  container.value.appendChild(pageDiv)
+  
+  // 保存 canvas 引用（用于后续操作）
+  canvas.value = canvasEl
+  
+  currentPageNum.value = 1
+  
+  console.log('✨ 分页导航模式初始化完成（当前仅显示第一页）')
+}
+
+// 渲染 PDF 页面（分页模式使用）
 async function renderPage(pdf, pageNum) {
-  // 确保 canvas 已经挂载（使用 nextTick 等待 DOM 更新）
   await nextTick()
   if (!canvas.value) {
     throw new Error('Canvas 元素尚未挂载，无法渲染 PDF')
   }
   
-  const page = await pdf.getPage(pageNum)
+  const containerWidth = canvas.value.parentElement 
+    ? canvas.value.parentElement.clientWidth - 40 
+    : 800
   
-  // 获取容器宽度，用于自适应缩放
-  const container = canvas.value.parentElement
-  const containerWidth = container ? container.clientWidth : 800
-  const baseViewport = page.getViewport({ scale: 1.0 })
-  
-  // 使用工具函数计算自适应缩放比例
-  const scale = calculateScale(containerWidth, baseViewport.width)
-  const viewport = page.getViewport({ scale: scale })
-  
-  // 设置 canvas 尺寸（这会自动清除 canvas）
-  canvas.value.height = viewport.height
-  canvas.value.width = viewport.width
-  
-  // 获取 canvas 上下文
-  const context = canvas.value.getContext('2d')
-  
-  // 确保 canvas 可见（如果被隐藏，设置背景色）
-  context.fillStyle = '#ffffff'
-  context.fillRect(0, 0, canvas.value.width, canvas.value.height)
-  
-  // 渲染 PDF 页面到 canvas
-  const renderContext = {
-    canvasContext: context,
-    viewport: viewport
-  }
-  await page.render(renderContext).promise
+  await renderPageToCanvas(pdf, pageNum, canvas.value, containerWidth)
   
   console.log('✅ PDF 页面渲染完成，尺寸:', canvas.value.width, 'x', canvas.value.height)
 }
 
-// 监听 SSE 事件（PDF 更新）
+// ========== 窗口大小变化处理 ==========
+function handleResize() {
+  if (currentPdf) {
+    if (displayMode.value === 'virtual') {
+      // 虚拟滚动模式：重新计算页面高度
+      console.log('🔄 窗口大小变化，重新计算页面高度...')
+      const containerWidth = container.value.clientWidth - 40
+      calculatePageHeights(currentPdf, containerWidth).then(heights => {
+        pageHeights.value = heights
+        // 更新每个容器的高度
+        pageContainers.value.forEach((pageDiv, index) => {
+          const height = heights[index] || 800
+          pageDiv.style.height = `${height}px`
+          pageDiv.style.minHeight = `${height}px`
+        })
+        // 重新渲染已渲染的页面
+        renderedPages.value.forEach(pageNum => {
+          renderPageVirtual(pageNum)
+        })
+      })
+    } else {
+      // 分页模式：重新渲染当前页
+      if (canvas.value) {
+        console.log('🔄 窗口大小变化，重新渲染当前页...')
+        renderPage(currentPdf, currentPageNum.value).catch(err => {
+          console.error('重新渲染失败:', err)
+        })
+      }
+    }
+  }
+}
+
+// ========== SSE 事件监听 ==========
 function setupSSE() {
   eventSource = createSSEConnection({
     onMessage: async (event) => {
@@ -142,7 +365,7 @@ function setupSSE() {
   })
 }
 
-// 检查后端连接（使用 API）
+// ========== 后端连接检查 ==========
 async function checkBackendConnection() {
   const { success, error: errorMsg } = await testBackendConnection()
   if (!success) {
@@ -152,16 +375,7 @@ async function checkBackendConnection() {
   return true
 }
 
-// 处理窗口大小变化，重新渲染PDF以适应新尺寸
-function handleResize() {
-  if (currentPdf && canvas.value) {
-    console.log('🔄 窗口大小变化，重新渲染 PDF...')
-    renderPage(currentPdf, 1).catch(err => {
-      console.error('重新渲染失败:', err)
-    })
-  }
-}
-
+// ========== 生命周期 ==========
 onMounted(async () => {
   console.log('🚀 PDFViewer 组件已挂载')
   
@@ -170,11 +384,11 @@ onMounted(async () => {
     window.addEventListener('resize', handleResize)
     // 使用 ResizeObserver 监听容器大小变化（更精确）
     await nextTick()
-    if (canvas.value?.parentElement) {
+    if (container.value) {
       resizeObserver = new ResizeObserver(() => {
         handleResize()
       })
-      resizeObserver.observe(canvas.value.parentElement)
+      resizeObserver.observe(container.value)
     }
   }
   
@@ -193,13 +407,12 @@ onMounted(async () => {
 onUnmounted(() => {
   // 清理资源
   closeSSEConnection(eventSource)
-  // 使用工具函数清理 PDF 对象
-  cleanupPDF(currentPdf)
-  // 移除窗口大小监听
+  cleanup()
+  
+  // 移除监听器
   if (typeof window !== 'undefined') {
     window.removeEventListener('resize', handleResize)
   }
-  // 断开 ResizeObserver
   if (resizeObserver) {
     resizeObserver.disconnect()
   }
@@ -208,12 +421,24 @@ onUnmounted(() => {
 
 <template>
   <div :class="styles.viewer">
-    <!-- 只在首次加载时显示 loading -->
-    <div v-if="loading && isInitialLoad" :class="styles.loading">正在加载 PDF...</div>
+    <!-- 加载提示 -->
+    <div v-if="loading && isInitialLoad" :class="styles.loading">
+      正在加载 PDF...
+    </div>
+    
+    <!-- 错误提示 -->
     <div v-if="error" :class="styles.error">{{ error }}</div>
-    <!-- Canvas 始终显示，这样刷新时不会出现黑屏 -->
-    <div :class="styles.canvasContainer" v-show="!error">
-      <canvas ref="canvas" :class="styles.canvas"></canvas>
+    
+    <!-- PDF 容器 -->
+    <div 
+      v-show="!error" 
+      ref="container"
+      :class="[
+        styles.canvasContainer,
+        displayMode === 'virtual' ? styles.multiPage : styles.singlePage
+      ]"
+    >
+      <!-- 页面会通过 JavaScript 动态创建 -->
     </div>
   </div>
 </template>

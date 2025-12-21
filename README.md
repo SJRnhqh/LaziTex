@@ -133,105 +133,28 @@ lazitex> ollama -u     # Uninstall
 
 ### Build & Preview
 
-**Features:**
-
-- One-click build - Automatically invokes XeLaTeX compiler
-- Auto package detection & installation - Detects missing packages from compilation errors and installs them automatically
-- Adaptive multi-pass compilation - Automatically handles cross-references, TOC, bibliographies, indexes, etc.
-- Smart preview - Automatically opens PDF after successful build (macOS prioritizes Skim, Windows prioritizes SumatraPDF)
-- Web preview mode - Local HTTP server + browser preview, SSE real-time auto-refresh, zero-latency update experience
-- Custom output - Supports specifying output directory or full path
-- Quiet mode - Use `-q` flag to suppress compiler verbose output, showing only key information and errors
-- Tidy mode - Use `-t` flag to automatically clean auxiliary files (.log, .aux, .toc, .out, etc.) after successful compilation, keeping only the PDF
-
-**Build Example:**
+One-click LaTeX document compilation with auto package detection & installation, adaptive multi-pass compilation, smart preview, and web real-time preview. Supports quiet mode (`-q`) and tidy mode (`-t`).
 
 ```bash
-$ lazitex -b report.tex -s
-🚀 Building LaTeX document: report.tex
-📁 Working directory: /Users/user/projects/paper
-... (compiler output) ...
-✨ Build successful!
-(Automatically opening show window)
-```
+# CLI mode
+$ lazitex -b report.tex -s           # Build and preview
+$ lazitex -b report.tex -q           # Quiet build
+$ lazitex -b report.tex -t           # Build and clean auxiliary files
+$ lazitex -p report.tex              # Web preview mode (LaziView)
+$ lazitex -p report.tex :3000       # Web preview mode (custom port)
+$ lazitex -p report.tex -d          # Web preview mode (development mode)
 
-**Quiet Mode Example:**
-
-```bash
-$ lazitex -b report.tex -q
-🚀 Building LaTeX document: report.tex
-📁 Working directory: /Users/user/projects/paper
-✨ Build successful!
-# Compiler verbose output is suppressed, only key information is shown
-```
-
-**Tidy Mode Example:**
-
-```bash
-$ lazitex -b report.tex -t
-🚀 Building LaTeX document: report.tex
-📁 Working directory: /Users/user/projects/paper
-✨ Build successful!
-🧹 Auxiliary files cleaned
-# Automatically removes .log, .aux, .toc, .out, etc., keeping only the PDF
-```
-
-**Note:** The `-t/--tidy` flag only cleans auxiliary files when compilation succeeds. If compilation fails, all files are preserved for debugging.
-
-**Web Preview Mode:**
-
-LaziTex frontend (LaziHub) provides two modes:
-
-- **LaziView Mode** (`-p`): PDF-only preview interface, perfect for multi-screen setups or when you prefer external editors like VS Code or Neovim
-- **LaziWorkspace Mode** (`-w`): Full workspace with code editor, AI chat, file browser, and PDF preview (coming soon)
-
-```bash
-# Preview mode (LaziView - PDF only)
-$ lazitex -p report.tex
-🚀 Building LaTeX document: report.tex
-✨ Build successful!
-💡 Vue Frontend: http://localhost:5173
-💡 Backend API: http://localhost:8080
-🔗 Opening browser: http://localhost:5173
-🌐 Server starting on port 8080
-👀 Watching file: report.tex (press Ctrl+C to stop)
-
-# Preview mode with quiet compilation
-$ lazitex -p report.tex -q
-
-# Preview mode with tidy mode (clean auxiliary files after compilation)
-$ lazitex -p report.tex -t
-
-# Preview mode with custom port (default is 8080)
-$ lazitex -p report.tex :3000
-$ lazitex -p report.tex report.tex:3000  # Alternative format
-$ lazitex -p report.tex -q -t :3000      # Port can be anywhere in arguments
-
-# Preview mode with development mode (-d flag)
-$ lazitex -p report.tex -d
-
-# After modifying the file, the browser will automatically refresh to show the latest PDF
-```
-
-**Frontend Architecture:**
-
-- **Dual-Mode System**: LaziHub frontend supports both LaziView (PDF-only) and LaziWorkspace (full workspace) modes
-- **Mode Switching**: Users can switch between modes at runtime via the UI
-- **Backend API**: The `/api/config` endpoint returns the initial mode based on CLI parameters (`-p` for view mode)
-- **State Management**: Uses Pinia for reactive state management
-- **Layout Components**: Modular layout architecture (LaziViewLayout, LaziWorkspaceLayout)
-
-### REPL Mode
-
-Interactive command-line interface with command history, Tab completion, and full i18n support.
-
-```bash
+# REPL mode
 $ lazitex -r
 lazitex> build main.tex -o out/ -s    # Build document
 lazitex> preview main.tex -q          # Live preview
-lazitex> ollama -c                    # Check Ollama
 lazitex> help                         # Show help
 ```
+
+**Web Preview Modes:**
+
+- **LaziView Mode** (`-p`): PDF-only preview interface, perfect for multi-screen setups or external editors
+- **LaziWorkspace Mode** (`-w`): Full workspace (coming soon)
 
 ### Detected LaTeX Tools
 
@@ -360,15 +283,11 @@ lazitex/
 
 ### Architecture Highlights
 
-- **Compilation Strategy Pattern** - Uses Strategy Pattern (`compileStrategy` interface) to handle different compilation scenarios. Default strategy automatically handles package errors and multi-pass compilation. Future AI-powered strategies can be easily added without modifying the core compilation loop
+- **Adaptive Multi-Pass Compilation Detection** - Automatically detects and handles 6 scenarios requiring multiple compilation passes (TOC, cross-refs, bibliographies, indexes, glossaries, PDF bookmarks), no manual pass count specification needed
 
-- **Compilation Error Handling Module** - `core/errors/` modularly handles compilation issues: automatic package detection & installation, adaptive multi-pass compilation detection (covers 6 scenarios: TOC, cross-refs, bibliographies, indexes, glossaries, PDF bookmarks)
+- **Automatic Package Detection & Installation** - Intelligently extracts missing package names from compilation errors and automatically installs them via tlmgr/mpm, delivering true zero-configuration compilation experience
 
-- **Web Preview Architecture** - Lightweight HTTP server based on Go standard library, using Server-Sent Events (SSE) for real-time push, frontend double-buffering eliminates refresh flicker, providing smooth preview experience. LaziHub frontend supports dual-mode architecture: LaziView (PDF-only) and LaziWorkspace (full workspace)
-- **Frontend State Management** - Uses Pinia for reactive state management, enabling seamless mode switching and component communication
-- **Frontend Code Organization** - Clean directory structure: `api/` for unified backend API calls, `utils/` for pure function utilities, `styles/` for centralized styling, enabling code reuse and maintainability
-
-- **Tool Priority System** - Tools categorized by priority (⭐ Core, 🔹 Important, 🔸 Optional), helping users quickly identify critical tools
+- **Tool Priority System** - 23 LaTeX tools categorized by priority (⭐ Core, 🔹 Important, 🔸 Optional), helping users quickly identify critical tools and optimize installation recommendations
 
 ---
 
@@ -411,6 +330,7 @@ lazitex/
 - [x] **Build System** - One-click compilation, smart preview (macOS Skim/Windows SumatraPDF), auto package detection & installation, adaptive multi-pass compilation (cross-refs, TOC, bibliographies, etc.)
 - [x] **Web Preview & Frontend** - LaziHub frontend (Vue 3 + PDF.js), web preview mode with SSE real-time refresh, dual-mode architecture (LaziView/LaziWorkspace), preview mode supports `-q/-t/-d/:port` flags
 - [x] **Frontend Code Refactoring** - Code organization optimization: `api/` directory for unified backend API calls, `utils/` directory for pure function utilities, `styles/` directory for centralized styling, enabling code reuse and maintainability
+- [x] **PDF Virtual Scrolling** - Multi-page PDF preview with virtual scrolling based on Intersection Observer, rendering only visible pages with preloading of adjacent pages, significantly improving performance for large documents, with pagination mode interface reserved
 - [x] **Ollama Management (Windows & macOS)** - One-click check, install, and uninstall Ollama, smart detection of installation status and service running status
 
 ### In Progress 🚧
@@ -418,6 +338,7 @@ lazitex/
 - [ ] **Live Preview Optimization** - Enhanced error feedback
 - [x] **Compilation Performance Optimization** - Concurrent execution of intermediate tools, compilation locks with task preemption, and compilation timeout control, improving compilation speed by 30-50% in multi-tool scenarios and ensuring compilation stability
 - [ ] **Linux Environment Management** - Auto install/update/uninstall
+- [ ] **PDF Preview Enhancement** - Pagination mode implementation, page navigation, zoom controls
 
 ### Planned 📋
 

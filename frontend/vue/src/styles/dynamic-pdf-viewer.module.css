@@ -32,16 +32,59 @@
     overflow: auto;
     padding: 20px;
     display: flex;
-    justify-content: center;
-    align-items: flex-start;
+    flex-direction: column; /* 垂直排列 */
+    align-items: center; /* 水平居中 */
     background: var(--nord0);
     scroll-behavior: smooth;
 }
 
+/* 单页模式（分页导航）的样式 */
+.canvasContainer.singlePage {
+    justify-content: flex-start;
+}
+
+/* 多页模式（虚拟滚动）的样式 */
+.canvasContainer.multiPage {
+    justify-content: flex-start;
+}
+
+/* PDF 页面容器 */
+.pageContainer {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column; /* 确保垂直排列 */
+    align-items: center; /* 水平居中 */
+    justify-content: flex-start;
+    position: relative;
+    width: 100%; /* 占满宽度 */
+}
+
+/* 页面占位符（未渲染时显示） */
+.pagePlaceholder {
+    background: var(--nord1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--nord4);
+    font-size: 14px;
+    min-height: 200px;
+}
+
+/* Canvas 样式 */
 .canvas {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     background: var(--nord6);
     display: block;
     max-width: 100%;
     height: auto;
+}
+
+/* 加载指示器（单页模式） */
+.pageLoading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--nord4);
+    font-size: 14px;
 }
