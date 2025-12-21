@@ -12,4 +12,7 @@ func (s *Server) RegisterRoutes() {
 
 	// SSE 事件流路由（新增）
 	s.mux.HandleFunc("/events", s.HandleSSE)
+
+	// 配置API路由（返回应用模式）
+	s.mux.HandleFunc("/api/config", s.HandleConfig)
 }

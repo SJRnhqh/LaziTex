@@ -19,14 +19,21 @@ type Server struct {
 	// SSE 客户端管理（新增）
 	sseClients map[chan string]bool // SSE 客户端通道映射
 	sseMu      sync.Mutex           // 保护 sseClients 的互斥锁
+
+	// 应用模式（新增）
+	mode string
 }
 
 // NewServer 创建新的HTTP服务器
-func NewServer(port int, pdfPath string, errorMsg string) *Server {
+func NewServer(port int, pdfPath string, errorMsg string, mode string) *Server {
 	mux := http.NewServeMux()
 	// 如果没有提供错误消息，使用默认英文
 	if errorMsg == "" {
 		errorMsg = "PDF file not found"
+	}
+	// 如果没有提供模式，使用默认值 "view"
+	if mode == "" {
+		mode = "workspace"
 	}
 	server := &Server{
 		httpServer: &http.Server{
@@ -38,6 +45,7 @@ func NewServer(port int, pdfPath string, errorMsg string) *Server {
 		errorMsg:   errorMsg,
 		sseClients: make(map[chan string]bool),
 		sseMu:      sync.Mutex{},
+		mode:       mode,
 	}
 
 	// 注册路由

@@ -63,7 +63,7 @@ func StartLivePreview(filePath string) {
 
 	// 3. 创建并启动Web服务器
 	port := 8080
-	server := backend.NewServer(port, pdfPath, lang.T("msg.pdf_not_found"))
+	server := backend.NewServer(port, pdfPath, lang.T("msg.pdf_not_found"), "view")
 
 	// 在goroutine中启动服务器
 	go func() {

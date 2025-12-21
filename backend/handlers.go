@@ -3,6 +3,7 @@
 package backend
 
 import (
+	"encoding/json"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -34,4 +35,18 @@ func (s *Server) HandlePDF(w http.ResponseWriter, r *http.Request) {
 
 	// 读取并返回PDF文件
 	http.ServeFile(w, r, pdfPath)
+}
+
+// HandleConfig 处理配置请求，返回应用模式
+func (s *Server) HandleConfig(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	// 返回 JSON 格式的配置信息
+	response := map[string]string{
+		"mode": s.mode,
+	}
+
+	// 将 map 转换为 JSON
+	json.NewEncoder(w).Encode(response)
 }
