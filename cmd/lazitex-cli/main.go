@@ -7,6 +7,7 @@ import (
 	// 外部包
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 
 	// 内部包
@@ -118,33 +119,69 @@ func main() {
 		var filePath string
 		quiet := false
 		tidy := false
+		port := 8080
 
 		// 灵活解析：遍历 -p 之后的所有参数
 		for i := 1; i < len(args); i++ {
 			arg := args[i]
+
+			// 处理标志位
 			if arg == "-q" || arg == "--quiet" {
 				quiet = true
-			} else if arg == "-t" || arg == "--tidy" {
+				continue
+			}
+			if arg == "-t" || arg == "--tidy" {
 				tidy = true
-			} else if strings.HasPrefix(arg, "-") {
-				// 严谨处理：未知的标志位直接报错
+				continue
+			}
+
+			// 处理未知标志位
+			if strings.HasPrefix(arg, "-") {
 				fmt.Printf(lang.T("msg.unknown_command")+"\n", arg)
 				return
-			} else {
-				// 遇到不以 - 开头的参数，当作文件路径
-				if filePath == "" {
-					filePath = arg
-				}
 			}
-		}
 
+			// 处理端口号参数（独立的:port格式）
+			if strings.HasPrefix(arg, ":") {
+				portStr := arg[1:]
+				parsedPort, err := strconv.Atoi(portStr)
+				if err != nil || parsedPort < 1 || parsedPort > 65535 {
+					fmt.Println(lang.T("msg.invalid_port"))
+					return
+				}
+				port = parsedPort
+				continue
+			}
+
+			if filePath == "" {
+				// 检查是否包含端口号
+				if strings.Contains(arg, ":") {
+					lastColonIndex := strings.LastIndex(arg, ":")
+					if lastColonIndex > 0 && lastColonIndex < len(arg)-1 {
+						portStr := arg[lastColonIndex+1:]
+						parsedPort, err := strconv.Atoi(portStr)
+						// 如果解析成功，说明是 file.tex:8080 格式
+						if err != nil && parsedPort >= 1 && parsedPort <= 65535 {
+							// 提取文件路径部分（去掉端口号）
+							filePath = arg[:lastColonIndex]
+							port = parsedPort
+							continue
+					    }
+					// 如果解析失败，说明冒号后面不是端口号（比如 Windows 路径 C:\）
+					// 当作普通文件路径处理
+					}
+				}
+				// 普通文件路径（不包含端口号，或者包含冒号但不是端口号格式）
+				filePath = arg
+			}
+        }
 		// 检查是否提供了文件路径
 		if filePath == "" {
 			fmt.Println(lang.T("msg.preview_usage"))
 			return
 		}
 
-		tasks.StartLivePreview(filePath, quiet, tidy)
+		tasks.StartLivePreview(filePath, port, quiet, tidy)
 	default:
 		fmt.Printf(lang.T("msg.unknown_command")+"\n", args[0])
 		tasks.ShowHelp()

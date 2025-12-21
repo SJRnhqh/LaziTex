@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	// 内部包
@@ -370,25 +371,51 @@ func handleREPLCommand(input string) bool {
 		}
 
 		var filePath string
+		port := 8080
 		quiet := false
 		tidy := false
 
 		// 解析参数：preview <file> [-q] [-t]
 		for i := 1; i < len(parts); i++ {
 			arg := parts[i]
+
+			// 处理标志位
 			if arg == "-q" || arg == "--quiet" {
 				quiet = true
-			} else if arg == "-t" || arg == "--tidy" {
+				continue
+			}
+			if arg == "-t" || arg == "--tidy" {
 				tidy = true
-			} else if strings.HasPrefix(arg, "-") {
-				// 严谨处理：未知标志位报错
-				fmt.Printf(lang.T("repl.unknown_command")+"\n", arg)
-				return false
-			} else {
-				// 遇到不以 - 开头的参数，当作文件路径
-				if filePath == "" {
-					filePath = arg
+				continue
+			}
+
+			// 处理端口号参数（独立的:port格式）
+			if strings.HasPrefix(arg, ":") {
+				portStr := arg[1:]
+				parsedPort, err := strconv.Atoi(portStr)
+				if err != nil || parsedPort < 1 || parsedPort > 65535 {
+					fmt.Println(lang.T("msg.invalid_port"))
+					return false
 				}
+				port = parsedPort
+				continue
+			}
+
+			// 处理文件路径（如果 filePath 还没设置）
+			if filePath == "" {
+				if strings.Contains(arg, ":") {
+					lastColonIndex := strings.LastIndex(arg, ":")
+					if lastColonIndex > 0 && lastColonIndex < len(arg)-1 {
+						portStr := arg[lastColonIndex+1:]
+						parsedPort, err := strconv.Atoi(portStr)
+						if err != nil && parsedPort >= 1 && parsedPort <= 65535 {
+							filePath = arg[:lastColonIndex]
+							port = parsedPort
+							continue
+						}
+					}
+				}
+				filePath = arg
 			}
 		}
 
@@ -398,7 +425,7 @@ func handleREPLCommand(input string) bool {
 			return false
 		}
 
-		tasks.StartLivePreview(filePath, quiet, tidy)
+		tasks.StartLivePreview(filePath, port, quiet, tidy)
 	case "lang", "language":
 		// 语言切换命令
 		if len(parts) < 2 {

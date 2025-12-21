@@ -72,7 +72,7 @@ Download pre-built binaries from [Releases](https://github.com/SJRnhqh/lazitex/r
 | `-i, --install` | Install/update LaTeX | `lazitex -i` |
 | `-u, --uninstall` | Uninstall LaTeX | `lazitex -u` |
 | `-b, --build` | Build LaTeX document (supports `-o` output, `-s` show, `-q` quiet, `-t` tidy) | `lazitex -b main.tex [-o out/] [-s] [-q] [-t]` |
-| `-p, --preview` | Live preview PDF (supports `-q` quiet mode, `-t` tidy mode) | `lazitex -p main.tex [-q] [-t]` |
+| `-p, --preview` | Live preview PDF (supports `-q` quiet mode, `-t` tidy mode, `:port` custom port) | `lazitex -p main.tex [-q] [-t] [:port]` |
 | `-o, --ollama` | Ollama management (`-c` check, `-i` install, `-u` uninstall) | `lazitex -o -c` |
 | `-r, --repl` | Start REPL mode | `lazitex -r` |
 | `-l, --lang` | Set language | `lazitex -l zh` |
@@ -217,6 +217,11 @@ $ lazitex -p report.tex -q
 # Preview mode with tidy mode (clean auxiliary files after compilation)
 $ lazitex -p report.tex -t
 
+# Preview mode with custom port (default is 8080)
+$ lazitex -p report.tex :3000
+$ lazitex -p report.tex report.tex:3000  # Alternative format
+$ lazitex -p report.tex -q -t :3000      # Port can be anywhere in arguments
+
 # After modifying the file, the browser will automatically refresh to show the latest PDF
 ```
 
@@ -247,6 +252,7 @@ lazitex> ollama -i                 # Install Ollama (Windows via winget)
 lazitex> ollama -u                 # Uninstall Ollama
 lazitex> build main.tex -o out/ -s -q -t # Build LaTeX document with show, output path, quiet mode, and tidy mode
 lazitex> preview main.tex -q -t # Live preview with quiet mode and tidy mode
+lazitex> preview main.tex :3000 # Live preview on custom port
 lazitex> lang zh                   # Switch to Chinese
 lazitex> lang en                   # Switch to English
 lazitex> lang                      # Show current language
@@ -436,7 +442,7 @@ lazitex/
 - [x] **Smart Compilation Optimization** - Auto package detection & installation, adaptive multi-pass compilation (cross-refs, TOC, bibliographies, etc.)
 - [x] **Web Preview Mode** - Local HTTP server + browser preview, SSE real-time auto-refresh, double-buffering optimization, Overleaf-style web preview experience
 - [x] **LaziHub Frontend (Development)** - Modern Vue 3 frontend with PDF.js integration, real-time updates via SSE, adaptive scaling, smooth refresh experience. Dual-mode architecture (LaziView/LaziWorkspace) with Pinia state management and mode switching capability
-- [x] **Preview Mode Enhancements** - Preview mode (`-p`) now supports `-q` (quiet) and `-t` (tidy) flags for cleaner compilation output and automatic auxiliary file cleanup
+- [x] **Preview Mode Enhancements** - Preview mode (`-p`) now supports `-q` (quiet), `-t` (tidy) flags, and `:port` (custom port) for cleaner compilation output, automatic auxiliary file cleanup, and flexible server configuration
 - [x] **Ollama Management (Windows & macOS)** - One-click check, install, and uninstall Ollama. Windows: automatic winget installation. macOS: Homebrew or official script installation. Smart detection of installation status and service running status
 
 ### In Progress 🚧

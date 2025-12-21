@@ -37,7 +37,7 @@ func openBrowser(url string) error {
 // filePath: 要预览的 .tex 文件路径
 // quiet: 是否安静模式（不输出编译日志）
 // tidy: 是否清理辅助文件
-func StartLivePreview(filePath string, quiet bool, tidy bool) {
+func StartLivePreview(filePath string, port int, quiet bool, tidy bool) {
 	// 1. 获取绝对路径，确保监听准确
 	absPath, err := filepath.Abs(filePath)
 	if err != nil {
@@ -66,7 +66,6 @@ func StartLivePreview(filePath string, quiet bool, tidy bool) {
 	}
 
 	// 3. 创建并启动Web服务器
-	port := 8080
 	server := backend.NewServer(port, pdfPath, lang.T("msg.pdf_not_found"), "view")
 
 	// 在goroutine中启动服务器

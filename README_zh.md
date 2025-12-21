@@ -72,7 +72,7 @@ go build -o lazitex ./cmd/lazitex-cli
 | `-i, --install` | 安装/更新 LaTeX | `lazitex -i` |
 | `-u, --uninstall` | 卸载 LaTeX | `lazitex -u` |
 | `-b, --build` | 构建 LaTeX 文档 (支持 `-o` 输出, `-s` 编译后展示, `-q` 静默模式, `-t` 清理辅助文件) | `lazitex -b main.tex [-o out/] [-s] [-q] [-t]` |
-| `-p, --preview` | 实时预览 PDF 文档 (支持 `-q` 静默模式, `-t` 清理辅助文件) | `lazitex -p main.tex [-q] [-t]` |
+| `-p, --preview` | 实时预览 PDF 文档 (支持 `-q` 静默模式, `-t` 清理辅助文件, `:端口号` 自定义端口) | `lazitex -p main.tex [-q] [-t] [:端口号]` |
 | `-o, --ollama` | Ollama 管理 (`-c` 检查, `-i` 安装, `-u` 卸载) | `lazitex -o -c` |
 | `-r, --repl` | 启动 REPL 模式 | `lazitex -r` |
 | `-l, --lang` | 设置语言 | `lazitex -l zh` |
@@ -217,6 +217,11 @@ $ lazitex -p report.tex -q
 # 预览模式（清理辅助文件）
 $ lazitex -p report.tex -t
 
+# 预览模式（自定义端口，默认 8080）
+$ lazitex -p report.tex :3000
+$ lazitex -p report.tex report.tex:3000  # 另一种格式
+$ lazitex -p report.tex -q -t :3000      # 端口参数可以放在任意位置
+
 # 修改文件后，浏览器会自动刷新显示最新的 PDF
 ```
 
@@ -244,6 +249,7 @@ lazitex> install                   # 安装或更新 LaTeX 环境
 lazitex> uninstall                 # 卸载 LaTeX 环境
 lazitex> build main.tex -o out/ -s -q -t # 构建 LaTeX 文档，指定输出目录、展示、静默模式和清理模式
 lazitex> preview main.tex -q -t # 实时预览，使用静默模式和清理模式
+lazitex> preview main.tex :3000 # 实时预览，使用自定义端口
 lazitex> ollama -c                    # 检查 Ollama 是否安装
 lazitex> ollama -i                    # 安装 Ollama（Windows 通过 winget）
 lazitex> ollama -u                    # 卸载 Ollama
@@ -437,7 +443,7 @@ lazitex/
 - [x] **智能编译优化** - 自动包检测与安装、自适应多轮编译（交叉引用、目录、参考文献等）
 - [x] **Web 预览模式** - 本地 HTTP 服务器 + 浏览器预览，SSE 实时自动刷新，双缓冲优化，提供 Overleaf 风格的 Web 预览体验
 - [x] **LaziHub 前端（开发中）** - 基于 Vue 3 的现代前端，集成 PDF.js，通过 SSE 实现实时更新，自适应缩放，平滑刷新体验。双模式架构（LaziView/LaziWorkspace），使用 Pinia 状态管理和模式切换功能
-- [x] **预览模式增强** - 预览模式（`-p`）现在支持 `-q`（静默）和 `-t`（清理）参数，提供更简洁的编译输出和自动清理辅助文件功能
+- [x] **预览模式增强** - 预览模式（`-p`）现在支持 `-q`（静默）、`-t`（清理）和 `:端口号`（自定义端口）参数，提供更简洁的编译输出、自动清理辅助文件功能和灵活的服务器端口配置
 - [x] **Ollama 管理（Windows & macOS）** - 一键检查、安装、卸载 Ollama。Windows：通过 winget 自动安装。macOS：通过 Homebrew 或官方脚本安装。智能检测安装状态和服务运行状态
 
 ### 进行中 🚧
