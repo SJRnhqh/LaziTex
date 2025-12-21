@@ -12,10 +12,37 @@ echo.
 REM 创建输出目录
 if not exist "bin" mkdir bin
 
-set "total=4"
+set "total=5"
 set "current=0"
 
-echo Starting build process...
+REM 步骤 1: 构建 Vue 前端
+set /a current+=1
+echo [%current%/%total%] Building Vue frontend...
+cd frontend\vue
+if not exist "node_modules" (
+    echo    Installing npm dependencies...
+    call npm install
+    if %errorlevel% neq 0 (
+        echo.
+        echo [ERROR] npm install failed!
+        pause
+        exit /b 1
+    )
+)
+
+echo    Building Vue frontend...
+call npm run build
+if %errorlevel% neq 0 (
+    echo.
+    echo [ERROR] Vue frontend build failed!
+    pause
+    exit /b 1
+)
+cd ..\..
+echo    [OK] Vue frontend build completed successfully
+echo.
+
+echo Starting Go build process...
 echo.
 
 REM Windows

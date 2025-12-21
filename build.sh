@@ -11,10 +11,35 @@ echo ""
 # 创建输出目录
 mkdir -p bin
 
-total=4
+total=5
 current=0
 
-echo "Starting build process..."
+# 步骤 1: 构建 Vue 前端
+current=$((current + 1))
+echo "[$current/$total] Building Vue frontend..."
+cd frontend/vue
+if [ ! -d "node_modules" ]; then
+    echo "    Installing npm dependencies..."
+    npm install
+    if [ $? -ne 0 ]; then
+        echo ""
+        echo "[ERROR] npm install failed!"
+        exit 1
+    fi
+fi
+
+echo "    Building Vue frontend..."
+npm run build
+if [ $? -ne 0 ]; then
+    echo ""
+    echo "[ERROR] Vue frontend build failed!"
+    exit 1
+fi
+cd ../..
+echo "    [OK] Vue frontend build completed successfully"
+echo ""
+
+echo "Starting Go build process..."
 echo ""
 
 # Windows
