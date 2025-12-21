@@ -11,11 +11,98 @@ import (
 	frontend "github.com/SJRnhqh/lazitex/frontend"
 )
 
-// HandleIndex 处理首页请求
-func HandleIndex(w http.ResponseWriter, r *http.Request) {
+// HandleIndex 处理首页请求（生产模式：返回嵌入的 Vue 前端）
+func (s *Server) HandleIndex(w http.ResponseWriter, r *http.Request) {
+	html, err := frontend.GetVueIndexHTML()
+	if err != nil {
+		// 如果获取 Vue 前端失败，回退到旧的静态页面
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		w.WriteHeader(http.StatusOK)
+		w.Write(frontend.IndexHTML)
+		return
+	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
-	w.Write(frontend.IndexHTML)
+	w.Write(html)
+}
+
+// HandleIndexDev 处理首页请求（开发模式：返回提示信息）
+func (s *Server) HandleIndexDev(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(`<!DOCTYPE html>
+<html>
+<head>
+	<title>LaziTex - Development Mode</title>
+	<meta charset="utf-8">
+	<style>
+		body {
+			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			height: 100vh;
+			margin: 0;
+			background: #2E3440;
+			color: #ECEFF4;
+		}
+		.container {
+			text-align: center;
+			max-width: 600px;
+			padding: 20px;
+		}
+		h1 {
+			margin-bottom: 20px;
+		}
+		p {
+			margin: 10px 0;
+			line-height: 1.6;
+		}
+		a {
+			color: #5E81AC;
+			text-decoration: none;
+			font-weight: bold;
+		}
+		a:hover {
+			text-decoration: underline;
+		}
+		.code {
+			background: #3B4252;
+			padding: 8px 12px;
+			border-radius: 4px;
+			font-family: 'Courier New', monospace;
+			display: inline-block;
+			margin: 5px 0;
+		}
+		.tip {
+			margin-top: 30px;
+			padding: 15px;
+			background: #434C5E;
+			border-radius: 4px;
+			font-size: 14px;
+		}
+		code {
+			background: #3B4252;
+			padding: 2px 6px;
+			border-radius: 3px;
+			font-family: 'Courier New', monospace;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<h1>🔧 Development Mode</h1>
+		<p>Please access the Vue dev server at:</p>
+		<p><a href="http://localhost:5173">http://localhost:5173</a></p>
+		
+		<div class="tip">
+			<p><strong>💡 Tip:</strong> If the Vue dev server is not running, start it with:</p>
+			<p class="code">cd frontend/vue && npm run dev</p>
+			<p style="margin-top: 15px; font-size: 13px;">Or if you want to use the embedded frontend instead, restart without the <code>-d</code> flag.</p>
+		</div>
+	</div>
+</body>
+</html>`))
 }
 
 // HandlePDF 处理PDF文件请求

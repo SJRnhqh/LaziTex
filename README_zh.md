@@ -222,6 +222,10 @@ $ lazitex -p report.tex :3000
 $ lazitex -p report.tex report.tex:3000  # 另一种格式
 $ lazitex -p report.tex -q -t :3000      # 端口参数可以放在任意位置
 
+# 预览模式（开发模式，使用 -d 标志）
+# 如果 Vue dev server 可用，会使用开发服务器 (http://localhost:5173)，并智能处理端口
+$ lazitex -p report.tex -d
+
 # 修改文件后，浏览器会自动刷新显示最新的 PDF
 ```
 
@@ -236,9 +240,20 @@ $ lazitex -p report.tex -q -t :3000      # 端口参数可以放在任意位置
 **开发环境设置：**
 
 - 前端（Vue 3 + Vite）：在 `frontend/vue/` 目录运行 `npm run dev`
-- 后端（Go）：运行 `lazitex -p report.tex`（LaziView 模式）
-- 前端通过 Vite 代理自动连接到后端
+- 后端（Go）：运行 `lazitex -p report.tex -d`（LaziView 模式，启用开发服务器）
+- 前端通过 Vite 代理自动连接到后端（代理配置硬编码到 8080 端口）
 - 前端从后端 API 检测模式并渲染相应的布局
+
+**开发模式智能处理：**
+
+`-d` 标志启用开发模式，并具有智能端口管理功能：
+
+1. **Vue dev server 可用 + 端口 8080**：使用开发模式，打开 `http://localhost:5173`
+2. **Vue dev server 可用 + 自定义端口 + 8080 可用**：强制使用 8080 端口以保持开发模式兼容性
+3. **Vue dev server 可用 + 自定义端口 + 8080 被占用**：回退到生产模式，使用自定义端口
+4. **Vue dev server 不可用**：自动回退到生产模式（使用嵌入的前端）
+
+如果您在开发模式下意外直接访问后端（`http://localhost:8080`），会看到提示信息，引导您访问 Vue dev server。
 
 ### REPL 模式
 
@@ -250,6 +265,7 @@ lazitex> uninstall                 # 卸载 LaTeX 环境
 lazitex> build main.tex -o out/ -s -q -t # 构建 LaTeX 文档，指定输出目录、展示、静默模式和清理模式
 lazitex> preview main.tex -q -t # 实时预览，使用静默模式和清理模式
 lazitex> preview main.tex :3000 # 实时预览，使用自定义端口
+lazitex> preview main.tex -d    # 实时预览，使用开发模式
 lazitex> ollama -c                    # 检查 Ollama 是否安装
 lazitex> ollama -i                    # 安装 Ollama（Windows 通过 winget）
 lazitex> ollama -u                    # 卸载 Ollama
@@ -443,7 +459,8 @@ lazitex/
 - [x] **智能编译优化** - 自动包检测与安装、自适应多轮编译（交叉引用、目录、参考文献等）
 - [x] **Web 预览模式** - 本地 HTTP 服务器 + 浏览器预览，SSE 实时自动刷新，双缓冲优化，提供 Overleaf 风格的 Web 预览体验
 - [x] **LaziHub 前端（开发中）** - 基于 Vue 3 的现代前端，集成 PDF.js，通过 SSE 实现实时更新，自适应缩放，平滑刷新体验。双模式架构（LaziView/LaziWorkspace），使用 Pinia 状态管理和模式切换功能
-- [x] **预览模式增强** - 预览模式（`-p`）现在支持 `-q`（静默）、`-t`（清理）和 `:端口号`（自定义端口）参数，提供更简洁的编译输出、自动清理辅助文件功能和灵活的服务器端口配置
+- [x] **预览模式增强** - 预览模式（`-p`）现在支持 `-q`（静默）、`-t`（清理）、`-d`（开发模式）和 `:端口号`（自定义端口）参数，提供更简洁的编译输出、自动清理辅助文件功能和灵活的服务器端口配置
+- [x] **开发模式智能处理** - 智能开发模式（`-d`），自动检测 Vue dev server 可用性，智能端口管理（需要时强制使用 8080，8080 被占用时回退到生产模式），并提供友好的回退提示信息
 - [x] **Ollama 管理（Windows & macOS）** - 一键检查、安装、卸载 Ollama。Windows：通过 winget 自动安装。macOS：通过 Homebrew 或官方脚本安装。智能检测安装状态和服务运行状态
 
 ### 进行中 🚧

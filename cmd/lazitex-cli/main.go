@@ -119,6 +119,7 @@ func main() {
 		var filePath string
 		quiet := false
 		tidy := false
+		devMode := false
 		port := 8080
 
 		// 灵活解析：遍历 -p 之后的所有参数
@@ -132,6 +133,10 @@ func main() {
 			}
 			if arg == "-t" || arg == "--tidy" {
 				tidy = true
+				continue
+			}
+			if arg == "-d" || arg == "--dev" {
+				devMode = true
 				continue
 			}
 
@@ -181,7 +186,7 @@ func main() {
 			return
 		}
 
-		tasks.StartLivePreview(filePath, port, quiet, tidy)
+		tasks.StartLivePreview(filePath, port, quiet, tidy, devMode)
 	default:
 		fmt.Printf(lang.T("msg.unknown_command")+"\n", args[0])
 		tasks.ShowHelp()

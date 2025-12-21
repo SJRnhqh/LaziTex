@@ -222,6 +222,10 @@ $ lazitex -p report.tex :3000
 $ lazitex -p report.tex report.tex:3000  # Alternative format
 $ lazitex -p report.tex -q -t :3000      # Port can be anywhere in arguments
 
+# Preview mode with development mode (-d flag)
+# Uses Vue dev server (http://localhost:5173) if available, with smart port handling
+$ lazitex -p report.tex -d
+
 # After modifying the file, the browser will automatically refresh to show the latest PDF
 ```
 
@@ -236,9 +240,20 @@ $ lazitex -p report.tex -q -t :3000      # Port can be anywhere in arguments
 **Development Setup:**
 
 - Frontend (Vue 3 + Vite): Run `npm run dev` in `frontend/vue/` directory
-- Backend (Go): Run `lazitex -p report.tex` (for LaziView mode)
-- The frontend automatically connects to the backend via Vite proxy
+- Backend (Go): Run `lazitex -p report.tex -d` (for LaziView mode with dev server)
+- The frontend automatically connects to the backend via Vite proxy (hardcoded to port 8080)
 - Frontend detects mode from backend API and renders the appropriate layout
+
+**Development Mode Smart Handling:**
+
+The `-d` flag enables development mode with intelligent port management:
+
+1. **Vue dev server available + port 8080**: Uses dev mode, opens `http://localhost:5173`
+2. **Vue dev server available + custom port + 8080 available**: Forces port 8080 to maintain dev mode compatibility
+3. **Vue dev server available + custom port + 8080 occupied**: Falls back to production mode with custom port
+4. **Vue dev server unavailable**: Automatically falls back to production mode (embedded frontend)
+
+If you accidentally access the backend directly (`http://localhost:8080`) in dev mode, you'll see a helpful message guiding you to the Vue dev server.
 
 ### REPL Mode
 
@@ -253,6 +268,7 @@ lazitex> ollama -u                 # Uninstall Ollama
 lazitex> build main.tex -o out/ -s -q -t # Build LaTeX document with show, output path, quiet mode, and tidy mode
 lazitex> preview main.tex -q -t # Live preview with quiet mode and tidy mode
 lazitex> preview main.tex :3000 # Live preview on custom port
+lazitex> preview main.tex -d    # Live preview with development mode
 lazitex> lang zh                   # Switch to Chinese
 lazitex> lang en                   # Switch to English
 lazitex> lang                      # Show current language
@@ -442,7 +458,8 @@ lazitex/
 - [x] **Smart Compilation Optimization** - Auto package detection & installation, adaptive multi-pass compilation (cross-refs, TOC, bibliographies, etc.)
 - [x] **Web Preview Mode** - Local HTTP server + browser preview, SSE real-time auto-refresh, double-buffering optimization, Overleaf-style web preview experience
 - [x] **LaziHub Frontend (Development)** - Modern Vue 3 frontend with PDF.js integration, real-time updates via SSE, adaptive scaling, smooth refresh experience. Dual-mode architecture (LaziView/LaziWorkspace) with Pinia state management and mode switching capability
-- [x] **Preview Mode Enhancements** - Preview mode (`-p`) now supports `-q` (quiet), `-t` (tidy) flags, and `:port` (custom port) for cleaner compilation output, automatic auxiliary file cleanup, and flexible server configuration
+- [x] **Preview Mode Enhancements** - Preview mode (`-p`) now supports `-q` (quiet), `-t` (tidy) flags, `-d` (dev mode), and `:port` (custom port) for cleaner compilation output, automatic auxiliary file cleanup, and flexible server configuration
+- [x] **Development Mode Smart Handling** - Intelligent development mode (`-d`) with automatic Vue dev server detection, smart port management (forces 8080 when needed, falls back to production mode if 8080 is occupied), and helpful fallback messages
 - [x] **Ollama Management (Windows & macOS)** - One-click check, install, and uninstall Ollama. Windows: automatic winget installation. macOS: Homebrew or official script installation. Smart detection of installation status and service running status
 
 ### In Progress 🚧

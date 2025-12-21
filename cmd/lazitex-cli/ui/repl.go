@@ -374,6 +374,7 @@ func handleREPLCommand(input string) bool {
 		port := 8080
 		quiet := false
 		tidy := false
+		devMode := false
 
 		// 解析参数：preview <file> [-q] [-t]
 		for i := 1; i < len(parts); i++ {
@@ -386,6 +387,10 @@ func handleREPLCommand(input string) bool {
 			}
 			if arg == "-t" || arg == "--tidy" {
 				tidy = true
+				continue
+			}
+			if arg == "-d" || arg == "--dev" {
+				devMode = true
 				continue
 			}
 
@@ -408,7 +413,7 @@ func handleREPLCommand(input string) bool {
 					if lastColonIndex > 0 && lastColonIndex < len(arg)-1 {
 						portStr := arg[lastColonIndex+1:]
 						parsedPort, err := strconv.Atoi(portStr)
-						if err != nil && parsedPort >= 1 && parsedPort <= 65535 {
+						if err == nil && parsedPort >= 1 && parsedPort <= 65535 {
 							filePath = arg[:lastColonIndex]
 							port = parsedPort
 							continue
@@ -425,7 +430,7 @@ func handleREPLCommand(input string) bool {
 			return false
 		}
 
-		tasks.StartLivePreview(filePath, port, quiet, tidy)
+		tasks.StartLivePreview(filePath, port, quiet, tidy, devMode)
 	case "lang", "language":
 		// 语言切换命令
 		if len(parts) < 2 {

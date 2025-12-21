@@ -16,16 +16,19 @@ type Server struct {
 	pdfPath    string
 	errorMsg   string // PDF文件不存在的错误消息（支持国际化）
 
-	// SSE 客户端管理（新增）
+	// SSE 客户端管理
 	sseClients map[chan string]bool // SSE 客户端通道映射
 	sseMu      sync.Mutex           // 保护 sseClients 的互斥锁
 
-	// 应用模式（新增）
+	// 应用模式
 	mode string
+
+	// 开发者模式
+	devMode bool // true=开发模式（使用外部 Vue dev server），false=生产模式（使用嵌入的前端资源）
 }
 
 // NewServer 创建新的HTTP服务器
-func NewServer(port int, pdfPath string, errorMsg string, mode string) *Server {
+func NewServer(port int, pdfPath string, errorMsg string, mode string, devMode bool) *Server {
 	mux := http.NewServeMux()
 	// 如果没有提供错误消息，使用默认英文
 	if errorMsg == "" {
@@ -46,6 +49,7 @@ func NewServer(port int, pdfPath string, errorMsg string, mode string) *Server {
 		sseClients: make(map[chan string]bool),
 		sseMu:      sync.Mutex{},
 		mode:       mode,
+		devMode:    devMode,
 	}
 
 	// 注册路由
