@@ -114,8 +114,37 @@ func main() {
 			fmt.Println(lang.T("msg.preview_usage"))
 			return
 		}
-		filePath := args[1]
-		tasks.StartLivePreview(filePath)
+
+		var filePath string
+		quiet := false
+		tidy := false
+
+		// 灵活解析：遍历 -p 之后的所有参数
+		for i := 1; i < len(args); i++ {
+			arg := args[i]
+			if arg == "-q" || arg == "--quiet" {
+				quiet = true
+			} else if arg == "-t" || arg == "--tidy" {
+				tidy = true
+			} else if strings.HasPrefix(arg, "-") {
+				// 严谨处理：未知的标志位直接报错
+				fmt.Printf(lang.T("msg.unknown_command")+"\n", arg)
+				return
+			} else {
+				// 遇到不以 - 开头的参数，当作文件路径
+				if filePath == "" {
+					filePath = arg
+				}
+			}
+		}
+
+		// 检查是否提供了文件路径
+		if filePath == "" {
+			fmt.Println(lang.T("msg.preview_usage"))
+			return
+		}
+
+		tasks.StartLivePreview(filePath, quiet, tidy)
 	default:
 		fmt.Printf(lang.T("msg.unknown_command")+"\n", args[0])
 		tasks.ShowHelp()

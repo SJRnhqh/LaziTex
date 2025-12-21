@@ -368,8 +368,37 @@ func handleREPLCommand(input string) bool {
 			fmt.Println(lang.T("repl.preview_usage"))
 			return false
 		}
-		filePath := parts[1]
-		tasks.StartLivePreview(filePath)
+
+		var filePath string
+		quiet := false
+		tidy := false
+
+		// 解析参数：preview <file> [-q] [-t]
+		for i := 1; i < len(parts); i++ {
+			arg := parts[i]
+			if arg == "-q" || arg == "--quiet" {
+				quiet = true
+			} else if arg == "-t" || arg == "--tidy" {
+				tidy = true
+			} else if strings.HasPrefix(arg, "-") {
+				// 严谨处理：未知标志位报错
+				fmt.Printf(lang.T("repl.unknown_command")+"\n", arg)
+				return false
+			} else {
+				// 遇到不以 - 开头的参数，当作文件路径
+				if filePath == "" {
+					filePath = arg
+				}
+			}
+		}
+
+		// 检查是否提供了文件路径
+		if filePath == "" {
+			fmt.Println(lang.T("repl.preview_usage"))
+			return false
+		}
+
+		tasks.StartLivePreview(filePath, quiet, tidy)
 	case "lang", "language":
 		// 语言切换命令
 		if len(parts) < 2 {

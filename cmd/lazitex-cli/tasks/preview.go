@@ -35,7 +35,9 @@ func openBrowser(url string) error {
 
 // StartLivePreview 启动实时预览模式（Web模式）
 // filePath: 要预览的 .tex 文件路径
-func StartLivePreview(filePath string) {
+// quiet: 是否安静模式（不输出编译日志）
+// tidy: 是否清理辅助文件
+func StartLivePreview(filePath string, quiet bool, tidy bool) {
 	// 1. 获取绝对路径，确保监听准确
 	absPath, err := filepath.Abs(filePath)
 	if err != nil {
@@ -48,6 +50,8 @@ func StartLivePreview(filePath string) {
 		InputPath:  absPath,
 		OutputPath: "",
 		Show:       false, // Web模式下不打开本地PDF
+		Quiet:      quiet, // 使用传入的 quiet 参数
+		Tidy:       tidy,  // 使用传入的 tidy 参数
 	}
 
 	pdfPath, err := core.Build(opts)
@@ -99,11 +103,13 @@ func StartLivePreview(filePath string) {
 		currentTime := time.Now().Format(time.TimeOnly)
 		fmt.Printf("\n🔄 [%s] %s\n", currentTime, lang.T("msg.building_doc"))
 
-		// 重新编译
+		// 重新编译（使用相同的 quiet 和 tidy 选项）
 		opts := core.BuildOptions{
 			InputPath:  absPath,
 			OutputPath: "",
 			Show:       false,
+			Quiet:      quiet, // 使用相同的 quiet 选项
+			Tidy:       tidy,  // 使用相同的 tidy 选项
 		}
 
 		newPdfPath, err := core.Build(opts)

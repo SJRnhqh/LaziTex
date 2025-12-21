@@ -72,7 +72,7 @@ go build -o lazitex ./cmd/lazitex-cli
 | `-i, --install` | 安装/更新 LaTeX | `lazitex -i` |
 | `-u, --uninstall` | 卸载 LaTeX | `lazitex -u` |
 | `-b, --build` | 构建 LaTeX 文档 (支持 `-o` 输出, `-s` 编译后展示, `-q` 静默模式, `-t` 清理辅助文件) | `lazitex -b main.tex [-o out/] [-s] [-q] [-t]` |
-| `-p, --preview` | 实时预览 PDF 文档 (监听保存动作并自动刷新) | `lazitex -p main.tex` |
+| `-p, --preview` | 实时预览 PDF 文档 (支持 `-q` 静默模式, `-t` 清理辅助文件) | `lazitex -p main.tex [-q] [-t]` |
 | `-o, --ollama` | Ollama 管理 (`-c` 检查, `-i` 安装, `-u` 卸载) | `lazitex -o -c` |
 | `-r, --repl` | 启动 REPL 模式 | `lazitex -r` |
 | `-l, --lang` | 设置语言 | `lazitex -l zh` |
@@ -195,7 +195,13 @@ $ lazitex -b report.tex -t
 
 **Web 预览模式：**
 
+LaziTex 前端（LaziHub）提供两种模式：
+
+- **LaziView 模式** (`-p`)：仅 PDF 预览界面，适合多屏幕场景或使用外部编辑器（如 VS Code 或 Neovim）
+- **LaziWorkspace 模式** (`-w`)：完整工作区，包含代码编辑器、AI 交流、文件浏览器和 PDF 预览（即将推出）
+
 ```bash
+# 预览模式（LaziView - 仅 PDF）
 $ lazitex -p report.tex
 🚀 正在构建 LaTeX 文档: report.tex
 ✨ 构建成功！
@@ -205,14 +211,29 @@ $ lazitex -p report.tex
 🌐 服务器启动在端口 8080
 👀 正在实时监听文件: report.tex (按 Ctrl+C 退出监听)
 
+# 预览模式（静默编译）
+$ lazitex -p report.tex -q
+
+# 预览模式（清理辅助文件）
+$ lazitex -p report.tex -t
+
 # 修改文件后，浏览器会自动刷新显示最新的 PDF
 ```
+
+**前端架构：**
+
+- **双模式系统**：LaziHub 前端支持 LaziView（仅 PDF）和 LaziWorkspace（完整工作区）两种模式
+- **模式切换**：用户可以通过 UI 在运行时切换模式
+- **后端 API**：`/api/config` 接口根据 CLI 参数返回初始模式（`-p` 为预览模式）
+- **状态管理**：使用 Pinia 进行响应式状态管理
+- **布局组件**：模块化布局架构（LaziViewLayout, LaziWorkspaceLayout）
 
 **开发环境设置：**
 
 - 前端（Vue 3 + Vite）：在 `frontend/vue/` 目录运行 `npm run dev`
-- 后端（Go）：运行 `lazitex -p report.tex`
+- 后端（Go）：运行 `lazitex -p report.tex`（LaziView 模式）
 - 前端通过 Vite 代理自动连接到后端
+- 前端从后端 API 检测模式并渲染相应的布局
 
 ### REPL 模式
 
@@ -221,7 +242,8 @@ lazitex> help                      # 显示可用命令
 lazitex> check                     # 检查 LaTeX 环境
 lazitex> install                   # 安装或更新 LaTeX 环境
 lazitex> uninstall                 # 卸载 LaTeX 环境
-lazitex> build main.tex -o out/ -s -q -t # 构建 LaTeX 文档，指定输出目录、展示、静默模式并清理辅助文件
+lazitex> build main.tex -o out/ -s -q -t # 构建 LaTeX 文档，指定输出目录、展示、静默模式和清理模式
+lazitex> preview main.tex -q -t # 实时预览，使用静默模式和清理模式
 lazitex> ollama -c                    # 检查 Ollama 是否安装
 lazitex> ollama -i                    # 安装 Ollama（Windows 通过 winget）
 lazitex> ollama -u                    # 卸载 Ollama
@@ -302,9 +324,9 @@ lazitex/
 │   └── config.go                  # 用户偏好与设置
 │
 ├── 🗄️  backend/                    # Web 服务器后端
-│   ├── server.go                  # HTTP 服务器核心
-│   ├── handlers.go                # HTTP 请求处理（首页、PDF）
-│   ├── routes.go                  # 路由注册
+│   ├── server.go                  # HTTP 服务器核心（支持模式配置）
+│   ├── handlers.go                # HTTP 请求处理（首页、PDF、配置 API）
+│   ├── routes.go                  # 路由注册（包含 /api/config）
 │   └── sse.go                     # Server-Sent Events 实时推送
 │
 ├── 🌐 frontend/                   # 前端资源
@@ -314,8 +336,14 @@ lazitex/
 │   └── vue/                       # Vue 3 前端（新版）
 │       ├── src/                   # Vue 源码文件
 │       │   ├── components/        # Vue 组件
-│       │   │   └── PDFViewer.vue  # PDF 预览组件
-│       │   ├── App.vue            # 根组件
+│       │   │   ├── DynamicPDFViewer.vue  # PDF 预览组件
+│       │   │   └── ModeSwitcher.vue      # 模式切换组件
+│       │   ├── layouts/           # 布局组件
+│       │   │   ├── LaziViewLayout.vue      # 仅 PDF 预览布局
+│       │   │   └── LaziWorkspaceLayout.vue # 完整工作区布局
+│       │   ├── stores/            # Pinia 状态管理
+│       │   │   └── appMode.js     # 应用模式状态管理
+│       │   ├── App.vue            # 根组件（模式分发器）
 │       │   └── main.js            # 入口文件
 │       ├── public/                # 公共资源
 │       ├── index.html             # HTML 模板
@@ -361,7 +389,8 @@ lazitex/
 
 - **编译错误处理模块** - `core/errors/` 模块化处理编译问题：自动包检测与安装、自适应多轮编译检测（覆盖目录、交叉引用、参考文献、索引、术语表、PDF 书签等 6 种场景）
 
-- **Web 预览架构** - 基于 Go 标准库的轻量级 HTTP 服务器，使用 Server-Sent Events (SSE) 实现实时推送，前端双缓冲技术消除刷新闪烁，提供流畅的预览体验
+- **Web 预览架构** - 基于 Go 标准库的轻量级 HTTP 服务器，使用 Server-Sent Events (SSE) 实现实时推送，前端双缓冲技术消除刷新闪烁，提供流畅的预览体验。LaziHub 前端支持双模式架构：LaziView（仅 PDF）和 LaziWorkspace（完整工作区）
+- **前端状态管理** - 使用 Pinia 进行响应式状态管理，实现无缝模式切换和组件通信
 
 - **工具优先级系统** - 工具按优先级分类（⭐ 核心、🔹 重要、🔸 可选），帮助用户快速识别关键工具
 
@@ -407,7 +436,8 @@ lazitex/
 - [x] **编译与预览系统** - 一键编译、智能预览（macOS Skim/Windows SumatraPDF）、实时预览监听
 - [x] **智能编译优化** - 自动包检测与安装、自适应多轮编译（交叉引用、目录、参考文献等）
 - [x] **Web 预览模式** - 本地 HTTP 服务器 + 浏览器预览，SSE 实时自动刷新，双缓冲优化，提供 Overleaf 风格的 Web 预览体验
-- [x] **Vue 3 前端（开发中）** - 基于 Vue 3 的现代前端，集成 PDF.js，通过 SSE 实现实时更新，自适应缩放，平滑刷新体验
+- [x] **LaziHub 前端（开发中）** - 基于 Vue 3 的现代前端，集成 PDF.js，通过 SSE 实现实时更新，自适应缩放，平滑刷新体验。双模式架构（LaziView/LaziWorkspace），使用 Pinia 状态管理和模式切换功能
+- [x] **预览模式增强** - 预览模式（`-p`）现在支持 `-q`（静默）和 `-t`（清理）参数，提供更简洁的编译输出和自动清理辅助文件功能
 - [x] **Ollama 管理（Windows & macOS）** - 一键检查、安装、卸载 Ollama。Windows：通过 winget 自动安装。macOS：通过 Homebrew 或官方脚本安装。智能检测安装状态和服务运行状态
 
 ### 进行中 🚧

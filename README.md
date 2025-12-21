@@ -72,7 +72,7 @@ Download pre-built binaries from [Releases](https://github.com/SJRnhqh/lazitex/r
 | `-i, --install` | Install/update LaTeX | `lazitex -i` |
 | `-u, --uninstall` | Uninstall LaTeX | `lazitex -u` |
 | `-b, --build` | Build LaTeX document (supports `-o` output, `-s` show, `-q` quiet, `-t` tidy) | `lazitex -b main.tex [-o out/] [-s] [-q] [-t]` |
-| `-p, --preview` | Live preview PDF (watches for saves and refreshes) | `lazitex -p main.tex` |
+| `-p, --preview` | Live preview PDF (supports `-q` quiet mode, `-t` tidy mode) | `lazitex -p main.tex [-q] [-t]` |
 | `-o, --ollama` | Ollama management (`-c` check, `-i` install, `-u` uninstall) | `lazitex -o -c` |
 | `-r, --repl` | Start REPL mode | `lazitex -r` |
 | `-l, --lang` | Set language | `lazitex -l zh` |
@@ -195,7 +195,13 @@ $ lazitex -b report.tex -t
 
 **Web Preview Mode:**
 
+LaziTex frontend (LaziHub) provides two modes:
+
+- **LaziView Mode** (`-p`): PDF-only preview interface, perfect for multi-screen setups or when you prefer external editors like VS Code or Neovim
+- **LaziWorkspace Mode** (`-w`): Full workspace with code editor, AI chat, file browser, and PDF preview (coming soon)
+
 ```bash
+# Preview mode (LaziView - PDF only)
 $ lazitex -p report.tex
 🚀 Building LaTeX document: report.tex
 ✨ Build successful!
@@ -205,14 +211,29 @@ $ lazitex -p report.tex
 🌐 Server starting on port 8080
 👀 Watching file: report.tex (press Ctrl+C to stop)
 
+# Preview mode with quiet compilation
+$ lazitex -p report.tex -q
+
+# Preview mode with tidy mode (clean auxiliary files after compilation)
+$ lazitex -p report.tex -t
+
 # After modifying the file, the browser will automatically refresh to show the latest PDF
 ```
+
+**Frontend Architecture:**
+
+- **Dual-Mode System**: LaziHub frontend supports both LaziView (PDF-only) and LaziWorkspace (full workspace) modes
+- **Mode Switching**: Users can switch between modes at runtime via the UI
+- **Backend API**: The `/api/config` endpoint returns the initial mode based on CLI parameters (`-p` for view mode)
+- **State Management**: Uses Pinia for reactive state management
+- **Layout Components**: Modular layout architecture (LaziViewLayout, LaziWorkspaceLayout)
 
 **Development Setup:**
 
 - Frontend (Vue 3 + Vite): Run `npm run dev` in `frontend/vue/` directory
-- Backend (Go): Run `lazitex -p report.tex`
+- Backend (Go): Run `lazitex -p report.tex` (for LaziView mode)
 - The frontend automatically connects to the backend via Vite proxy
+- Frontend detects mode from backend API and renders the appropriate layout
 
 ### REPL Mode
 
@@ -224,7 +245,8 @@ lazitex> uninstall                 # Uninstall LaTeX environment
 lazitex> ollama -c                 # Check if Ollama is installed
 lazitex> ollama -i                 # Install Ollama (Windows via winget)
 lazitex> ollama -u                 # Uninstall Ollama
-lazitex> build main.tex -o out/ -s -q -t # Build LaTeX document with show, output path, and quiet mode, and tidy up auxiliary files
+lazitex> build main.tex -o out/ -s -q -t # Build LaTeX document with show, output path, quiet mode, and tidy mode
+lazitex> preview main.tex -q -t # Live preview with quiet mode and tidy mode
 lazitex> lang zh                   # Switch to Chinese
 lazitex> lang en                   # Switch to English
 lazitex> lang                      # Show current language
@@ -302,9 +324,9 @@ lazitex/
 │   └── config.go                  # User preferences & settings
 │
 ├── 🗄️  backend/                    # Web server backend
-│   ├── server.go                  # HTTP server core
-│   ├── handlers.go                # HTTP request handlers (index, PDF)
-│   ├── routes.go                  # Route registration
+│   ├── server.go                  # HTTP server core (with mode configuration)
+│   ├── handlers.go                # HTTP request handlers (index, PDF, config API)
+│   ├── routes.go                  # Route registration (includes /api/config)
 │   └── sse.go                     # Server-Sent Events real-time push
 │
 ├── 🌐 frontend/                   # Frontend resources
@@ -314,8 +336,14 @@ lazitex/
 │   └── vue/                       # Vue 3 frontend (modern)
 │       ├── src/                   # Vue source files
 │       │   ├── components/        # Vue components
-│       │   │   └── PDFViewer.vue  # PDF preview component
-│       │   ├── App.vue            # Root component
+│       │   │   ├── DynamicPDFViewer.vue  # PDF preview component
+│       │   │   └── ModeSwitcher.vue      # Mode switching component
+│       │   ├── layouts/           # Layout components
+│       │   │   ├── LaziViewLayout.vue      # PDF-only preview layout
+│       │   │   └── LaziWorkspaceLayout.vue # Full workspace layout
+│       │   ├── stores/            # Pinia state management
+│       │   │   └── appMode.js     # Application mode store
+│       │   ├── App.vue            # Root component (mode dispatcher)
 │       │   └── main.js            # Entry point
 │       ├── public/                # Public assets
 │       ├── index.html             # HTML template
@@ -361,7 +389,8 @@ lazitex/
 
 - **Compilation Error Handling Module** - `core/errors/` modularly handles compilation issues: automatic package detection & installation, adaptive multi-pass compilation detection (covers 6 scenarios: TOC, cross-refs, bibliographies, indexes, glossaries, PDF bookmarks)
 
-- **Web Preview Architecture** - Lightweight HTTP server based on Go standard library, using Server-Sent Events (SSE) for real-time push, frontend double-buffering eliminates refresh flicker, providing smooth preview experience
+- **Web Preview Architecture** - Lightweight HTTP server based on Go standard library, using Server-Sent Events (SSE) for real-time push, frontend double-buffering eliminates refresh flicker, providing smooth preview experience. LaziHub frontend supports dual-mode architecture: LaziView (PDF-only) and LaziWorkspace (full workspace)
+- **Frontend State Management** - Uses Pinia for reactive state management, enabling seamless mode switching and component communication
 
 - **Tool Priority System** - Tools categorized by priority (⭐ Core, 🔹 Important, 🔸 Optional), helping users quickly identify critical tools
 
@@ -406,7 +435,8 @@ lazitex/
 - [x] **Build & Preview System** - One-click compilation, smart preview (macOS Skim/Windows SumatraPDF), live preview watching
 - [x] **Smart Compilation Optimization** - Auto package detection & installation, adaptive multi-pass compilation (cross-refs, TOC, bibliographies, etc.)
 - [x] **Web Preview Mode** - Local HTTP server + browser preview, SSE real-time auto-refresh, double-buffering optimization, Overleaf-style web preview experience
-- [x] **Vue 3 Frontend (Development)** - Modern Vue 3 frontend with PDF.js integration, real-time updates via SSE, adaptive scaling, smooth refresh experience
+- [x] **LaziHub Frontend (Development)** - Modern Vue 3 frontend with PDF.js integration, real-time updates via SSE, adaptive scaling, smooth refresh experience. Dual-mode architecture (LaziView/LaziWorkspace) with Pinia state management and mode switching capability
+- [x] **Preview Mode Enhancements** - Preview mode (`-p`) now supports `-q` (quiet) and `-t` (tidy) flags for cleaner compilation output and automatic auxiliary file cleanup
 - [x] **Ollama Management (Windows & macOS)** - One-click check, install, and uninstall Ollama. Windows: automatic winget installation. macOS: Homebrew or official script installation. Smart detection of installation status and service running status
 
 ### In Progress 🚧
