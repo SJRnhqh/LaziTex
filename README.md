@@ -73,7 +73,7 @@ Download pre-built binaries from [Releases](https://github.com/SJRnhqh/lazitex/r
 | `-u, --uninstall` | Uninstall LaTeX | `lazitex -u` |
 | `-b, --build` | Build LaTeX document (supports `-o` output, `-s` show, `-q` quiet, `-t` tidy) | `lazitex -b main.tex [-o out/] [-s] [-q] [-t]` |
 | `-p, --preview` | Live preview PDF (supports `-q` quiet mode, `-t` tidy mode, `:port` custom port) | `lazitex -p main.tex [-q] [-t] [:port]` |
-| `-o, --ollama` | Ollama management (`-c` check, `-i` install, `-u` uninstall) | `lazitex -o -c` |
+| `-o, --ollama` | Ollama management (use `-c/-i/-u` flags) | `lazitex -o -c` |
 | `-r, --repl` | Start REPL mode | `lazitex -r` |
 | `-l, --lang` | Set language | `lazitex -l zh` |
 | `-h, --help` | Show help | `lazitex -h` |
@@ -87,7 +87,7 @@ Download pre-built binaries from [Releases](https://github.com/SJRnhqh/lazitex/r
 
 LaziTex supports **English** and **Chinese** languages. You can set the language in two ways:
 
-Method 1: Runtime Change
+#### Method 1: Runtime Change
 
 ```bash
 lazitex -l zh --check    # Use Chinese for this command
@@ -96,7 +96,7 @@ lazitex --lang en --check  # Use English for this command
 
 Language preference is automatically saved when using `-l` or `--lang` parameters.
 
-Method 2: Configuration File
+#### Method 2: Configuration File
 
 | Platform | Config Location |
 |----------|----------------|
@@ -116,35 +116,19 @@ Edit the config file directly or use `--lang` parameter to update automatically.
 
 ### Ollama Management
 
-**Features:**
-
-- One-click Check - Detect if Ollama is installed and version information
-- One-click Install - Auto-install Ollama via winget (Windows) or Homebrew/official script (macOS)
-- One-click Uninstall - Auto-uninstall Ollama via winget (Windows) or Homebrew (macOS)
-- Smart Detection - Automatically detect installation status and service running status
-- Path Detection - Can detect installation even if not in PATH
-- Multi-Platform Support - Windows and macOS supported
-
-**Usage Examples:**
+One-click check, install, and uninstall Ollama (Windows & macOS). Windows uses winget, macOS supports Homebrew or official script.
 
 ```bash
 # CLI Mode
-$ lazitex -o -c        # Check Ollama
-$ lazitex -o -i        # Install Ollama
-$ lazitex -o -u        # Uninstall Ollama
+$ lazitex -o -c        # Check
+$ lazitex -o -i        # Install
+$ lazitex -o -u        # Uninstall
 
 # REPL Mode
 lazitex> ollama -c     # Check
 lazitex> ollama -i     # Install
 lazitex> ollama -u     # Uninstall
 ```
-
-**Notes:**
-
-- **Windows**: Version includes GUI, but CLI tools are also available. Installation via winget.
-- **macOS**: Supports installation via Homebrew (recommended) or official installation script. Auto-detects installation method for uninstall.
-- You may need to restart the terminal after installation to recognize the `ollama` command
-- If installed but not in PATH, you'll be prompted to restart the terminal
 
 ### Build & Preview
 
@@ -223,7 +207,6 @@ $ lazitex -p report.tex report.tex:3000  # Alternative format
 $ lazitex -p report.tex -q -t :3000      # Port can be anywhere in arguments
 
 # Preview mode with development mode (-d flag)
-# Uses Vue dev server (http://localhost:5173) if available, with smart port handling
 $ lazitex -p report.tex -d
 
 # After modifying the file, the browser will automatically refresh to show the latest PDF
@@ -237,60 +220,17 @@ $ lazitex -p report.tex -d
 - **State Management**: Uses Pinia for reactive state management
 - **Layout Components**: Modular layout architecture (LaziViewLayout, LaziWorkspaceLayout)
 
-**Development Setup:**
-
-- Frontend (Vue 3 + Vite): Run `npm run dev` in `frontend/vue/` directory
-- Backend (Go): Run `lazitex -p report.tex -d` (for LaziView mode with dev server)
-- The frontend automatically connects to the backend via Vite proxy (hardcoded to port 8080)
-- Frontend detects mode from backend API and renders the appropriate layout
-
-**Development Mode Smart Handling:**
-
-The `-d` flag enables development mode with intelligent port management:
-
-1. **Vue dev server available + port 8080**: Uses dev mode, opens `http://localhost:5173`
-2. **Vue dev server available + custom port + 8080 available**: Forces port 8080 to maintain dev mode compatibility
-3. **Vue dev server available + custom port + 8080 occupied**: Falls back to production mode with custom port
-4. **Vue dev server unavailable**: Automatically falls back to production mode (embedded frontend)
-
-If you accidentally access the backend directly (`http://localhost:8080`) in dev mode, you'll see a helpful message guiding you to the Vue dev server.
-
 ### REPL Mode
 
+Interactive command-line interface with command history, Tab completion, and full i18n support.
+
 ```bash
-lazitex> help                      # Show available commands
-lazitex> check                     # Check LaTeX environment
-lazitex> install                   # Install or update LaTeX environment
-lazitex> uninstall                 # Uninstall LaTeX environment
-lazitex> ollama -c                 # Check if Ollama is installed
-lazitex> ollama -i                 # Install Ollama (Windows via winget)
-lazitex> ollama -u                 # Uninstall Ollama
-lazitex> build main.tex -o out/ -s -q -t # Build LaTeX document with show, output path, quiet mode, and tidy mode
-lazitex> preview main.tex -q -t # Live preview with quiet mode and tidy mode
-lazitex> preview main.tex :3000 # Live preview on custom port
-lazitex> preview main.tex -d    # Live preview with development mode
-lazitex> lang zh                   # Switch to Chinese
-lazitex> lang en                   # Switch to English
-lazitex> lang                      # Show current language
-lazitex> version                   # Show version
-lazitex> exit                      # Exit REPL
-lazitex> cd /tmp                   # Change directory (default to home)
-lazitex> ls                        # List contents (supports path arg)
-lazitex> pwd                       # Print working directory
-lazitex> clear                     # Clear the screen
-lazitex> cat file.log              # View file content (supports .tex, .log, .aux)
+$ lazitex -r
+lazitex> build main.tex -o out/ -s    # Build document
+lazitex> preview main.tex -q          # Live preview
+lazitex> ollama -c                    # Check Ollama
+lazitex> help                         # Show help
 ```
-
-**Modern REPL Experience:**
-
-- 🕒 **Command History** - Use Up/Down arrows to navigate through previous commands
-- ⌨️ **Cursor Control** - Full support for Left/Right arrows, Home/End, Ctrl+A/E, etc.
-- 🎯 **Smart Completion** - Context-aware Tab completion:
-  - **Command Completion**: Auto-completes built-in commands
-  - **Context-Aware Pathing**: `cd` suggests directories; `build` suggests `.tex` files; `cat` suggests `.tex/.log/.aux`
-- 🌐 **Full i18n Support** - All command help, error messages, and usage tips support instant language switching
-
-Language switching in REPL is instant and persists for future sessions!
 
 ### Detected LaTeX Tools
 
@@ -325,8 +265,8 @@ LaziTex is built with a clean, modular architecture — making it easy to extend
 
 ```txt
 lazitex/
-├── 🗂️  go.mod                      # Go module definition
-├── 🔒 go.sum                      # Go dependencies (lock file)
+├── 🗂️  go.mod                     # Go module definition
+├── 🔒  go.sum                     # Go dependencies
 ├── 🛠️  build.sh                   # Linux/macOS build script
 ├── 🛠️  build.bat                  # Windows build script
 │
@@ -454,13 +394,9 @@ lazitex/
 - [x] **Cross-Platform Environment Detection** - Windows, Linux, macOS environment detection and 23 tools checking
 - [x] **macOS Environment Management** - Auto install/update/uninstall, supports Homebrew, MacPorts, MacTeX
 - [x] **REPL Interactive Mode** - Command history, Tab completion, Shell shortcuts, full i18n support
-- [x] **Build & Preview System** - One-click compilation, smart preview (macOS Skim/Windows SumatraPDF), live preview watching
-- [x] **Smart Compilation Optimization** - Auto package detection & installation, adaptive multi-pass compilation (cross-refs, TOC, bibliographies, etc.)
-- [x] **Web Preview Mode** - Local HTTP server + browser preview, SSE real-time auto-refresh, double-buffering optimization, Overleaf-style web preview experience
-- [x] **LaziHub Frontend (Development)** - Modern Vue 3 frontend with PDF.js integration, real-time updates via SSE, adaptive scaling, smooth refresh experience. Dual-mode architecture (LaziView/LaziWorkspace) with Pinia state management and mode switching capability
-- [x] **Preview Mode Enhancements** - Preview mode (`-p`) now supports `-q` (quiet), `-t` (tidy) flags, `-d` (dev mode), and `:port` (custom port) for cleaner compilation output, automatic auxiliary file cleanup, and flexible server configuration
-- [x] **Development Mode Smart Handling** - Intelligent development mode (`-d`) with automatic Vue dev server detection, smart port management (forces 8080 when needed, falls back to production mode if 8080 is occupied), and helpful fallback messages
-- [x] **Ollama Management (Windows & macOS)** - One-click check, install, and uninstall Ollama. Windows: automatic winget installation. macOS: Homebrew or official script installation. Smart detection of installation status and service running status
+- [x] **Build System** - One-click compilation, smart preview (macOS Skim/Windows SumatraPDF), auto package detection & installation, adaptive multi-pass compilation (cross-refs, TOC, bibliographies, etc.)
+- [x] **Web Preview & Frontend** - LaziHub frontend (Vue 3 + PDF.js), web preview mode with SSE real-time refresh, dual-mode architecture (LaziView/LaziWorkspace), preview mode supports `-q/-t/-d/:port` flags
+- [x] **Ollama Management (Windows & macOS)** - One-click check, install, and uninstall Ollama, smart detection of installation status and service running status
 
 ### In Progress 🚧
 

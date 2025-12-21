@@ -43,20 +43,49 @@ func main() {
 	case "-u", "--uninstall":
 		tasks.UninstallLaTeXEnvironment()
 	case "-o", "--ollama":
-		if len(args) < 2 {
+		// 灵活解析：遍历 -o 之后的所有参数，找到 check/install/uninstall 中的任意一个
+		checkMode := false
+		installMode := false
+		uninstallMode := false
+		actionCount := 0
+
+		for i := 1; i < len(args); i++ {
+			arg := args[i]
+
+			if arg == "-c" || arg == "--check" {
+				checkMode = true
+				actionCount++
+			} else if arg == "-i" || arg == "--install" {
+				installMode = true
+				actionCount++
+			} else if arg == "-u" || arg == "--uninstall" {
+				uninstallMode = true
+				actionCount++
+			} else if strings.HasPrefix(arg, "-") {
+				// 未知的标志位
+				fmt.Printf(lang.T("msg.unknown_command")+"\n", arg)
+				return
+			}
+			// 忽略非标志位参数（如果有的话）
+		}
+
+		// 验证：必须且只能有一个操作
+		if actionCount == 0 {
 			fmt.Println(lang.T("msg.ollama_usage"))
 			return
 		}
-		action := args[1]
-		switch action {
-		case "-c", "--check":
-			tasks.CheckOllama()
-		case "-i", "--install":
-			tasks.InstallOllama()
-		case "-u", "--uninstall":
-			tasks.UninstallOllama()
-		default:
+		if actionCount > 1 {
 			fmt.Println(lang.T("msg.ollama_usage"))
+			return
+		}
+
+		// 执行对应的操作
+		if checkMode {
+			tasks.CheckOllama()
+		} else if installMode {
+			tasks.InstallOllama()
+		} else if uninstallMode {
+			tasks.UninstallOllama()
 		}
 	case "-b", "--build":
 		if len(args) < 2 {
@@ -171,15 +200,15 @@ func main() {
 							filePath = arg[:lastColonIndex]
 							port = parsedPort
 							continue
-					    }
-					// 如果解析失败，说明冒号后面不是端口号（比如 Windows 路径 C:\）
-					// 当作普通文件路径处理
+						}
+						// 如果解析失败，说明冒号后面不是端口号（比如 Windows 路径 C:\）
+						// 当作普通文件路径处理
 					}
 				}
 				// 普通文件路径（不包含端口号，或者包含冒号但不是端口号格式）
 				filePath = arg
 			}
-        }
+		}
 		// 检查是否提供了文件路径
 		if filePath == "" {
 			fmt.Println(lang.T("msg.preview_usage"))
