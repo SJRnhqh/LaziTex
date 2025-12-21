@@ -1,7 +1,7 @@
-// core/tools/lock.go
+// core/performance/lock.go
 // 编译锁和任务管理，防止并发编译冲突，支持任务抢占
 
-package tools
+package performance
 
 import (
 	"context"

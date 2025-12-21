@@ -13,19 +13,18 @@ Instant LaTeX compilation across platforms — powered by Go with local AI to he
 
 ## ✨ Features
 
-- 🔍 **Smart Environment Detection** - Automatically detects your LaTeX installation and provides detailed diagnostics
-- 📦 **Auto Install/Update** - One-click installation or update of LaTeX environments (macOS supported)
-- 🗑️ **Auto Uninstall** - One-click uninstallation of LaTeX environments with smart installation method detection (macOS supported)
-- 🌍 **Cross-Platform** - Seamless support for Windows, Linux, and macOS
-- 🎯 **Zero Configuration** - Works out of the box with TeX Live, MiKTeX, and MacTeX
-- 🚀 **Fast & Lightweight** - Built with Go for blazing-fast compilation
-- 💬 **Interactive REPL** - Interactive commands for check, install, uninstall, language switching, and more
-- 🔄 **Adaptive Multi-Pass Compilation** - Automatically detects and handles multiple compilation passes for cross-references, table of contents, bibliographies, indexes, and glossaries
-- 📦 **Auto Package Management** - Automatically detects missing packages from compilation errors and installs them via tlmgr/mpm
-- 🌐 **Web Preview Mode** - Local HTTP server + browser preview, SSE real-time auto-refresh, double-buffering optimization, Overleaf-style web preview experience
-- 🦙 **Ollama Management** - One-click check, install, and uninstall Ollama (Windows & macOS supported), providing foundation for AI features
-- 🧠 **AI-Powered** (Coming Soon) - Local AI assistance for writing and refining LaTeX documents
-- 🎨 **Multiple Modes** - TUI (Terminal UI) and REPL modes for different workflows
+- 🔍 **Smart Environment Detection** - Automatically detects LaTeX installation
+- 📦 **Auto Install/Update** - One-click installation or update of LaTeX environments
+- 🗑️ **Auto Uninstall** - One-click uninstallation of LaTeX environments
+- 🌍 **Cross-Platform** - Supports Windows, Linux, and macOS
+- 🎯 **Zero Configuration** - Works out of the box
+- 🚀 **Fast & Lightweight** - Built with Go
+- 🔄 **Adaptive Multi-Pass Compilation** - Automatically detects and handles multi-pass compilation scenarios
+- 📦 **Auto Package Management** - Automatically detects and installs missing packages
+- 🌐 **Web Preview Mode** - Web real-time preview
+- 🦙 **Ollama Management** - One-click Ollama management
+- 🧠 **AI-Powered** (Coming Soon) - Local AI assistant
+- 🎨 **Multiple Modes** - Supports TUI and REPL modes
 
 ---
 
@@ -181,6 +180,14 @@ LaziTex can detect **23 LaTeX tools** across 7 categories:
 - 🔸 **Optional Tools (Priority 2)**: Advanced usage, specific scenarios
   - Examples: xindy, dvips, texdoc, updmap
 
+### Platform Support
+
+LaziTex supports Windows, Linux, and macOS:
+
+- **Windows**: Detects TeX Live and MiKTeX, supports auto preview (prioritizes SumatraPDF)
+- **Linux**: Auto-identifies distributions, provides distro-specific installation guides
+- **macOS**: Supports MacTeX, Homebrew, MacPorts, supports auto install/update/uninstall (Intel and Apple Silicon)
+
 ---
 
 ## 🗂️ Project Structure
@@ -189,22 +196,22 @@ LaziTex is built with a clean, modular architecture — making it easy to extend
 
 ```txt
 lazitex/
-├── 🗂️  go.mod                     # Go module definition
-├── 🔒  go.sum                     # Go dependencies
-├── 🛠️  build.sh                   # Linux/macOS build script
-├── 🛠️  build.bat                  # Windows build script
+├── 🐹 go.mod                     # Go module definition
+├── 🔒 go.sum                     # Go dependencies
+├── 🐚 build.sh                   # Linux/macOS build script
+├── 🪟 build.bat                  # Windows build script
 │
 ├── 🧠 core/                       # Core logic - the brain of LaziTex
-│   ├── 🌍 env.go                  # Environment detection, installer interface & install/uninstall logic
-│   ├── 🔨 build.go                # Build workflow with Strategy Pattern (cross-platform, adaptive multi-pass)
-│   ├── 👀 watcher.go              # File watching for live preview
-│   ├── 🦙 ollama.go               # Ollama manager interface definition and wrapper functions
+│   ├── env.go                     # Environment detection, installer interface & install/uninstall logic
+│   ├── build.go                   # Build workflow with Strategy Pattern (cross-platform, adaptive multi-pass)
+│   ├── watcher.go                 # File watching for live preview
+│   ├── ollama.go                  # Ollama manager interface definition and wrapper functions
 │   ├── 🚨 errors/                 # Compilation error handling module
-│   │   ├── 📦 package.go           # Auto package detection & installation
-│   │   └── 🔄 passes.go            # Adaptive multi-pass compilation detection
-│   └── 🛠️  tools/                  # Compilation optimization tools module
-│       ├── concurrent.go           # Concurrent optimization (parallel execution of intermediate tools)
-│       └── lock.go                 # Compilation lock & task management (task preemption, timeout control)
+│   │   ├── package.go             # Auto package detection & installation
+│   │   └── passes.go              # Adaptive multi-pass compilation detection
+│   └── ⚡ performance/             # Compilation performance optimization module
+│       ├── concurrent.go          # Concurrent optimization (parallel execution of intermediate tools)
+│       └── lock.go                # Compilation lock & task management (task preemption, timeout control)
 │
 ├── 📚 lang/                       # Internationalization module
 │   └── i18n.go                    # Multi-language support (English/Chinese)
@@ -214,15 +221,15 @@ lazitex/
 │
 ├── 🗄️  backend/                    # Web server backend
 │   ├── server.go                  # HTTP server core (with mode configuration)
-│   ├── handlers.go                # HTTP request handlers (index, PDF, config API)
-│   ├── routes.go                  # Route registration (includes /api/config)
+│   ├── handlers.go               # HTTP request handlers (index, PDF, config API)
+│   ├── routes.go                 # Route registration (includes /api/config)
 │   └── sse.go                     # Server-Sent Events real-time push
 │
 ├── 🌐 frontend/                   # Frontend resources
 │   ├── embed.go                   # Static resource embedding (legacy)
 │   ├── static/                    # Legacy static files
 │   │   └── index.html             # Legacy preview page (double-buffering optimized)
-│   └── vue/                       # Vue 3 frontend (modern)
+│   └── 🟢 vue/                    # Vue 3 frontend (modern)
 │       ├── src/                   # Vue source files
 │       │   ├── api/               # API layer - unified backend API calls
 │       │   │   ├── pdf.js         # PDF-related APIs (download, connection test)
@@ -245,36 +252,36 @@ lazitex/
 │       │   └── main.js            # Entry point
 │       ├── public/                # Public assets
 │       ├── index.html             # HTML template
-│       ├── vite.config.js         # Vite configuration
-│       └── package.json           # Dependencies
+│       ├── ⚡ vite.config.js       # Vite configuration
+│       └── 📦 package.json        # Dependencies
 │
 ├── 🎯 target/                     # Platform-specific implementations
 │   ├── 🪟 win/                    # Windows-specific detection
-│   │   ├── 🔍 checker.go          # Detects TeX Live & MiKTeX on Windows
-│   │   ├── 📦 installer.go        # Windows installer (In Development)
-│   │   ├── 🦙 ollama.go           # Windows Ollama manager (✅ Implemented)
-│   │   └── 🛠️  builder.go         # Windows compilation logic (Coming Soon)
+│   │   ├── checker.go             # Detects TeX Live & MiKTeX on Windows
+│   │   ├── installer.go           # Windows installer (In Development)
+│   │   ├── ollama.go              # Windows Ollama manager (✅ Implemented)
+│   │   └── builder.go             # Windows compilation logic (Coming Soon)
 │   ├── 🐧 linux/                  # Linux-specific detection
-│   │   ├── 🔍 checker.go          # Detects distro-specific TeX installations
-│   │   ├── 📦 installer.go        # Linux installer (In Development)
-│   │   └── 🛠️  builder.go         # Linux compilation logic (Coming Soon)
+│   │   ├── checker.go             # Detects distro-specific TeX installations
+│   │   ├── installer.go           # Linux installer (In Development)
+│   │   └── builder.go             # Linux compilation logic (Coming Soon)
 │   └── 🍏 mac/                    # macOS-specific detection
-│       ├── 🔍 checker.go          # Detects MacTeX, Homebrew, MacPorts
-│       ├── 📦 installer.go        # macOS installer (✅ Implemented)
-│       └── 🛠️  builder.go         # macOS build & preview logic (✅ Implemented)
+│       ├── checker.go              # Detects MacTeX, Homebrew, MacPorts
+│       ├── installer.go           # macOS installer (✅ Implemented)
+│       └── builder.go             # macOS build & preview logic (✅ Implemented)
 │
 ├── 💻 cmd/                       # Command-line interface
 │   └── 🚀 lazitex-cli/
-│       ├── 📄 main.go             # CLI entry point: parses commands and routes to modes
+│       ├── main.go                # CLI entry point: parses commands and routes to modes
 │       ├── 📋 tasks/              # Task execution layer (unified command execution logic)
-│       │   ├── 🌍 env.go          # Environment operations (check, install, uninstall)
-│       │   ├── 🔨 build.go        # Build functionality
-│       │   ├── 👀 preview.go      # Live preview functionality
-│       │   ├── 🦙 ollama.go       # Ollama management functionality
-│       │   └── 📖 help.go         # Help information
+│       │   ├── env.go             # Environment operations (check, install, uninstall)
+│       │   ├── build.go           # Build functionality
+│       │   ├── preview.go         # Live preview functionality
+│       │   ├── ollama.go          # Ollama management functionality
+│       │   └── help.go            # Help information
 │       └── 🎨 ui/                 # User interface layer (interaction mode implementation)
-│           ├── 🖼️  tui.go         # Terminal UI mode with Bubble Tea
-│           └── 💬 repl.go         # Interactive REPL mode (command parsing, completion, history)
+│           ├── tui.go             # Terminal UI mode with Bubble Tea
+│           └── repl.go            # Interactive REPL mode (command parsing, completion, history)
 │
 ├── 📖 README.md                   # English documentation (You're reading it!)
 ├── 📖 README_zh.md                # Chinese documentation
@@ -291,70 +298,36 @@ lazitex/
 
 ---
 
-## 🛠️ Platform-Specific Features
-
-### Windows
-
-- Detects **TeX Live** and **MiKTeX** installations
-- Searches common install paths (C:\texlive, C:\Program Files\MiKTeX, etc.)
-- Checks user-specific installations in AppData
-- **Auto Preview Support** - Automatically invokes the system default PDF viewer after a successful build
-- **Smart Preview Enhancement** - Prioritizes detection and invocation of **SumatraPDF** (supporting silent refresh with -reuse-instance), falling back to the system default if not found
-
-### Linux
-
-- Identifies Linux distribution automatically
-- Provides distro-specific installation instructions (apt, dnf, pacman)
-- Detects package manager vs manual installations
-- Supports both x86_64 and aarch64 architectures
-
-### macOS
-
-- Detects **MacTeX**, **Homebrew**, and **MacPorts** installations
-- Shows macOS version information
-- **Auto Install/Update** - One-click BasicTeX installation via Homebrew
-- **Auto Uninstall** - Smart detection of installation method with one-click uninstallation
-- **Ollama Management** - One-click check, install, and uninstall Ollama via Homebrew or official script
-- Provides optimized installation guides based on detected package managers
-- Supports both Intel and Apple Silicon chips
-
----
-
 ## 🌟 Roadmap
 
 ### Completed ✅
 
-- [x] **Cross-Platform Environment Detection** - Windows, Linux, macOS environment detection and 23 tools checking
-- [x] **macOS Environment Management** - Auto install/update/uninstall, supports Homebrew, MacPorts, MacTeX
-- [x] **REPL Interactive Mode** - Command history, Tab completion, Shell shortcuts, full i18n support
-- [x] **Build System** - One-click compilation, smart preview (macOS Skim/Windows SumatraPDF), auto package detection & installation, adaptive multi-pass compilation (cross-refs, TOC, bibliographies, etc.)
-- [x] **Web Preview & Frontend** - LaziHub frontend (Vue 3 + PDF.js), web preview mode with SSE real-time refresh, dual-mode architecture (LaziView/LaziWorkspace), preview mode supports `-q/-t/-d/:port` flags
-- [x] **Frontend Code Refactoring** - Code organization optimization: `api/` directory for unified backend API calls, `utils/` directory for pure function utilities, `styles/` directory for centralized styling, enabling code reuse and maintainability
-- [x] **PDF Virtual Scrolling** - Multi-page PDF preview with virtual scrolling based on Intersection Observer, rendering only visible pages with preloading of adjacent pages, significantly improving performance for large documents, with pagination mode interface reserved
-- [x] **Ollama Management (Windows & macOS)** - One-click check, install, and uninstall Ollama, smart detection of installation status and service running status
+- [x] **Cross-Platform Environment Detection** - Windows, Linux, macOS environment detection
+- [x] **macOS Environment Management** - Auto install/update/uninstall
+- [x] **REPL Interactive Mode** - Command history, Tab completion, full i18n support
+- [x] **Build System** - One-click compilation, smart preview, auto package detection & installation, adaptive multi-pass compilation
+- [x] **Web Preview & Frontend** - Vue 3 frontend, SSE real-time refresh, dual-mode architecture
+- [x] **PDF Virtual Scrolling** - Multi-page PDF virtual scrolling preview, improved performance for large documents
+- [x] **Ollama Management** - One-click check, install, and uninstall Ollama
+- [x] **Vue Frontend Production Build** - Single binary deployment via build script
 
 ### In Progress 🚧
 
 - [ ] **Live Preview Optimization** - Enhanced error feedback
-- [x] **Compilation Performance Optimization** - Concurrent execution of intermediate tools, compilation locks with task preemption, and compilation timeout control, improving compilation speed by 30-50% in multi-tool scenarios and ensuring compilation stability
+- [x] **Compilation Performance Optimization** - Concurrent execution, task preemption, timeout control
 - [ ] **Linux Environment Management** - Auto install/update/uninstall
-- [ ] **PDF Preview Enhancement** - Pagination mode implementation, page navigation, zoom controls
+- [ ] **PDF Preview Enhancement** - Pagination mode, page navigation, zoom controls
+- [ ] **AI Architecture Implementation** - Modular architecture for LLM and Agent management
 
 ### Planned 📋
 
-- [ ] **AI Agent Environment Management** - Manage AI Agents like conda environments, supporting multi-agent creation, switching, and configuration. Use `ai` command to manage agents (create, list, switch LLM), and `agent` command to invoke agents (ask, chat, generate). Each agent can be configured with independent LLM providers, tool sets, and system prompts, enabling quick switching between different scenarios (compiler expert, writing assistant, error diagnosis, etc.)
-- [ ] **AI Integration (CLI Internal)** - Compilation error diagnosis, code generation & optimization, smart completion. CLI provides quick access via `-a` flag using the currently configured agent, while REPL offers full agent management and invocation capabilities
-- [ ] **Quiet Mode Error Formatting** - In quiet mode, extract and format compilation errors with LaziTex-style error messages (with icons) instead of raw compiler output
-- [ ] **Multi-document Project Support** - Automatically handle file dependencies and compilation order
-- [ ] **Custom Compilation Profiles** - Project-level configuration files (compiler selection, output directories, compilation parameters, etc.)
-
-### Future 🔮
-
-- [ ] **Project Initialization** - `lazitex init` minimalist startup, fast template fetching
-- [ ] **Modern GUI Support** - Modern graphical interface
-- [ ] **Windows Environment Management** - Auto install/update/uninstall (lower priority)
-- [ ] **AI-Native Authoring Flow** - Prompt2PDF experience, multi-agent collaborative workflows
-- [ ] **Cloud Vertical Ecosystem** - Server-side deployment, online interactive generation services
+- [ ] **AI Agent Environment Management** - Multi-agent creation, switching, and configuration, similar to conda environment management
+- [ ] **AI Integration (CLI Internal)** - Compilation error diagnosis, code generation & optimization, smart completion
+- [ ] **Web Workspace Enhancement** - File management, code editor, terminal integration, AI chat interface
+- [ ] **Project Feature Enhancement** - Project initialization, multi-document support, custom compilation profiles, collaborative editing
+- [ ] **TUI Enhancement** - Terminal UI feature enhancement and interaction optimization
+- [ ] **Platform Support Extension** - Windows environment management, modern GUI support
+- [ ] **AI-Native Authoring Flow** - Prompt2PDF, multi-agent collaboration, cloud ecosystem
 
 ---
 
@@ -387,78 +360,15 @@ See [LICENSE](LICENSE) file for details.
 
 ## 💡 FAQ
 
-### 1. Why can't LaziTex detect my LaTeX installation?
+### Why can't LaziTex detect my LaTeX installation?
 
 - **Windows**: Make sure the LaTeX installation path is added to your PATH environment variable
 - **Linux**: Try running `which pdflatex` to confirm the installation location
 - **macOS**: If using Homebrew, make sure you've run `brew link` command
 
-### 2. Which LaTeX distributions are supported?
-
-Currently supported:
-
-- TeX Live (all platforms)
-- MiKTeX (Windows)
-- MacTeX (macOS)
-
-### 3. How to install missing tools?
-
-Method 1: Use LaziTex auto-install (Recommended)
-
-```bash
-lazitex -i    # Auto-install or update LaTeX environment (macOS supported)
-```
-
-Method 2: Manual installation
-
-After running `lazitex --check`, if tools are missing, the system will automatically display installation guides for your platform.
-
-### 4. How to uninstall LaTeX environment?
-
-Use LaziTex one-click uninstall (Recommended, currently macOS):
-
-```bash
-lazitex -u    # Auto-uninstall LaTeX environment (macOS supported)
-```
-
-**Features:**
-
-- Automatically detects installation method (Homebrew, MacPorts, MacTeX official, etc.)
-- Interactive confirmation to prevent accidental removal
-- Suggests using `-i` to install when LaTeX is not installed
-
-**Manual uninstallation:**
-
-- Homebrew: `brew uninstall --cask basictex` or `brew uninstall --cask mactex`
-- MacPorts: `sudo port uninstall texlive`
-- MacTeX Official: Manually delete `/Library/TeX/` directory
-
-### 5. How to check current language?
-
-```bash
-# View config file
-# Windows
-type %APPDATA%\lazitex\config.json
-# Linux/macOS
-cat ~/.config/lazitex/config.json
-```
-
-### 6. How to reset to default language (English)?
-
-```bash
-lazitex -l en --help
-# Or use long form
-lazitex --lang en --help
-# Or delete the config file
-```
-
-### 7. Can I add other languages?
+### Can I add other languages?
 
 Currently only English and Chinese are supported. If you need other language support, please submit an Issue or Pull Request!
-
-### 8. What features will be supported in the future?
-
-Please check the [Roadmap](#-roadmap) section above.
 
 ---
 

@@ -16,7 +16,7 @@ import (
 
 	// 内部包
 	errors "github.com/SJRnhqh/lazitex/core/errors"
-	tools "github.com/SJRnhqh/lazitex/core/tools"
+	performance "github.com/SJRnhqh/lazitex/core/performance"
 	lang "github.com/SJRnhqh/lazitex/lang"
 )
 
@@ -58,7 +58,7 @@ type compileStrategy interface {
 // Build 执行 LaTeX 编译
 func Build(opts BuildOptions) (string, error) {
 	// 0. 获取编译管理器
-	manager := tools.GetCompileManager()
+	manager := performance.GetCompileManager()
 
 	// 开始编译任务（带锁和任务抢占）
 	buildCtx, cancel := manager.StartBuild(opts.InputPath)
@@ -175,7 +175,7 @@ func buildWithStrategy(ctx *compileContext, strategy compileStrategy) (string, e
 			case <-ctx.ctx.Done():
 				// 区分超时和取消
 				if ctx.ctx.Err() == context.DeadlineExceeded {
-					timeoutSeconds := int(tools.GetCompileManager().GetTimeout().Seconds())
+					timeoutSeconds := int(performance.GetCompileManager().GetTimeout().Seconds())
 					return "", fmt.Errorf(lang.T("msg.compile_timeout"), timeoutSeconds)
 				}
 				return "", fmt.Errorf("%s", lang.T("msg.compile_cancelled"))
@@ -225,7 +225,7 @@ func buildWithStrategy(ctx *compileContext, strategy compileStrategy) (string, e
 
 		// 运行中间工具（如果需要）
 		if strategy.shouldRunIntermediateTools(ctx, passInfo) {
-			tools.RunIntermediateToolsConcurrent(ctx.workDir, ctx.jobName, passInfo, ctx.quiet)
+			performance.RunIntermediateToolsConcurrent(ctx.workDir, ctx.jobName, passInfo, ctx.quiet)
 			// runIntermediateTools(ctx.workDir, ctx.jobName, passInfo, ctx.quiet)
 		}
 
@@ -354,7 +354,7 @@ func compileOnce(ctx *compileContext, isFirstPass bool) (string, error) {
 	if err != nil && ctx.ctx != nil {
 		if ctx.ctx.Err() == context.DeadlineExceeded {
 			// 超时
-			timeoutSeconds := int(tools.GetCompileManager().GetTimeout().Seconds())
+			timeoutSeconds := int(performance.GetCompileManager().GetTimeout().Seconds())
 			return logOutput.String(), fmt.Errorf(lang.T("msg.compile_timeout"), timeoutSeconds)
 		}
 		if ctx.ctx.Err() == context.Canceled {

@@ -13,19 +13,18 @@
 
 ## ✨ 特性
 
-- 🔍 **智能环境检测** - 自动检测 LaTeX 安装并提供详细诊断报告
-- 📦 **自动安装/更新** - 一键安装或更新 LaTeX 环境（macOS 已支持）
-- 🗑️ **自动卸载** - 一键卸载 LaTeX 环境，智能检测安装方式（macOS 已支持）
-- 🌍 **跨平台支持** - 无缝支持 Windows、Linux 和 macOS
-- 🎯 **零配置启动** - 开箱即用，完美兼容 TeX Live、MiKTeX 和 MacTeX
-- 🚀 **快速轻量** - 基于 Go 构建，编译速度极快
-- 💬 **交互式 REPL** - 支持检查、安装、卸载、语言切换等交互命令
-- 🔄 **自适应多轮编译** - 自动检测并处理交叉引用、目录、参考文献、索引、术语表等需要多次编译的场景
-- 📦 **自动包管理** - 从编译错误中自动检测缺失的包并通过 tlmgr/mpm 安装
-- 🌐 **Web 预览模式** - 本地 HTTP 服务器 + 浏览器预览，SSE 实时自动刷新，提供 Overleaf 风格的 Web 预览体验
-- 🦙 **Ollama 管理** - 一键检查、安装、卸载 Ollama（Windows & macOS 已支持），为 AI 功能提供基础支持
-- 🧠 **AI 增强** (即将推出) - 本地 AI 助手，帮助撰写和优化 LaTeX 文档
-- 🎨 **多种模式** - 支持 TUI（终端界面）和 REPL 模式，适应不同工作流
+- 🔍 **智能环境检测** - 自动检测 LaTeX 安装
+- 📦 **自动安装/更新** - 一键安装或更新 LaTeX 环境
+- 🗑️ **自动卸载** - 一键卸载 LaTeX 环境
+- 🌍 **跨平台支持** - 支持 Windows、Linux 和 macOS
+- 🎯 **零配置启动** - 开箱即用
+- 🚀 **快速轻量** - 基于 Go 构建
+- 🔄 **自适应多轮编译** - 自动检测并处理多轮编译场景
+- 📦 **自动包管理** - 自动检测并安装缺失的包
+- 🌐 **Web 预览模式** - Web 实时预览
+- 🦙 **Ollama 管理** - 一键管理 Ollama
+- 🧠 **AI 增强** (即将推出) - 本地 AI 助手
+- 🎨 **多种模式** - 支持 TUI 和 REPL 模式
 
 ---
 
@@ -181,6 +180,14 @@ LaziTex 可以检测 **23 个 LaTeX 工具**，涵盖 7 大类别：
 - 🔸 **可选工具（Priority 2）**：进阶使用，特定场景需要
   - 示例：xindy, dvips, texdoc, updmap
 
+### 平台支持
+
+LaziTex 支持 Windows、Linux 和 macOS 三大平台：
+
+- **Windows**：检测 TeX Live 和 MiKTeX，支持自动预览（优先 SumatraPDF）
+- **Linux**：自动识别发行版，提供针对性的安装指南
+- **macOS**：支持 MacTeX、Homebrew、MacPorts，支持自动安装/更新/卸载（Intel 和 Apple Silicon）
+
 ---
 
 ## 🗂️ 项目结构
@@ -189,20 +196,20 @@ LaziTex 采用清晰的模块化架构设计，易于扩展和维护。
 
 ```txt
 lazitex/
-├── 🗂️  go.mod                     # Go 模块定义
+├── 🐹 go.mod                      # Go 模块定义
 ├── 🔒 go.sum                      # Go 依赖锁定
-├── 🛠️  build.sh                   # Linux/macOS 一键编译脚本
-├── 🛠️  build.bat                  # Windows 一键编译脚本
+├── 🐚 build.sh                    # Linux/macOS 一键编译脚本
+├── 🪟 build.bat                   # Windows 一键编译脚本
 │
 ├── 🧠 core/                       # 核心逻辑 - LaziTex 的大脑
-│   ├── 🌍 env.go                  # 环境检测、安装器接口定义及安装/卸载逻辑
-│   ├── 🔨 build.go                # 跨平台编译工作流（策略模式，自适应多轮编译）
-│   ├── 👀 watcher.go              # 文件监听（实时预览）
-│   ├── 🦙 ollama.go               # Ollama 管理器接口定义和包装函数
+│   ├── env.go                     # 环境检测、安装器接口定义及安装/卸载逻辑
+│   ├── build.go                    # 跨平台编译工作流（策略模式，自适应多轮编译）
+│   ├── watcher.go                  # 文件监听（实时预览）
+│   ├── ollama.go                   # Ollama 管理器接口定义和包装函数
 │   ├── 🚨 errors/                 # 编译错误处理模块
-│   │   ├── 📦 package.go           # 自动包检测与安装
-│   │   └── 🔄 passes.go            # 自适应多轮编译检测
-│   └── 🛠️  tools/                  # 编译优化工具模块
+│   │   ├── package.go              # 自动包检测与安装
+│   │   └── passes.go               # 自适应多轮编译检测
+│   └── ⚡ performance/             # 编译性能优化模块
 │       ├── concurrent.go           # 并发优化（中间工具并发执行）
 │       └── lock.go                 # 编译锁与任务管理（任务抢占、超时控制）
 │
@@ -222,7 +229,7 @@ lazitex/
 │   ├── embed.go                   # 静态资源嵌入（旧版）
 │   ├── static/                    # 旧版静态文件
 │   │   └── index.html             # 旧版预览页面（双缓冲优化）
-│   └── vue/                       # Vue 3 前端（新版）
+│   └── 🟢 vue/                    # Vue 3 前端（新版）
 │       ├── src/                   # Vue 源码文件
 │       │   ├── api/               # API 层 - 统一管理后端 API 调用
 │       │   │   ├── pdf.js         # PDF 相关 API（下载、连接测试）
@@ -245,36 +252,36 @@ lazitex/
 │       │   └── main.js            # 入口文件
 │       ├── public/                # 公共资源
 │       ├── index.html             # HTML 模板
-│       ├── vite.config.js         # Vite 配置
-│       └── package.json           # 依赖配置
+│       ├── ⚡ vite.config.js       # Vite 配置
+│       └── 📦 package.json        # 依赖配置
 │
 ├── 🎯 target/                     # 平台特定实现
 │   ├── 🪟 win/                    # Windows 平台
-│   │   ├── 🔍 checker.go          # 检测 Windows 上的 TeX Live 和 MiKTeX
-│   │   ├── 📦 installer.go        # Windows 安装器（开发中）
-│   │   ├── 🦙 ollama.go           # Windows Ollama 管理器（✅ 已实现）
-│   │   └── 🛠️  builder.go         # Windows 编译逻辑（即将推出）
+│   │   ├── checker.go             # 检测 Windows 上的 TeX Live 和 MiKTeX
+│   │   ├── installer.go           # Windows 安装器（开发中）
+│   │   ├── ollama.go              # Windows Ollama 管理器（✅ 已实现）
+│   │   └── builder.go             # Windows 编译逻辑（即将推出）
 │   ├── 🐧 linux/                  # Linux 平台
-│   │   ├── 🔍 checker.go          # 检测各发行版的 TeX 安装
-│   │   ├── 📦 installer.go        # Linux 安装器（开发中）
-│   │   └── 🛠️  builder.go         # Linux 编译逻辑（即将推出）
+│   │   ├── checker.go             # 检测各发行版的 TeX 安装
+│   │   ├── installer.go           # Linux 安装器（开发中）
+│   │   └── builder.go             # Linux 编译逻辑（即将推出）
 │   └── 🍏 mac/                    # macOS 平台
-│       ├── 🔍 checker.go          # 检测 MacTeX、Homebrew、MacPorts
-│       ├── 📦 installer.go        # macOS 安装器（✅ 已实现）
-│       └── 🛠️  builder.go         # macOS 编译与预览逻辑（✅ 已实现）
+│       ├── checker.go              # 检测 MacTeX、Homebrew、MacPorts
+│       ├── installer.go            # macOS 安装器（✅ 已实现）
+│       └── builder.go             # macOS 编译与预览逻辑（✅ 已实现）
 │
 ├── 💻 cmd/                       # 命令行界面
 │   └── 🚀 lazitex-cli/
-│       ├── 📄 main.go             # CLI 入口：解析命令并路由到不同模式
+│       ├── main.go                # CLI 入口：解析命令并路由到不同模式
 │       ├── 📋 tasks/              # 任务执行层（统一管理命令执行逻辑）
-│       │   ├── 🌍 env.go          # 环境操作（检查、安装、卸载）
-│       │   ├── 🔨 build.go        # 构建功能
-│       │   ├── 👀 preview.go      # 实时预览功能
-│       │   ├── 🦙 ollama.go       # Ollama 管理功能
-│       │   └── 📖 help.go         # 帮助信息
+│       │   ├── env.go             # 环境操作（检查、安装、卸载）
+│       │   ├── build.go           # 构建功能
+│       │   ├── preview.go         # 实时预览功能
+│       │   ├── ollama.go          # Ollama 管理功能
+│       │   └── help.go            # 帮助信息
 │       └── 🎨 ui/                 # 用户界面层（交互模式实现）
-│           ├── 🖼️  tui.go         # 基于 Bubble Tea 的终端 UI 模式
-│           └── 💬 repl.go         # 交互式 REPL 模式（命令解析、补全、历史）
+│           ├── tui.go             # 基于 Bubble Tea 的终端 UI 模式
+│           └── repl.go            # 交互式 REPL 模式（命令解析、补全、历史）
 │
 ├── 📖 README.md                   # 英文文档
 ├── 📖 README_zh.md                # 中文文档（当前文件）
@@ -291,77 +298,36 @@ lazitex/
 
 ---
 
-## 🛠️ 平台特定功能
-
-### Windows
-
-- 检测 **TeX Live** 和 **MiKTeX** 安装
-- 搜索常见安装路径（C:\texlive、C:\Program Files\MiKTeX 等）
-- 检查 AppData 中的用户特定安装
-- **自动预览支持** - 构建成功后自动调用系统默认 PDF 阅读器预览
-- **智能预览增强** - 优先检测并调用 **SumatraPDF**（支持静默刷新与 -reuse-instance），若未安装则回退至系统默认关联程序
-- 提供详细的 Windows 安装指南
-
-### Linux
-
-- 自动识别 Linux 发行版（Ubuntu、Fedora、Arch 等）
-- 提供针对不同发行版的安装命令（apt、dnf、pacman）
-- 区分包管理器安装和手动安装
-- 支持 x86_64 和 aarch64 架构
-
-### macOS
-
-- 检测 **MacTeX**、**Homebrew** 和 **MacPorts** 安装
-- 显示 macOS 版本信息
-- **自动安装/更新** - 通过 Homebrew 一键安装 BasicTeX
-- **自动卸载** - 智能检测安装方式并一键卸载
-- **Ollama 管理** - 通过 Homebrew 或官方脚本一键检查、安装、卸载 Ollama
-- 根据检测到的包管理器提供优化的安装指南
-- 支持 Intel 和 Apple Silicon 芯片
-
----
-
 ## 🌟 开发路线图
 
 ### 已完成 ✅
 
-- [x] **跨平台环境检测** - Windows、Linux、macOS 环境检测与 23 个工具检查
-- [x] **macOS 环境管理** - 自动安装/更新/卸载，支持 Homebrew、MacPorts、MacTeX
-- [x] **REPL 交互模式** - 历史记录、Tab 补全、Shell 快捷命令、全语言国际化
-- [x] **编译系统** - 一键编译、智能预览（macOS Skim/Windows SumatraPDF）、自动包检测与安装、自适应多轮编译（交叉引用、目录、参考文献等）
-- [x] **Web 预览与前端** - LaziHub 前端（Vue 3 + PDF.js），Web 预览模式支持 SSE 实时刷新、双模式架构（LaziView/LaziWorkspace）、预览模式支持 `-q/-t/-d/:端口号` 等参数
-- [x] **前端代码重构** - 代码组织优化：`api/` 目录统一管理后端 API 调用，`utils/` 目录提供纯函数工具库，`styles/` 目录集中管理样式，实现代码复用和易于维护
-- [x] **PDF 虚拟滚动** - 基于 Intersection Observer 实现的多页 PDF 虚拟滚动预览，只渲染可见页面，支持预加载相邻页面，大幅提升大文档浏览性能，预留分页导航模式接口
-- [x] **Ollama 管理（Windows & macOS）** - 一键检查、安装、卸载 Ollama，智能检测安装状态和服务运行状态
+- [x] **跨平台环境检测** - Windows、Linux、macOS 环境检测
+- [x] **macOS 环境管理** - 自动安装/更新/卸载
+- [x] **REPL 交互模式** - 历史记录、Tab 补全、全语言国际化
+- [x] **编译系统** - 一键编译、智能预览、自动包检测与安装、自适应多轮编译
+- [x] **Web 预览与前端** - Vue 3 前端、SSE 实时刷新、双模式架构
+- [x] **PDF 虚拟滚动** - 多页 PDF 虚拟滚动预览，提升大文档浏览性能
+- [x] **Ollama 管理** - 一键检查、安装、卸载 Ollama
+- [x] **Vue 前端生产构建** - 通过构建脚本实现单一二进制部署
 
 ### 进行中 🚧
 
 - [ ] **实时预览优化** - 错误反馈增强
-- [x] **编译性能优化** - 中间工具并发执行、编译锁与任务抢占、编译超时控制，提升多工具场景编译速度（30-50% 性能提升）并确保编译稳定性
+- [x] **编译性能优化** - 并发执行、任务抢占、超时控制
 - [ ] **Linux 环境管理** - 自动安装/更新/卸载
-- [ ] **PDF 预览增强** - 分页导航模式实现、页面跳转功能、缩放控制
+- [ ] **PDF 预览增强** - 分页导航、页面跳转、缩放控制
+- [ ] **AI 架构实现** - LLM 和 Agent 模块化架构
 
 ### 计划中 📋
 
-- [ ] **Vue 前端生产构建** - 构建 Vue 前端并通过 Go `embed` 嵌入到二进制文件中，实现单一二进制部署
-- [ ] **文件管理模块** - 文件列表/树形结构、创建/删除/重命名文件、文件切换
-- [ ] **代码编辑器（Monaco Editor）** - LaTeX 语法高亮、代码补全、错误提示、多文件编辑
-- [ ] **终端集成（xterm.js）** - 内置终端、执行 LaTeX 命令、查看编译日志
-- [ ] **AI 聊天界面** - 集成 Ollama、AI 辅助写作、错误诊断建议
-- [ ] **UI 布局增强** - 分栏布局（编辑器 + PDF 预览）、可调整面板大小、响应式布局
-- [ ] **AI Agent 环境管理** - 将 AI Agent 作为类似 conda 环境一样管理，支持多 Agent 创建、切换和配置。通过 `ai` 命令管理 Agent（创建、列表、切换 LLM），通过 `agent` 命令调用 Agent（ask、chat、generate）。每个 Agent 可配置独立的 LLM 提供者、工具集和系统提示，实现不同场景的快速切换（编译专家、写作助手、错误诊断等）
-- [ ] **AI 集成（CLI 内部）** - 编译错误诊断、代码生成与优化、智能补全。CLI 通过 `-a` 快速调用当前配置的 Agent，REPL 提供完整的 Agent 管理和调用功能
-- [ ] **静默模式错误格式化** - 在静默模式下，提取并格式化编译错误，使用 LaziTex 风格的错误提示（带图标）替代原始编译器输出
-- [ ] **多文档项目支持** - 自动处理文件依赖关系和编译顺序
-- [ ] **自定义编译配置** - 项目级别配置文件（编译器选择、输出目录、编译参数等）
-
-### 后续计划 🔮
-
-- [ ] **项目初始化** - `lazitex init` 极简启动，快速拉取优质 LaTeX 模板
-- [ ] **GUI 图形界面** - 现代化图形界面支持
-- [ ] **Windows 环境管理** - 自动安装/更新/卸载（优先级较低）
-- [ ] **AI 原生创作流** - Prompt2PDF 体验，多智能体协同工作流
-- [ ] **云端垂直生态** - 服务器端部署，在线交互式生成服务
+- [ ] **AI Agent 环境管理** - 多 Agent 创建、切换和配置，类似 conda 环境管理
+- [ ] **AI 集成（CLI 内部）** - 编译错误诊断、代码生成与优化、智能补全
+- [ ] **Web 工作区增强** - 文件管理、代码编辑器、终端集成、AI 聊天界面
+- [ ] **项目功能增强** - 项目初始化、多文档支持、自定义编译配置、多人协作
+- [ ] **TUI 完善** - 终端界面功能增强、交互优化
+- [ ] **平台支持扩展** - Windows 环境管理、GUI 图形界面
+- [ ] **AI 原生创作流** - Prompt2PDF、多智能体协同、云端生态
 
 ---
 
@@ -401,78 +367,15 @@ Apache License 2.0 - 包含明确的专利授权，保护开发者与用户。
 
 ## 💡 常见问题
 
-### 1. 为什么检测不到我的 LaTeX 安装？
+### 为什么检测不到我的 LaTeX 安装？
 
 - **Windows**：确保 LaTeX 安装路径已添加到 PATH 环境变量
 - **Linux**：尝试运行 `which pdflatex` 确认安装位置
 - **macOS**：如果使用 Homebrew，确保已运行 `brew link` 命令
 
-### 2. 支持哪些 LaTeX 发行版？
-
-目前支持：
-
-- TeX Live（所有平台）
-- MiKTeX（Windows）
-- MacTeX（macOS）
-
-### 3. 如何安装缺失的工具？
-
-方法一：使用 LaziTex 自动安装（推荐）
-
-```bash
-lazitex -i    # 自动安装或更新 LaTeX 环境（目前支持 macOS）
-```
-
-方法二：手动安装
-
-运行 `lazitex --check` 后，如果有工具未安装，系统会自动显示针对你平台的安装指南。
-
-### 4. 如何卸载 LaTeX 环境？
-
-使用 LaziTex 一键卸载（推荐，目前支持 macOS）：
-
-```bash
-lazitex -u    # 自动卸载 LaTeX 环境（目前支持 macOS）
-```
-
-**功能特点：**
-
-- 自动检测安装方式（Homebrew、MacPorts、MacTeX 官方安装等）
-- 交互式确认，防止误操作
-- 未安装时会提示可以使用 `-i` 安装
-
-**手动卸载：**
-
-- Homebrew: `brew uninstall --cask basictex` 或 `brew uninstall --cask mactex`
-- MacPorts: `sudo port uninstall texlive`
-- MacTeX 官方: 手动删除 `/Library/TeX/` 目录
-
-### 5. 如何查看当前使用的语言？
-
-```bash
-# 查看配置文件
-# Windows
-type %APPDATA%\lazitex\config.json
-# Linux/macOS
-cat ~/.config/lazitex/config.json
-```
-
-### 6. 如何重置为默认语言（英文）？
-
-```bash
-lazitex -l en --help
-# 或使用长选项
-lazitex --lang en --help
-# 或删除配置文件
-```
-
-### 7. 可以添加其他语言吗？
+### 可以添加其他语言吗？
 
 当前只支持中文和英文。如果你需要其他语言支持，欢迎提交 Issue 或 Pull Request！
-
-### 8. 未来会支持哪些功能？
-
-请查看上方的 [开发路线图](#-开发路线图) 部分。
 
 ---
 

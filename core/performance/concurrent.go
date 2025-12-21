@@ -1,7 +1,7 @@
-// core/tools/concurrent.go
+// core/performance/concurrent.go
 // 并发优化相关函数
 
-package tools
+package performance
 
 import (
 	"bytes"
