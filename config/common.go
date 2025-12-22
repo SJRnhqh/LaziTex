@@ -37,6 +37,11 @@ func getConfigPath() (string, error) {
 	return filepath.Join(lazitexDir, "config.json"), nil
 }
 
+// GetConfigPath 对外公开配置文件路径，供 CLI/REPL 打开配置文件
+func GetConfigPath() (string, error) {
+	return getConfigPath()
+}
+
 // LoadConfig 加载配置
 func LoadConfig() (*Config, error) {
 	configPath, err := getConfigPath()

@@ -28,10 +28,11 @@ func ShowHelp() {
 	fmt.Printf("  %-75s %s\n", "-i, --install", lang.T("help.install_latex"))
 	fmt.Printf("  %-75s %s\n", "-u, --uninstall", lang.T("help.uninstall_latex"))
 	fmt.Printf("  %-75s %s\n", "-o, --ollama <-c|--check|-i|--install|-u|--uninstall|-s|--status>", lang.T("help.ollama"))
-	fmt.Printf("  %-75s %s\n", "-m, --llm [add|link|list|test|remove|unlink|<alias>]", "LLM 管理（智能/显式注册、链接、列表、测试、删除）")
+	fmt.Printf("  %-75s %s\n", "-m, --model [add|link|list|test|remove|unlink|<alias>]", lang.T("help.llm"))
 	fmt.Printf("  %-75s %s\n", "-b, --build <file> [-o|--output path] [-s|--show] [-q|--quiet] [-t|--tidy]", lang.T("help.build_latex"))
 	fmt.Printf("  %-75s %s\n", "-p, --preview <file>", lang.T("help.live_preview"))
 	fmt.Printf("  %-75s %s\n", "-l, --lang <lang>", lang.T("help.set_language"))
+	fmt.Printf("  %-75s %s\n", "config", lang.T("help.config"))
 }
 
 // showREPLHelp 显示帮助信息
@@ -44,11 +45,12 @@ func ShowREPLHelp() {
 	fmt.Printf("  %-75s - %s\n", "install", lang.T("repl.install_desc"))
 	fmt.Printf("  %-75s - %s\n", "uninstall", lang.T("repl.uninstall_desc"))
 	fmt.Printf("  %-75s - %s\n", "ollama <-c|--check|-i|--install|-u|--uninstall|-s|--status>", lang.T("repl.ollama_check_desc"))
-	fmt.Printf("  %-75s - %s\n", "llm [add|link|list|test|remove|unlink|<alias>]", "LLM 管理（智能/显式注册、链接、列表、测试、删除）")
+	fmt.Printf("  %-75s - %s\n", "llm [add|link|list|test|remove|unlink|<alias>]", lang.T("repl.llm_desc"))
 	fmt.Printf("  %-75s - %s\n", "build <file> [-o|--output path] [-s|--show] [-q|--quiet] [-t|--tidy]", lang.T("repl.build_desc"))
 	fmt.Printf("  %-75s - %s\n", "preview <file>", lang.T("repl.preview_desc"))
 	fmt.Printf("  %-75s - %s\n", "lang <zh|en>", lang.T("repl.lang_desc"))
 	fmt.Printf("  %-75s - %s\n", "lang", lang.T("repl.lang_current")+lang.GetCurrentLanguageName())
+	fmt.Printf("  %-75s - %s\n", "config", lang.T("repl.config_desc"))
 	fmt.Printf("  %-75s - %s\n", "quit / exit", lang.T("repl.quit_desc"))
 	fmt.Println()
 	fmt.Println(lang.T("repl.shell_title") + ":")

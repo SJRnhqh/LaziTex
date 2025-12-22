@@ -20,9 +20,9 @@ func main() {
 	// 初始化语言设置并移除 --lang 参数
 	args := processLanguageFlag()
 
-	// 如果没有参数，显示帮助
+	// 如果没有其他参数，输出当前语言即可
 	if len(args) == 0 {
-		tasks.ShowHelp()
+		fmt.Println(lang.T("repl.lang_current") + lang.GetCurrentLanguageName())
 		return
 	}
 
@@ -42,6 +42,8 @@ func main() {
 		tasks.InstallLaTeXEnvironment()
 	case "-u", "--uninstall":
 		tasks.UninstallLaTeXEnvironment()
+	case "config":
+		tasks.OpenConfigFile()
 	case "-o", "--ollama":
 		// 灵活解析：遍历 -o 之后的所有参数，找到 check/install/uninstall/status 中的任意一个
 		checkMode := false

@@ -27,6 +27,7 @@ var replCompleter = readline.NewPrefixCompleter(
 	readline.PcItem("check"),
 	readline.PcItem("install"),
 	readline.PcItem("uninstall"),
+	readline.PcItem("config"),
 	readline.PcItem("exit"),
 	readline.PcItem("quit"),
 
@@ -301,6 +302,9 @@ func handleREPLCommand(input string) bool {
 
 	case "uninstall":
 		tasks.UninstallLaTeXEnvironment()
+
+	case "config":
+		tasks.OpenConfigFile()
 
 	case "ollama":
 		// 灵活解析：遍历 ollama 之后的所有参数，找到 check/install/uninstall/status 中的任意一个
