@@ -303,9 +303,6 @@ func handleREPLCommand(input string) bool {
 	case "uninstall":
 		tasks.UninstallLaTeXEnvironment()
 
-	case "config":
-		tasks.OpenConfigFile()
-
 	case "ollama":
 		// 灵活解析：遍历 ollama 之后的所有参数，找到 check/install/uninstall/status 中的任意一个
 		if len(parts) < 2 {
@@ -355,56 +352,58 @@ func handleREPLCommand(input string) bool {
 			tasks.StatusOllama()
 		}
 	case "llm":
-		// llm <alias> (智能) | llm add/link/list/test/remove/unlink [alias]
+		// llm list | llm add/link/test/remove/unlink [alias] | llm <alias> (智能，暂不实现)
 		if len(parts) < 2 {
-			tasks.PrintREPLLLMUsage()
+			fmt.Println(lang.T("repl.llm_usage"))
 			return false
 		}
 
 		sub := parts[1:]
-
-		// 智能模式：只有一个别名参数
-		if len(sub) == 1 {
-			tasks.SmartLinkOrAddLLM(sub[0])
-			return false
-		}
-
 		action := strings.ToLower(sub[0])
+
+		// 先处理不需要额外参数的命令（如 list）
 		switch action {
+		case "list":
+			tasks.ListLLM()
+			return false
 		case "add":
 			if len(sub) < 2 {
-				tasks.PrintREPLLLMUsage()
+				fmt.Println(lang.T("repl.llm_usage"))
 				return false
 			}
 			tasks.AddLLM(sub[1])
+			return false
 		case "link":
 			if len(sub) < 2 {
-				tasks.PrintREPLLLMUsage()
+				fmt.Println(lang.T("repl.llm_usage"))
 				return false
 			}
 			tasks.LinkLLM(sub[1])
-		case "list":
-			tasks.ListLLM()
+			return false
 		case "test":
 			if len(sub) < 2 {
-				tasks.PrintREPLLLMUsage()
+				fmt.Println(lang.T("repl.llm_usage"))
 				return false
 			}
 			tasks.TestLLM(sub[1])
+			return false
 		case "remove", "unlink":
 			if len(sub) < 2 {
-				tasks.PrintREPLLLMUsage()
+				fmt.Println(lang.T("repl.llm_usage"))
 				return false
 			}
 			tasks.RemoveLLM(sub[1])
+			return false
 		default:
-			// fallback: 当成智能别名处理
+			// 默认当作模型名（智能模式）：暂时不实现，显示提示
 			if len(sub) == 1 {
-				tasks.SmartLinkOrAddLLM(action)
+				fmt.Println("⚠️  智能注册/链接功能暂未实现")
+				fmt.Println("请使用: llm add <model> 注册，或 llm link <model> 链接")
 				return false
 			}
+			// 未知命令
 			fmt.Printf(lang.T("repl.unknown_command")+"\n", action)
-			tasks.PrintREPLLLMUsage()
+			fmt.Println(lang.T("repl.llm_usage"))
 		}
 
 	case "build":
@@ -527,6 +526,9 @@ func handleREPLCommand(input string) bool {
 		} else {
 			handleLanguageSwitch(parts[1])
 		}
+
+	case "config":
+		tasks.OpenConfigFile()
 
 	default:
 		fmt.Printf(lang.T("repl.unknown_command")+"\n", command)

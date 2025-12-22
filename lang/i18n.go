@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	// 内部包
-	config "github.com/SJRnhqh/lazitex/config"
+	cfg "github.com/SJRnhqh/lazitex/config"
 )
 
 // Language 语言代码
@@ -26,14 +26,14 @@ var currentLang Language = LangZH
 // SaveLanguagePreference 保存语言偏好
 func SaveLanguagePreference(lang Language) error {
 	// 使用 UpdateConfig 进行部分更新，只更新 language 字段
-	return config.UpdateConfig(map[string]interface{}{
+	return cfg.UpdateConfig(map[string]interface{}{
 		"language": string(lang),
 	})
 }
 
 // LoadLanguagePreference 加载语言偏好
 func LoadLanguagePreference() Language {
-	jsonConfig, err := config.LoadConfig()
+	jsonConfig, err := cfg.LoadConfig()
 	if err != nil {
 		return LangEN // 默认英文
 	}
@@ -204,19 +204,25 @@ func init() {
 		"msg.watcher_error":      "错误: 监听器意外崩溃: %v",
 
 		// Web预览相关
-		"msg.server_starting":              "🌐 服务器启动在端口 %d",
-		"msg.server_error":                 "❌ 服务器错误: %v",
-		"msg.opening_browser":              "🔗 正在打开浏览器: %s",
-		"msg.browser_error":                "⚠️  无法打开浏览器: %v",
-		"msg.manual_open":                  "💡 请手动打开浏览器访问: %s",
-		"msg.config_path_error":            "获取配置路径失败",
-		"msg.config_load_error":            "加载配置失败",
-		"msg.config_save_error":            "创建默认配置失败",
-		"msg.config_open_error":            "打开配置文件失败",
-		"msg.config_opening":               "正在打开配置文件",
-		"msg.pdf_not_found":                "PDF文件不存在",
-		"msg.invalid_port":                 "❌错误: 无效的端口号: %s (必须是 1-65535 之间的数字)",
-		"msg.dev_mode_vue_url":             "💡 开发模式：Vue 前端地址: %s",
+		"msg.server_starting":   "🌐 服务器启动在端口 %d",
+		"msg.server_error":      "❌ 服务器错误: %v",
+		"msg.opening_browser":   "🔗 正在打开浏览器: %s",
+		"msg.browser_error":     "⚠️  无法打开浏览器: %v",
+		"msg.manual_open":       "💡 请手动打开浏览器访问: %s",
+		"msg.config_path_error": "获取配置路径失败",
+		"msg.config_load_error": "加载配置失败",
+		"msg.config_save_error": "创建默认配置失败",
+		"msg.config_open_error": "打开配置文件失败",
+		"msg.config_opening":    "正在打开配置文件",
+		"msg.pdf_not_found":     "PDF文件不存在",
+		"msg.invalid_port":      "❌错误: 无效的端口号: %s (必须是 1-65535 之间的数字)",
+		"msg.dev_mode_vue_url":  "💡 开发模式：Vue 前端地址: %s",
+
+		// LLM 管理相关消息
+		"msg.llm.load_config_failed":       "❌ 读取配置失败: %v",
+		"msg.llm.no_providers":             "📝 暂无 LLM 配置，请先添加一个 LLM 提供商",
+		"msg.llm.list_header":              "ID/Name\tProvider\tModel\tEnabled\tActive",
+		"msg.llm.cli_usage":                "用法: lazitex -m list | lazitex -m [add|link|test|remove|unlink|<模型名称>] （开发中）\n示例:\n  lazitex -m list            # 列出所有已配置的 LLM",
 		"msg.dev_mode_backend_url":         "💡 后端 API 地址: %s",
 		"msg.prod_mode_embedded":           "💡 生产模式：前端已嵌入，访问: %s",
 		"msg.dev_mode_custom_port_warning": "⚠️  警告：开发模式下使用了自定义端口 (%d)，但 Vite 代理配置硬编码到 8080\n   将强制使用默认端口 8080 以确保前端可以连接后端",
@@ -372,6 +378,7 @@ func init() {
 		"help.set_language":    "设置语言 (zh/en)",
 		"help.config":          "打开配置文件（JSON）",
 		"help.ollama":          "Ollama 管理",
+		"help.llm":             "LLM 管理（list 可用，其他功能开发中）",
 		"help.description":     "LaziTex: 零配置 LaTeX 编译工具，支持 AI 辅助",
 
 		// 工具描述
@@ -423,6 +430,8 @@ func init() {
 		"repl.lang_desc":             "切换语言 (zh/en)",
 		"repl.quit_desc":             "退出 REPL",
 		"repl.config_desc":           "打开配置文件（JSON）",
+		"repl.llm_desc":              "LLM 管理（list 可用，其他功能开发中）",
+		"repl.llm_usage":             "用法: llm list | llm [add|link|test|remove|unlink|<模型名称>] （开发中）\n示例:\n  llm list            # 列出所有已配置的 LLM",
 		"repl.lang_usage":            "用法: lang <zh|en>",
 		"repl.lang_current":          "当前语言: ",
 		"repl.lang_switched":         "✓ 语言已切换并保存",
@@ -496,19 +505,25 @@ func init() {
 		"msg.watcher_error":      "Error: Watcher unexpectedly crashed: %v",
 
 		// Web preview related
-		"msg.server_starting":              "🌐 Server starting on port %d",
-		"msg.server_error":                 "❌ Server error: %v",
-		"msg.opening_browser":              "🔗 Opening browser: %s",
-		"msg.browser_error":                "⚠️  Failed to open browser: %v",
-		"msg.manual_open":                  "💡 Please manually open browser: %s",
-		"msg.config_path_error":            "Failed to get config path",
-		"msg.config_load_error":            "Failed to load config",
-		"msg.config_save_error":            "Failed to create default config",
-		"msg.config_open_error":            "Failed to open config file",
-		"msg.config_opening":               "Opening config file",
-		"msg.pdf_not_found":                "PDF file not found",
-		"msg.invalid_port":                 "❌ Error: Invalid port '%s' (must be a number between 1 and 65535)",
-		"msg.dev_mode_vue_url":             "💡 Development mode: Vue frontend URL: %s",
+		"msg.server_starting":   "🌐 Server starting on port %d",
+		"msg.server_error":      "❌ Server error: %v",
+		"msg.opening_browser":   "🔗 Opening browser: %s",
+		"msg.browser_error":     "⚠️  Failed to open browser: %v",
+		"msg.manual_open":       "💡 Please manually open browser: %s",
+		"msg.config_path_error": "Failed to get config path",
+		"msg.config_load_error": "Failed to load config",
+		"msg.config_save_error": "Failed to create default config",
+		"msg.config_open_error": "Failed to open config file",
+		"msg.config_opening":    "Opening config file",
+		"msg.pdf_not_found":     "PDF file not found",
+		"msg.invalid_port":      "❌ Error: Invalid port '%s' (must be a number between 1 and 65535)",
+		"msg.dev_mode_vue_url":  "💡 Development mode: Vue frontend URL: %s",
+
+		// LLM management related messages
+		"msg.llm.load_config_failed":       "❌ Failed to load config: %v",
+		"msg.llm.no_providers":             "📝 No LLM providers configured, please add one first",
+		"msg.llm.list_header":              "ID/Name\tProvider\tModel\tEnabled\tActive",
+		"msg.llm.cli_usage":                "Usage: lazitex -m list | lazitex -m [add|link|test|remove|unlink|<model_name>] (in development)\nExample:\n  lazitex -m list            # List all configured LLMs",
 		"msg.dev_mode_backend_url":         "💡 Backend API URL: %s",
 		"msg.prod_mode_embedded":           "💡 Production mode: Frontend embedded, access: %s",
 		"msg.dev_mode_custom_port_warning": "⚠️  Warning: Custom port (%d) used in dev mode, but Vite proxy is hardcoded to 8080\n   Will force use default port 8080 to ensure frontend can connect to backend",
@@ -664,6 +679,7 @@ func init() {
 		"help.set_language":    "Set language (zh/en)",
 		"help.config":          "Open config file (JSON)",
 		"help.ollama":          "Ollama management",
+		"help.llm":             "LLM management (list available, other features in development)",
 		"help.description":     "LaziTex: Zero-config LaTeX compilation with AI assistance",
 
 		// Tool descriptions
@@ -715,6 +731,8 @@ func init() {
 		"repl.lang_desc":             "Switch language (zh/en)",
 		"repl.quit_desc":             "Exit REPL",
 		"repl.config_desc":           "Open config file (JSON)",
+		"repl.llm_desc":              "LLM management (list available, other features in development)",
+		"repl.llm_usage":             "Usage: llm list | llm [add|link|test|remove|unlink|<model_name>] (in development)\nExample:\n  llm list            # List all configured LLMs",
 		"repl.lang_usage":            "Usage: lang <zh|en>",
 		"repl.lang_current":          "Current language: ",
 		"repl.lang_switched":         "✓ Language switched and saved",

@@ -95,57 +95,59 @@ func main() {
 		} else if statusMode {
 			tasks.StatusOllama()
 		}
-	case "-m", "-llm":
+	case "-m", "--llm":
 		// LLM 管理：智能 / add / link / list / test / remove(unlink)
 		if len(args) < 2 {
-			tasks.PrintLLMUsage()
+			fmt.Println(lang.T("msg.llm.cli_usage"))
 			return
 		}
 
 		sub := args[1:]
-
-		// 智能模式：只有一个别名参数
-		if len(sub) == 1 {
-			tasks.SmartLinkOrAddLLM(sub[0])
-			return
-		}
-
 		action := sub[0]
+
+		// 先处理不需要额外参数的命令（如 list）
 		switch action {
+		case "list":
+			tasks.ListLLM()
+			return
 		case "add":
 			if len(sub) < 2 {
-				tasks.PrintLLMUsage()
+				fmt.Println(lang.T("msg.llm.cli_usage"))
 				return
 			}
 			tasks.AddLLM(sub[1])
+			return
 		case "link":
 			if len(sub) < 2 {
-				tasks.PrintLLMUsage()
+				fmt.Println(lang.T("msg.llm.cli_usage"))
 				return
 			}
 			tasks.LinkLLM(sub[1])
-		case "list":
-			tasks.ListLLM()
+			return
 		case "test":
 			if len(sub) < 2 {
-				tasks.PrintLLMUsage()
+				fmt.Println(lang.T("msg.llm.cli_usage"))
 				return
 			}
 			tasks.TestLLM(sub[1])
+			return
 		case "remove", "unlink":
 			if len(sub) < 2 {
-				tasks.PrintLLMUsage()
+				fmt.Println(lang.T("msg.llm.cli_usage"))
 				return
 			}
 			tasks.RemoveLLM(sub[1])
+			return
 		default:
-			// fallback: 当成智能别名处理
+			// 默认当作模型名（智能模式）：暂时不实现，显示提示
 			if len(sub) == 1 {
-				tasks.SmartLinkOrAddLLM(action)
+				fmt.Println("⚠️  智能注册/链接功能暂未实现")
+				fmt.Println("请使用: lazitex -m add <model> 注册，或 lazitex -m link <model> 链接")
 				return
 			}
-			fmt.Printf(lang.T("msg.unknown_command")+"\n", action)
-			tasks.PrintLLMUsage()
+			// 未知命令
+			fmt.Printf("未知操作: %s\n", action)
+			fmt.Println(lang.T("msg.llm.cli_usage"))
 		}
 	case "-b", "--build":
 		if len(args) < 2 {

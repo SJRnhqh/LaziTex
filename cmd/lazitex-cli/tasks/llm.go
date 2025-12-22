@@ -7,12 +7,13 @@ import (
 	"fmt"
 	"time"
 
-	config "github.com/SJRnhqh/lazitex/config"
+	cfg "github.com/SJRnhqh/lazitex/config"
+	lang "github.com/SJRnhqh/lazitex/lang"
 )
 
 // 默认用 Ollama，把模型名和 ID/Name 统一成传入的别名，方便「智能注册+链接」
-func newDefaultProvider(alias string) *config.LLMProvider {
-	return &config.LLMProvider{
+func newDefaultProvider(alias string) *cfg.LLMProvider {
+	return &cfg.LLMProvider{
 		ID:       alias,
 		Name:     alias,
 		Provider: "ollama",
@@ -24,14 +25,14 @@ func newDefaultProvider(alias string) *config.LLMProvider {
 
 // 智能：不存在则注册+设为当前，存在则直接设为当前
 func SmartLinkOrAddLLM(alias string) {
-	existing, err := config.FindLLMProvider(alias)
+	existing, err := cfg.FindLLMProvider(alias)
 	if err != nil {
 		fmt.Printf("❌ 读取配置失败: %v\n", err)
 		return
 	}
 
 	if existing != nil {
-		if err := config.SetActiveLLM(existing.ID); err != nil {
+		if err := cfg.SetActiveLLM(existing.ID); err != nil {
 			fmt.Printf("❌ 链接失败: %v\n", err)
 			return
 		}
@@ -40,11 +41,11 @@ func SmartLinkOrAddLLM(alias string) {
 	}
 
 	provider := newDefaultProvider(alias)
-	if err := config.AddLLMProvider(provider); err != nil {
+	if err := cfg.AddLLMProvider(provider); err != nil {
 		fmt.Printf("❌ 注册失败: %v\n", err)
 		return
 	}
-	if err := config.SetActiveLLM(provider.ID); err != nil {
+	if err := cfg.SetActiveLLM(provider.ID); err != nil {
 		fmt.Printf("❌ 注册成功但链接失败: %v\n", err)
 		return
 	}
@@ -54,7 +55,7 @@ func SmartLinkOrAddLLM(alias string) {
 // 显式注册（不自动链接）
 func AddLLM(alias string) {
 	provider := newDefaultProvider(alias)
-	if err := config.AddLLMProvider(provider); err != nil {
+	if err := cfg.AddLLMProvider(provider); err != nil {
 		fmt.Printf("❌ 注册失败: %v\n", err)
 		return
 	}
@@ -63,7 +64,7 @@ func AddLLM(alias string) {
 
 // 显式链接已存在的
 func LinkLLM(alias string) {
-	if err := config.SetActiveLLM(alias); err != nil {
+	if err := cfg.SetActiveLLM(alias); err != nil {
 		fmt.Printf("❌ 链接失败: %v\n", err)
 		return
 	}
@@ -72,28 +73,29 @@ func LinkLLM(alias string) {
 
 // 列出所有
 func ListLLM() {
-	config, err := config.LoadConfig()
+	cfgData, err := cfg.LoadConfig()
 	if err != nil {
-		fmt.Printf("❌ 读取配置失败: %v\n", err)
+		fmt.Printf(lang.T("msg.llm.load_config_failed")+"\n", err)
 		return
 	}
-	if len(config.LLMProviders) == 0 {
-		fmt.Println("（暂无 LLM 配置）")
+	if len(cfgData.LLMProviders) == 0 {
+		fmt.Println(lang.T("msg.llm.no_providers"))
 		return
 	}
-	fmt.Println("ID/Name\tProvider\tModel\tEnabled\tActive")
-	for _, p := range config.LLMProviders {
+	// 使用固定宽度格式化，确保列对齐
+	fmt.Printf("  %-20s %-15s %-20s %-10s %s\n", "ID/Name", "Provider", "Model", "Enabled", "Active")
+	for _, p := range cfgData.LLMProviders {
 		active := ""
-		if config.ActiveLLM == p.ID {
+		if cfgData.ActiveLLM == p.ID {
 			active = "*"
 		}
-		fmt.Printf("%s\t%s\t%s\t%v\t%s\n", p.Name, p.Provider, p.Model, p.Enabled, active)
+		fmt.Printf("  %-20s %-15s %-20s %-10v %s\n", p.Name, p.Provider, p.Model, p.Enabled, active)
 	}
 }
 
 // 测试：目前只是检查配置存在与否（后续可扩展真实连通性）
 func TestLLM(alias string) {
-	p, err := config.FindLLMProvider(alias)
+	p, err := cfg.FindLLMProvider(alias)
 	if err != nil {
 		fmt.Printf("❌ 读取失败: %v\n", err)
 		return
@@ -111,7 +113,7 @@ func TestLLM(alias string) {
 
 // 删除
 func RemoveLLM(alias string) {
-	if err := config.RemoveLLMProvider(alias); err != nil {
+	if err := cfg.RemoveLLMProvider(alias); err != nil {
 		fmt.Printf("❌ 删除失败: %v\n", err)
 		return
 	}
@@ -119,7 +121,7 @@ func RemoveLLM(alias string) {
 }
 
 // 可选：标记验证时间的工具函数，供以后真实验证时使用
-func markVerified(p *config.LLMProvider) {
+func markVerified(p *cfg.LLMProvider) {
 	p.Verified = true
 	p.VerifiedAt = time.Now().Format(time.RFC3339)
 }
