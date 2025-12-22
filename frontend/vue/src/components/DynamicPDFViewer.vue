@@ -146,11 +146,11 @@ async function initVirtualScroll(pdf) {
   // 创建页面容器
   await createPageContainers(pdf.numPages)
   
-  // 设置 Intersection Observer
-  setupPageObserver()
-  
   // 初始渲染可见页面
   await renderVisiblePages()
+
+  // 设置 Intersection Observer
+  setupPageObserver()
   
   console.log('✨ 虚拟滚动初始化完成')
 }
@@ -227,10 +227,16 @@ async function renderPageVirtual(pageNum) {
   if (!currentPdf || renderedPages.value.has(pageNum)) {
     return
   }
+
+  // 立即标记为正在渲染，防止重复渲染（在异步操作之前）
+  renderedPages.value.add(pageNum)
   
   try {
     const pageDiv = pageContainers.value[pageNum - 1]
-    if (!pageDiv) return
+    if (!pageDiv) {
+      renderedPages.value.delete(pageNum) // 如果失败，移除标记
+      return
+    }
     
     // 创建 canvas
     const canvas = document.createElement('canvas')
@@ -242,11 +248,18 @@ async function renderPageVirtual(pageNum) {
     // 渲染页面
     await renderPageToCanvas(currentPdf, pageNum, canvas, containerWidth)
     
-    // 替换占位符
-    const placeholder = pageDiv.querySelector(`.${styles.pagePlaceholder}`)
-    if (placeholder) {
+    // 移除所有占位符（确保完全清理）
+    const placeholders = pageDiv.querySelectorAll(`.${styles.pagePlaceholder}`)
+    placeholders.forEach(placeholder => {
       pageDiv.removeChild(placeholder)
+    })
+
+    // 移除可能存在的旧 canvas（防止重复添加）
+    const oldCanvas = pageDiv.querySelector(`canvas.${styles.canvas}`)
+    if (oldCanvas) {
+      pageDiv.removeChild(oldCanvas)
     }
+
     pageDiv.appendChild(canvas)
     
     // 标记为已渲染
