@@ -9,12 +9,21 @@ import * as pdfjsLib from 'pdfjs-dist'
 // 导入 PDF 工具函数
 import { 
   parsePDF, 
-  calculateScale, 
   cleanupPDF, 
   formatPDFError,
   renderPageToCanvas,
   calculatePageHeights
 } from '../utils/pdf'
+
+// 导入 PDF 显示模式工具函数
+import {
+  initVirtualScrollMode,
+  renderVirtualScrollPage,
+  initPaginationMode,
+  renderPaginationPage,
+  loadDisplayModeConfig,
+  switchDisplayMode as switchModeUtil
+} from '../utils/pdfDisplay'
 
 // 导入 SSE API
 import { createSSEConnection, closeSSEConnection } from '../api/sse'
@@ -35,12 +44,13 @@ const error = ref('')
 const isInitialLoad = ref(true)
 
 // 显示模式：'virtual' (虚拟滚动) 或 'pagination' (分页导航)
-// 预留接口，未来可以从配置或用户设置中读取
-const displayMode = ref('virtual') // 默认虚拟滚动
+const displayMode = ref('virtual') // 默认虚拟滚动，会从后端配置加载
 
-// 分页模式相关（预留）
+// 分页模式相关
 const canvas = ref(null) // 分页模式需要
 const currentPageNum = ref(1) // 当前页码（分页模式）
+const totalPages = ref(0) // 总页数（分页模式需要）
+const pageInput = ref('') // 页码输入框的值
 
 // PDF 相关
 let eventSource = null
@@ -106,6 +116,9 @@ async function loadPDF(showLoading = true) {
     
     console.log('✅ PDF 解析成功，页数:', pdf.numPages)
     
+    // 保存总页数（两种模式都需要）
+    totalPages.value = pdf.numPages
+
     // 根据显示模式初始化
     if (displayMode.value === 'virtual') {
       await initVirtualScroll(pdf)
@@ -136,90 +149,41 @@ async function initVirtualScroll(pdf) {
   if (!container.value) {
     throw new Error('容器元素尚未挂载')
   }
-  
-  const containerWidth = container.value.clientWidth - 40 // 减去 padding
-  
-  // 计算所有页面的高度
-  console.log('📏 计算页面高度...')
-  pageHeights.value = await calculatePageHeights(pdf, containerWidth)
-  
-  // 创建页面容器
-  await createPageContainers(pdf.numPages)
-  
-  // 初始渲染可见页面
-  await renderVisiblePages()
 
-  // 设置 Intersection Observer
-  setupPageObserver()
-  
-  console.log('✨ 虚拟滚动初始化完成')
-}
-
-// 创建页面容器（占位符）
-async function createPageContainers(totalPages) {
-  await nextTick()
-  if (!container.value) return
-  
-  // 清空容器
-  container.value.innerHTML = ''
+  // 重置状态
   pageContainers.value = []
   renderedPages.value.clear()
-  
-  // 为每一页创建容器
-  for (let i = 1; i <= totalPages; i++) {
-    const pageDiv = document.createElement('div')
-    pageDiv.className = styles.pageContainer
-    pageDiv.dataset.pageNum = i
-    
-    // 设置占位高度
-    const height = pageHeights.value[i - 1] || 800
-    pageDiv.style.height = `${height}px`
-    pageDiv.style.minHeight = `${height}px`
-    
-    // 创建占位符
-    const placeholder = document.createElement('div')
-    placeholder.className = styles.pagePlaceholder
-    placeholder.style.width = '100%'
-    placeholder.style.height = '100%'
-    placeholder.textContent = `页面 ${i}`
-    pageDiv.appendChild(placeholder)
-    
-    container.value.appendChild(pageDiv)
-    pageContainers.value.push(pageDiv)
-  }
-}
 
-// 设置 Intersection Observer
-function setupPageObserver() {
-  // 清理旧的观察器
-  if (pageObserver) {
-    pageObserver.disconnect()
+  // 页面可见时的回调函数
+  const onPageVisible = (pageNum) => {
+    if (!renderedPages.value.has(pageNum)) {
+      renderPageVirtual(pageNum)
+    }
+  }
+
+  // 使用工具函数初始化虚拟滚动
+  const { pageHeights: heights, containers, observer } = await initVirtualScrollMode(
+    pdf,
+    container.value,
+    onPageVisible,
+    {
+      pageContainer: styles.pageContainer,
+      placeholder: styles.pagePlaceholder,
+      canvas: styles.canvas
+    }
+  )
+
+  // 保存状态
+  pageHeights.value = heights
+  pageContainers.value = containers
+  pageObserver = observer
+
+  // 初始渲染可见页面（第一页）
+  if (pageContainers.value.length > 0) {
+    await renderPageVirtual(1)
   }
   
-  // 创建新的观察器
-  // rootMargin: '200px' 表示提前 200px 预加载
-  pageObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      const pageNum = parseInt(entry.target.dataset.pageNum)
-      
-      if (entry.isIntersecting) {
-        // 页面进入视口，渲染它
-        if (!renderedPages.value.has(pageNum)) {
-          renderPageVirtual(pageNum)
-        }
-      }
-      // 页面离开视口时，保留已渲染的页面（不清理，提升体验）
-    })
-  }, {
-    root: container.value,
-    rootMargin: '200px', // 提前 200px 预加载
-    threshold: 0 // 一进入就触发
-  })
-  
-  // 观察所有页面容器
-  pageContainers.value.forEach(pageDiv => {
-    pageObserver.observe(pageDiv)
-  })
+  console.log('✨ 虚拟滚动初始化完成')
 }
 
 // 渲染单个页面（虚拟滚动版）
@@ -238,48 +202,27 @@ async function renderPageVirtual(pageNum) {
       return
     }
     
-    // 创建 canvas
-    const canvas = document.createElement('canvas')
-    canvas.className = styles.canvas
-    
     // 获取容器宽度
     const containerWidth = container.value.clientWidth - 40
     
-    // 渲染页面
-    await renderPageToCanvas(currentPdf, pageNum, canvas, containerWidth)
-    
-    // 移除所有占位符（确保完全清理）
-    const placeholders = pageDiv.querySelectorAll(`.${styles.pagePlaceholder}`)
-    placeholders.forEach(placeholder => {
-      pageDiv.removeChild(placeholder)
-    })
-
-    // 移除可能存在的旧 canvas（防止重复添加）
-    const oldCanvas = pageDiv.querySelector(`canvas.${styles.canvas}`)
-    if (oldCanvas) {
-      pageDiv.removeChild(oldCanvas)
-    }
-
-    pageDiv.appendChild(canvas)
-    
-    // 标记为已渲染
-    renderedPages.value.add(pageNum)
+    // 使用工具函数渲染页面
+    await renderVirtualScrollPage(
+      currentPdf,
+      pageNum,
+      pageDiv,
+      containerWidth,
+      styles.pagePlaceholder,
+      styles.canvas
+    )
     
     console.log(`✅ 页面 ${pageNum} 渲染完成`)
   } catch (err) {
     console.error(`❌ 渲染页面 ${pageNum} 失败:`, err)
+    renderedPages.value.delete(pageNum) // 如果失败，移除标记，允许重试
   }
 }
 
-// 初始渲染可见页面
-async function renderVisiblePages() {
-  // 渲染第一页（通常可见）
-  if (pageContainers.value.length > 0) {
-    await renderPageVirtual(1)
-  }
-}
-
-// ========== 分页导航模式（预留） ==========
+// ========== 分页导航模式 ==========
 async function initPagination(pdf) {
   console.log('🎨 初始化分页导航模式...')
   
@@ -287,33 +230,34 @@ async function initPagination(pdf) {
   if (!container.value) {
     throw new Error('容器元素尚未挂载')
   }
-  
-  // 创建单页容器
-  container.value.innerHTML = ''
-  const pageDiv = document.createElement('div')
-  pageDiv.className = styles.pageContainer
-  pageDiv.dataset.pageNum = 1
-  
-  // 创建 canvas
-  const canvasEl = document.createElement('canvas')
-  canvasEl.className = styles.canvas
-  
-  const containerWidth = container.value.clientWidth - 40
-  await renderPageToCanvas(pdf, 1, canvasEl, containerWidth)
-  
-  pageDiv.appendChild(canvasEl)
-  container.value.appendChild(pageDiv)
-  
+
+  // 保存总页数
+  totalPages.value = pdf.numPages
+  currentPageNum.value = 1
+  pageInput.value = '1'
+
+  // 使用工具函数初始化分页导航
+  const { canvas: canvasEl } = await initPaginationMode(
+    pdf,
+    container.value,
+    {
+      pageContainer: styles.pageContainer,
+      canvas: styles.canvas
+    }
+  )
+
   // 保存 canvas 引用（用于后续操作）
   canvas.value = canvasEl
-  
-  currentPageNum.value = 1
-  
-  console.log('✨ 分页导航模式初始化完成（当前仅显示第一页）')
+
+  console.log('✨ 分页导航模式初始化完成')
 }
 
 // 渲染 PDF 页面（分页模式使用）
 async function renderPage(pdf, pageNum) {
+  if (!pdf || pageNum < 1 || pageNum > pdf.numPages) {
+    return
+  }
+
   await nextTick()
   if (!canvas.value) {
     throw new Error('Canvas 元素尚未挂载，无法渲染 PDF')
@@ -323,9 +267,78 @@ async function renderPage(pdf, pageNum) {
     ? canvas.value.parentElement.clientWidth - 40 
     : 800
   
-  await renderPageToCanvas(pdf, pageNum, canvas.value, containerWidth)
+  // 使用工具函数渲染页面
+  await renderPaginationPage(pdf, pageNum, canvas.value, containerWidth)
+  currentPageNum.value = pageNum
+  pageInput.value = pageNum.toString()
   
-  console.log('✅ PDF 页面渲染完成，尺寸:', canvas.value.width, 'x', canvas.value.height)
+  console.log(`✅ PDF 页面 ${pageNum} 渲染完成`)
+}
+
+// 分页导航：上一页
+function goToPreviousPage() {
+  if (currentPdf && currentPageNum.value > 1) {
+    renderPage(currentPdf, currentPageNum.value - 1).catch(err => {
+      console.error('跳转到上一页失败:', err)
+    })
+  }
+}
+
+// 分页导航：下一页
+function goToNextPage() {
+  if (currentPdf && currentPageNum.value < totalPages.value) {
+    renderPage(currentPdf, currentPageNum.value + 1).catch(err => {
+      console.error('跳转到下一页失败:', err)
+    })
+  }
+}
+
+// 分页导航：跳转到指定页
+function goToPage(pageNum) {
+  if (!currentPdf) return
+  
+  const targetPage = parseInt(pageNum)
+  if (targetPage >= 1 && targetPage <= totalPages.value) {
+    renderPage(currentPdf, targetPage).catch(err => {
+      console.error('跳转到指定页失败:', err)
+    })
+  } else {
+    // 如果输入无效，恢复当前页码
+    pageInput.value = currentPageNum.value.toString()
+  }
+}
+
+// 处理页码输入框回车
+function handlePageInputEnter(event) {
+  if (event.key === 'Enter') {
+    goToPage(pageInput.value)
+  }
+}
+
+// ========== 模式切换 ==========
+async function switchDisplayMode(newMode) {
+  await switchModeUtil(
+    newMode,
+    displayMode.value,
+    (mode) => { displayMode.value = mode },
+    async (pdf, mode) => {
+      // 重新初始化函数
+      if (mode === 'virtual') {
+        await initVirtualScroll(pdf)
+      } else {
+        await initPagination(pdf)
+      }
+    },
+    currentPdf
+  )
+}
+
+// 加载配置
+async function loadConfig() {
+  await loadDisplayModeConfig(
+    (mode) => { displayMode.value = mode },
+    'virtual'
+  )
 }
 
 // ========== 窗口大小变化处理 ==========
@@ -408,7 +421,12 @@ onMounted(async () => {
   // 先测试后端连接
   const connected = await checkBackendConnection()
   if (connected) {
-    console.log('✅ 后端连接正常，开始加载 PDF')
+    console.log('✅ 后端连接正常')
+    
+    // 加载配置（在加载 PDF 之前）
+    await loadConfig()
+    
+    // 开始加载 PDF
     setupSSE()
     loadPDF()
   } else {
@@ -452,6 +470,57 @@ onUnmounted(() => {
       ]"
     >
       <!-- 页面会通过 JavaScript 动态创建 -->
+    </div>
+
+    <!-- 模式切换控件 -->
+    <div v-if="!error && totalPages > 0" :class="styles.modeControls">
+      <button
+        :class="[styles.modeButton, displayMode === 'virtual' ? styles.modeButtonActive : '']"
+        @click="switchDisplayMode('virtual')"
+        title="虚拟滚动模式"
+      >
+        📄 虚拟滚动
+      </button>
+      <button
+        :class="[styles.modeButton, displayMode === 'pagination' ? styles.modeButtonActive : '']"
+        @click="switchDisplayMode('pagination')"
+        title="分页导航模式"
+      >
+        📑 分页导航
+      </button>
+    </div>
+
+    <!-- 分页导航控件（仅在分页模式下显示） -->
+    <div v-if="!error && displayMode === 'pagination' && totalPages > 0" :class="styles.paginationControls">
+      <button 
+        :class="styles.paginationButton"
+        :disabled="currentPageNum <= 1"
+        @click="goToPreviousPage"
+      >
+        ← 上一页
+      </button>
+      
+      <div :class="styles.pageInfo">
+        <input
+          :class="styles.pageInput"
+          type="number"
+          :min="1"
+          :max="totalPages"
+          v-model="pageInput"
+          @keyup="handlePageInputEnter"
+          @blur="goToPage(pageInput)"
+        />
+        <span :class="styles.pageSeparator">/</span>
+        <span :class="styles.totalPages">{{ totalPages }}</span>
+      </div>
+      
+      <button 
+        :class="styles.paginationButton"
+        :disabled="currentPageNum >= totalPages"
+        @click="goToNextPage"
+      >
+        下一页 →
+      </button>
     </div>
   </div>
 </template>

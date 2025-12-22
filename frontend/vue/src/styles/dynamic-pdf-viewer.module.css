@@ -10,7 +10,8 @@
     flex-direction: column;
     background: var(--nord0);
     overflow: hidden;
-    }
+    box-sizing: border-box;
+}
 
 .loading,
 .error {
@@ -29,13 +30,17 @@
 
 .canvasContainer {
     flex: 1;
-    overflow: auto;
+    overflow-x: hidden; /* 禁止横向滚动 */
+    overflow-y: auto; /* 允许纵向滚动 */
     padding: 20px;
     display: flex;
     flex-direction: column; /* 垂直排列 */
     align-items: center; /* 水平居中 */
     background: var(--nord0);
     scroll-behavior: smooth;
+    box-sizing: border-box;
+    width: 100%; /* 确保不超出父容器 */
+    max-width: 100%; /* 防止溢出 */
 }
 
 /* 单页模式（分页导航）的样式 */
@@ -56,7 +61,9 @@
     align-items: center; /* 水平居中 */
     justify-content: flex-start;
     position: relative;
-    width: 100%; /* 占满宽度 */
+    width: 100%;
+    max-width: 100%; /* 防止溢出 */
+    box-sizing: border-box;
 }
 
 /* 页面占位符（未渲染时显示） */
@@ -76,7 +83,9 @@
     background: var(--nord6);
     display: block;
     max-width: 100%;
+    width: auto; /* 自动宽度，但不超过容器 */
     height: auto;
+    box-sizing: border-box;
 }
 
 /* 加载指示器（单页模式） */
@@ -87,4 +96,113 @@
     transform: translate(-50%, -50%);
     color: var(--nord4);
     font-size: 14px;
+}
+
+/* 模式切换控件 */
+.modeControls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: var(--nord1);
+    border-top: 1px solid var(--nord3);
+    width: 100%;
+    box-sizing: border-box;
+    flex-shrink: 0; /* 防止被压缩 */
+}
+
+.modeButton {
+    padding: 6px 12px;
+    background: var(--nord2);
+    color: var(--nord4);
+    border: 1px solid var(--nord3);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s;
+}
+
+.modeButton:hover {
+    background: var(--nord3);
+    color: var(--nord6);
+}
+
+.modeButtonActive {
+    background: var(--nord8);
+    color: var(--nord0);
+    border-color: var(--nord8);
+}
+
+.modeButtonActive:hover {
+    background: var(--nord9);
+}
+
+/* 分页导航控件 */
+.paginationControls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 16px 20px;
+    background: var(--nord1);
+    border-top: 1px solid var(--nord3);
+    width: 100%;
+    box-sizing: border-box;
+    flex-shrink: 0; /* 防止被压缩 */
+}
+
+.paginationButton {
+    padding: 8px 16px;
+    background: var(--nord3);
+    color: var(--nord6);
+    border: 1px solid var(--nord3);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.paginationButton:hover:not(:disabled) {
+    background: var(--nord4);
+    border-color: var(--nord4);
+}
+
+.paginationButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pageInfo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--nord4);
+    font-size: 14px;
+}
+
+.pageInput {
+    width: 60px;
+    padding: 6px 8px;
+    background: var(--nord0);
+    color: var(--nord6);
+    border: 1px solid var(--nord3);
+    border-radius: 4px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.pageInput:focus {
+    outline: none;
+    border-color: var(--nord8);
+}
+
+.pageSeparator {
+    color: var(--nord4);
+}
+
+.totalPages {
+    color: var(--nord4);
+    min-width: 30px;
+    text-align: left;
 }

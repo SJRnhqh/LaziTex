@@ -20,12 +20,13 @@ import ModeSwitcher from '../components/ModeSwitcher.vue'
 
 <style scoped>
 .laziview-layout {
-    width: 100vw;
+    width: 100%;
     height: 100vh;
     display: flex;
     flex-direction: column;
     background: #2E3440; /* nord0 - 主背景 */
     overflow: hidden;
+    box-sizing: border-box;
 }
 
 header {
@@ -35,6 +36,9 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+    flex-shrink: 0; /* 防止被压缩 */
 }
 
 header h1 {

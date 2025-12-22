@@ -25,10 +25,10 @@ var currentLang Language = LangZH
 
 // SaveLanguagePreference 保存语言偏好
 func SaveLanguagePreference(lang Language) error {
-	jsonConfig := &config.Config{
-		Language: string(lang),
-	}
-	return config.SaveConfig(jsonConfig)
+	// 使用 UpdateConfig 进行部分更新，只更新 language 字段
+	return config.UpdateConfig(map[string]interface{}{
+		"language": string(lang),
+	})
 }
 
 // LoadLanguagePreference 加载语言偏好

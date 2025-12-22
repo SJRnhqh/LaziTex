@@ -3,7 +3,7 @@
 
 /**
  * 获取应用配置
- * @returns {Promise<{mode: string}>}
+ * @returns {Promise<{mode?: string, displayMode?: string}>}
  */
 export async function getConfig() {
     const response = await fetch('/api/config')
@@ -13,4 +13,23 @@ export async function getConfig() {
     }
     
     return await response.json()
+}
+
+/**
+ * 保存应用配置
+ * @param {Object} config - 配置对象 {displayMode?: string, ...}
+ * @returns {Promise<void>}
+ */
+export async function setConfig(config) {
+    const response = await fetch('/api/config', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(config)
+    })
+    
+    if (!response.ok) {
+        throw new Error(`保存配置失败: ${response.status} ${response.statusText}`)
+    }
 }

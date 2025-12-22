@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
+	config "github.com/SJRnhqh/lazitex/config"
 	frontend "github.com/SJRnhqh/lazitex/frontend"
 )
 
@@ -124,16 +125,59 @@ func (s *Server) HandlePDF(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, pdfPath)
 }
 
-// HandleConfig 处理配置请求，返回应用模式
+// HandleConfig 处理配置请求
+// GET: 返回用户配置和应用模式
+// POST: 更新用户配置
 func (s *Server) HandleConfig(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
 
-	// 返回 JSON 格式的配置信息
-	response := map[string]string{
-		"mode": s.mode,
+	switch r.Method {
+	case http.MethodGet:
+		// GET 请求：返回配置
+		userConfig, err := config.LoadConfig()
+		if err != nil {
+			// 如果加载失败，使用默认值
+			userConfig = &config.Config{
+				Language:    "en",
+				DisplayMode: "virtual",
+			}
+		}
+
+		response := map[string]string{
+			"mode":        s.mode,              // 服务器模式（LaziView/LaziWorkspace）
+			"language":    userConfig.Language, // 用户语言偏好
+			"displayMode": userConfig.DisplayMode, // PDF 显示模式
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(response)
+
+	case http.MethodPost:
+		// POST 请求：更新配置
+		var updates map[string]interface{}
+		if err := json.NewDecoder(r.Body).Decode(&updates); err != nil {
+			http.Error(w, "Invalid JSON", http.StatusBadRequest)
+			return
+		}
+
+		// 使用 UpdateConfig 部分更新配置
+		if err := config.UpdateConfig(updates); err != nil {
+			http.Error(w, "Failed to save config", http.StatusInternalServerError)
+			return
+		}
+
+		// 返回更新后的配置
+		userConfig, _ := config.LoadConfig()
+		response := map[string]string{
+			"mode":        s.mode,
+			"language":    userConfig.Language,
+			"displayMode": userConfig.DisplayMode,
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(response)
+
+	default:
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	}
-
-	// 将 map 转换为 JSON
-	json.NewEncoder(w).Encode(response)
 }
