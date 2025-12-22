@@ -30,6 +30,35 @@ Instant LaTeX compilation across platforms — powered by Go with local AI to he
 
 ## 📦 Installation
 
+### Build Dependencies
+
+Before building from source, ensure you have the following tools installed:
+
+- **Node.js** (includes npm)
+  - macOS: `brew install node`
+  - Linux: Use your distribution's package manager
+  - Windows: Download from [nodejs.org](https://nodejs.org/)
+  
+- **Go** (version 1.25+)
+  - macOS: `brew install go`
+  - Linux: Use your distribution's package manager
+  - Windows: Download from [go.dev](https://go.dev/dl/)
+  
+- **Go Proxy Configuration** (Recommended for users in China)
+
+  ```bash
+  go env -w GOPROXY=https://goproxy.cn,direct
+  ```
+
+### Runtime Dependencies
+
+- **LaTeX Distribution** (e.g., MacTeX, TeX Live, MiKTeX)
+  - macOS: `brew install --cask mactex` (or use Homebrew: `brew install basictex`)
+  - Linux: Use your distribution's package manager
+  - Windows: Download and install [TeX Live](https://www.tug.org/texlive/) or [MiKTeX](https://miktex.org/)
+
+> **Note**: The build scripts will automatically check for build dependencies. If any are missing, you'll receive helpful installation instructions.
+
 ### From Source
 
 #### Method 1: Using Build Scripts (Recommended)

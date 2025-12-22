@@ -30,6 +30,35 @@
 
 ## 📦 安装
 
+### 构建依赖
+
+在从源码构建之前，请确保已安装以下工具：
+
+- **Node.js** (包含 npm)
+  - macOS: `brew install node`
+  - Linux: 使用发行版的包管理器
+  - Windows: 从 [nodejs.org](https://nodejs.org/) 下载安装
+  
+- **Go** (版本 1.25+)
+  - macOS: `brew install go`
+  - Linux: 使用发行版的包管理器
+  - Windows: 从 [go.dev](https://go.dev/dl/) 下载安装
+  
+- **Go 代理配置** (中国大陆用户推荐)
+
+  ```bash
+  go env -w GOPROXY=https://goproxy.cn,direct
+  ```
+
+### 运行时依赖
+
+- **LaTeX 发行版** (如 MacTeX、TeX Live、MiKTeX)
+  - macOS: `brew install --cask mactex` (或使用 Homebrew: `brew install basictex`)
+  - Linux: 使用发行版的包管理器
+  - Windows: 下载安装 [TeX Live](https://www.tug.org/texlive/) 或 [MiKTeX](https://miktex.org/)
+
+> **注意**：构建脚本会自动检查构建依赖。如果缺少任何依赖，您将收到有用的安装说明。
+
 ### 从源码编译
 
 #### 方式一：使用一键编译脚本（推荐）

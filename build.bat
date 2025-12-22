@@ -9,13 +9,53 @@ echo.
 echo ============================================================
 echo.
 
+REM 检查命令是否存在
+where node >nul 2>&1
+if %errorlevel% neq 0 (
+    echo [ERROR] node is not installed or not in PATH
+    echo.
+    echo Please install Node.js from https://nodejs.org/
+    pause
+    exit /b 1
+)
+
+where npm >nul 2>&1
+if %errorlevel% neq 0 (
+    echo [ERROR] npm is not installed or not in PATH
+    echo.
+    echo Please install Node.js from https://nodejs.org/
+    pause
+    exit /b 1
+)
+
+where go >nul 2>&1
+if %errorlevel% neq 0 (
+    echo [ERROR] go is not installed or not in PATH
+    echo.
+    echo Please install Go from https://go.dev/dl/
+    pause
+    exit /b 1
+)
+
 REM 创建输出目录
 if not exist "bin" mkdir bin
 
-set "total=5"
+set "total=6"
 set "current=0"
 
-REM 步骤 1: 构建 Vue 前端
+REM 步骤 1: 环境检查
+set /a current+=1
+echo [%current%/%total%] Checking build environment...
+echo     Node.js: 
+call node --version
+echo     npm: 
+call npm --version
+echo     Go: 
+call go version
+echo [OK] Build environment check passed
+echo.
+
+REM 步骤 2: 构建 Vue 前端
 set /a current+=1
 echo [%current%/%total%] Building Vue frontend...
 cd frontend\vue
