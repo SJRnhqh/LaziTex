@@ -87,3 +87,25 @@ func UninstallOllama() {
 	}
 	// 注意：成功消息由卸载器内部输出，这里不需要再输出
 }
+
+// StatusOllama 检查 Ollama 服务状态
+func StatusOllama() {
+	var manager core.OllamaManager
+
+	switch runtime.GOOS {
+	case "windows":
+		manager = win.NewOllamaManager()
+	case "darwin":
+		manager = mac.NewOllamaManager()
+	default:
+		fmt.Printf(lang.T("msg.unsupported_os")+"\n", runtime.GOOS)
+		return
+	}
+
+	_, err := core.StatusOllama(manager)
+	if err != nil {
+		fmt.Printf("❌ %v\n", err)
+		return
+	}
+	// 注意：状态信息由 Status 方法内部输出，这里不需要再输出
+}

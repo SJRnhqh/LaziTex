@@ -43,10 +43,11 @@ func main() {
 	case "-u", "--uninstall":
 		tasks.UninstallLaTeXEnvironment()
 	case "-o", "--ollama":
-		// 灵活解析：遍历 -o 之后的所有参数，找到 check/install/uninstall 中的任意一个
+		// 灵活解析：遍历 -o 之后的所有参数，找到 check/install/uninstall/status 中的任意一个
 		checkMode := false
 		installMode := false
 		uninstallMode := false
+		statusMode := false
 		actionCount := 0
 
 		for i := 1; i < len(args); i++ {
@@ -60,6 +61,9 @@ func main() {
 				actionCount++
 			} else if arg == "-u" || arg == "--uninstall" {
 				uninstallMode = true
+				actionCount++
+			} else if arg == "-s" || arg == "--status" {
+				statusMode = true
 				actionCount++
 			} else if strings.HasPrefix(arg, "-") {
 				// 未知的标志位
@@ -86,6 +90,8 @@ func main() {
 			tasks.InstallOllama()
 		} else if uninstallMode {
 			tasks.UninstallOllama()
+		} else if statusMode {
+			tasks.StatusOllama()
 		}
 	case "-b", "--build":
 		if len(args) < 2 {

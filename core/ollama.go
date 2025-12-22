@@ -23,6 +23,10 @@ type OllamaManager interface {
 	// Uninstall 卸载 Ollama
 	// 返回: 错误信息（如果卸载失败）
 	Uninstall() error
+
+	// Status 获取 Ollama 状态
+	// 返回: 状态信息
+	Status() (bool, error)
 }
 
 // CheckOllama 检查 Ollama 是否安装
@@ -50,4 +54,13 @@ func UninstallOllama(manager OllamaManager) error {
 		return fmt.Errorf("%s", lang.T("msg.ollama.manager_nil"))
 	}
 	return manager.Uninstall()
+}
+
+// StatusOllama 检查 Ollama 服务状态
+// 使用平台特定的管理器实现进行检查
+func StatusOllama(manager OllamaManager) (bool, error) {
+	if manager == nil {
+		return false, fmt.Errorf("%s", lang.T("msg.ollama.manager_nil"))
+	}
+	return manager.Status()
 }

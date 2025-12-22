@@ -164,10 +164,10 @@ func (m *OllamaManager) Install() error {
 	}
 
 	// 3. 询问用户使用哪种方式安装
-	fmt.Println("🦙 检测到已安装 Homebrew，可以选择以下安装方式：")
-	fmt.Println("  1. Homebrew (推荐，快速安装)")
-	fmt.Println("  2. 官方安装脚本 (直接安装)")
-	fmt.Print("请选择 [1/2] (默认: 1): ")
+	fmt.Println(lang.T("msg.ollama.mac.install_method_prompt"))
+	fmt.Println(lang.T("msg.ollama.mac.install_method_option1"))
+	fmt.Println(lang.T("msg.ollama.mac.install_method_option2"))
+	fmt.Print(lang.T("msg.ollama.mac.install_method_choice"))
 
 	reader := bufio.NewReader(os.Stdin)
 	choice, _ := reader.ReadString('\n')
@@ -179,7 +179,7 @@ func (m *OllamaManager) Install() error {
 
 	// 4. 通过 Homebrew 安装
 	fmt.Println(lang.T("msg.ollama.mac.installing_via_homebrew"))
-	fmt.Println("💡 注意: 这将通过 Homebrew 安装 Ollama")
+	fmt.Println(lang.T("msg.ollama.mac.install_note_homebrew"))
 
 	// 使用 brew install ollama (formula，不是 cask)
 	cmd := exec.Command("brew", "install", "ollama")
@@ -224,7 +224,7 @@ func (m *OllamaManager) Install() error {
 // installViaScript 通过官方安装脚本安装
 func (m *OllamaManager) installViaScript() error {
 	fmt.Println(lang.T("msg.ollama.mac.installing_via_script"))
-	fmt.Println("💡 注意: 这将使用官方安装脚本安装 Ollama")
+	fmt.Println(lang.T("msg.ollama.mac.install_note_script"))
 
 	// 下载并运行官方安装脚本
 	cmd := exec.Command("sh", "-c", "curl -fsSL https://ollama.com/install.sh | sh")
@@ -371,10 +371,10 @@ func (m *OllamaManager) uninstallViaScript() error {
 
 	// 如果没有卸载脚本，手动清理
 	fmt.Println(lang.T("msg.ollama.mac.manual_uninstall_hint"))
-	fmt.Println("  请手动执行以下步骤：")
-	fmt.Println("  1. 删除 ~/.ollama 目录")
-	fmt.Println("  2. 从 PATH 中移除 ollama 命令（通常在 ~/.zshrc 或 ~/.bash_profile）")
-	fmt.Println("  3. 删除 /usr/local/bin/ollama 或 ~/.local/bin/ollama（如果存在）")
+	fmt.Println(lang.T("msg.ollama.mac.manual_uninstall_steps"))
+	fmt.Println(lang.T("msg.ollama.mac.manual_uninstall_step1"))
+	fmt.Println(lang.T("msg.ollama.mac.manual_uninstall_step2"))
+	fmt.Println(lang.T("msg.ollama.mac.manual_uninstall_step3"))
 
 	return fmt.Errorf("%s", lang.T("msg.ollama.uninstall_verify_failed"))
 }
@@ -382,9 +382,43 @@ func (m *OllamaManager) uninstallViaScript() error {
 // uninstallGeneric 通用卸载方法
 func (m *OllamaManager) uninstallGeneric() error {
 	fmt.Println(lang.T("msg.ollama.mac.unknown_install_method"))
-	fmt.Println("请手动卸载 Ollama：")
-	fmt.Println("  - Homebrew: brew uninstall ollama")
-	fmt.Println("  - 脚本安装: 删除 ~/.ollama 目录和相关 PATH 配置")
+	fmt.Println(lang.T("msg.ollama.mac.manual_uninstall_prompt"))
+	fmt.Println(lang.T("msg.ollama.mac.manual_uninstall_homebrew"))
+	fmt.Println(lang.T("msg.ollama.mac.manual_uninstall_script"))
 
 	return fmt.Errorf("%s", lang.T("msg.ollama.uninstall_failed"))
+}
+
+// Status 检查 Ollama 服务状态
+// 返回: (是否运行, 错误)
+func (m *OllamaManager) Status() (bool, error) {
+	// 1. 检查是否已安装
+	installed, version, err := m.Check()
+	if err != nil {
+		return false, err
+	}
+
+	if !installed {
+		fmt.Println(lang.T("msg.ollama.not_installed"))
+		return false, nil
+	}
+
+	// 2. 检查服务状态
+	running := m.checkService()
+
+	// 3. 输出状态信息
+	if version != "" && version != "installed" {
+		fmt.Printf(lang.T("msg.ollama.status_installed")+"\n", version)
+	} else {
+		fmt.Println(lang.T("msg.ollama.status_installed_no_version"))
+	}
+
+	if running {
+		fmt.Println(lang.T("msg.ollama.service_running"))
+	} else {
+		fmt.Println(lang.T("msg.ollama.service_not_running"))
+		fmt.Println(lang.T("msg.ollama.start_service_hint"))
+	}
+
+	return running, nil
 }

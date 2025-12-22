@@ -303,7 +303,7 @@ func handleREPLCommand(input string) bool {
 		tasks.UninstallLaTeXEnvironment()
 
 	case "ollama":
-		// 灵活解析：遍历 ollama 之后的所有参数，找到 check/install/uninstall 中的任意一个
+		// 灵活解析：遍历 ollama 之后的所有参数，找到 check/install/uninstall/status 中的任意一个
 		if len(parts) < 2 {
 			fmt.Println(lang.T("repl.ollama_usage"))
 			return false
@@ -312,6 +312,7 @@ func handleREPLCommand(input string) bool {
 		checkMode := false
 		installMode := false
 		uninstallMode := false
+		statusMode := false
 		actionCount := 0
 
 		for i := 1; i < len(parts); i++ {
@@ -324,6 +325,9 @@ func handleREPLCommand(input string) bool {
 				actionCount++
 			} else if arg == "-u" || arg == "--uninstall" {
 				uninstallMode = true
+				actionCount++
+			} else if arg == "-s" || arg == "--status" {
+				statusMode = true
 				actionCount++
 			} else if strings.HasPrefix(arg, "-") {
 				fmt.Printf(lang.T("repl.unknown_command")+"\n", arg)
@@ -343,6 +347,8 @@ func handleREPLCommand(input string) bool {
 			tasks.InstallOllama()
 		} else if uninstallMode {
 			tasks.UninstallOllama()
+		} else if statusMode {
+			tasks.StatusOllama()
 		}
 
 	case "build":

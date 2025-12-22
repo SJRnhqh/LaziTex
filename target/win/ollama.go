@@ -320,3 +320,37 @@ func (m *OllamaManager) Uninstall() error {
 
 	return fmt.Errorf("%s", lang.T("msg.ollama.uninstall_verify_failed"))
 }
+
+// Status 检查 Ollama 服务状态
+// 返回: (是否运行, 错误)
+func (m *OllamaManager) Status() (bool, error) {
+	// 1. 检查是否已安装
+	installed, version, err := m.Check()
+	if err != nil {
+		return false, err
+	}
+
+	if !installed {
+		fmt.Println(lang.T("msg.ollama.not_installed"))
+		return false, nil
+	}
+
+	// 2. 检查服务状态
+	running := m.checkService()
+
+	// 3. 输出状态信息
+	if version != "" && version != "installed" {
+		fmt.Printf(lang.T("msg.ollama.status_installed")+"\n", version)
+	} else {
+		fmt.Println(lang.T("msg.ollama.status_installed_no_version"))
+	}
+
+	if running {
+		fmt.Println(lang.T("msg.ollama.service_running"))
+	} else {
+		fmt.Println(lang.T("msg.ollama.service_not_running"))
+		fmt.Println(lang.T("msg.ollama.start_service_hint"))
+	}
+
+	return running, nil
+}
