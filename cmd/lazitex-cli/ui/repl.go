@@ -350,6 +350,58 @@ func handleREPLCommand(input string) bool {
 		} else if statusMode {
 			tasks.StatusOllama()
 		}
+	case "llm":
+		// llm <alias> (智能) | llm add/link/list/test/remove/unlink [alias]
+		if len(parts) < 2 {
+			tasks.PrintREPLLLMUsage()
+			return false
+		}
+
+		sub := parts[1:]
+
+		// 智能模式：只有一个别名参数
+		if len(sub) == 1 {
+			tasks.SmartLinkOrAddLLM(sub[0])
+			return false
+		}
+
+		action := strings.ToLower(sub[0])
+		switch action {
+		case "add":
+			if len(sub) < 2 {
+				tasks.PrintREPLLLMUsage()
+				return false
+			}
+			tasks.AddLLM(sub[1])
+		case "link":
+			if len(sub) < 2 {
+				tasks.PrintREPLLLMUsage()
+				return false
+			}
+			tasks.LinkLLM(sub[1])
+		case "list":
+			tasks.ListLLM()
+		case "test":
+			if len(sub) < 2 {
+				tasks.PrintREPLLLMUsage()
+				return false
+			}
+			tasks.TestLLM(sub[1])
+		case "remove", "unlink":
+			if len(sub) < 2 {
+				tasks.PrintREPLLLMUsage()
+				return false
+			}
+			tasks.RemoveLLM(sub[1])
+		default:
+			// fallback: 当成智能别名处理
+			if len(sub) == 1 {
+				tasks.SmartLinkOrAddLLM(action)
+				return false
+			}
+			fmt.Printf(lang.T("repl.unknown_command")+"\n", action)
+			tasks.PrintREPLLLMUsage()
+		}
 
 	case "build":
 		if len(parts) < 2 {

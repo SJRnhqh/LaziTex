@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	// 内部包
-	"github.com/SJRnhqh/lazitex/config"
+	config "github.com/SJRnhqh/lazitex/config"
 )
 
 // Language 语言代码

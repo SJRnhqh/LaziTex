@@ -93,6 +93,58 @@ func main() {
 		} else if statusMode {
 			tasks.StatusOllama()
 		}
+	case "-m", "-llm":
+		// LLM 管理：智能 / add / link / list / test / remove(unlink)
+		if len(args) < 2 {
+			tasks.PrintLLMUsage()
+			return
+		}
+
+		sub := args[1:]
+
+		// 智能模式：只有一个别名参数
+		if len(sub) == 1 {
+			tasks.SmartLinkOrAddLLM(sub[0])
+			return
+		}
+
+		action := sub[0]
+		switch action {
+		case "add":
+			if len(sub) < 2 {
+				tasks.PrintLLMUsage()
+				return
+			}
+			tasks.AddLLM(sub[1])
+		case "link":
+			if len(sub) < 2 {
+				tasks.PrintLLMUsage()
+				return
+			}
+			tasks.LinkLLM(sub[1])
+		case "list":
+			tasks.ListLLM()
+		case "test":
+			if len(sub) < 2 {
+				tasks.PrintLLMUsage()
+				return
+			}
+			tasks.TestLLM(sub[1])
+		case "remove", "unlink":
+			if len(sub) < 2 {
+				tasks.PrintLLMUsage()
+				return
+			}
+			tasks.RemoveLLM(sub[1])
+		default:
+			// fallback: 当成智能别名处理
+			if len(sub) == 1 {
+				tasks.SmartLinkOrAddLLM(action)
+				return
+			}
+			fmt.Printf(lang.T("msg.unknown_command")+"\n", action)
+			tasks.PrintLLMUsage()
+		}
 	case "-b", "--build":
 		if len(args) < 2 {
 			fmt.Println(lang.T("msg.build_usage"))
