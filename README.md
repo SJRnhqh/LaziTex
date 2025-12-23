@@ -145,7 +145,7 @@ Edit the config file directly or use `--lang` parameter to update automatically.
 
 ### Ollama Management
 
-One-click check, install, and uninstall Ollama (Windows, Linux & macOS). 
+One-click check, install, and uninstall Ollama (Windows, Linux & macOS).
 
 - **Windows**: Uses winget package manager
 - **Linux**: Supports multiple package managers (apt, yum, dnf, pacman, zypper, snap) or official script
