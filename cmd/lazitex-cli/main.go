@@ -18,6 +18,14 @@ import (
 )
 
 func main() {
+	// 初始化 ollama 动作处理函数（只需一次）
+	internal.SetOllamaActionHandlers(map[internal.OllamaAction]func(){
+		internal.OllamaCheck:     tasks.CheckOllama,
+		internal.OllamaInstall:   tasks.InstallOllama,
+		internal.OllamaUninstall: tasks.UninstallOllama,
+		internal.OllamaStatus:    tasks.StatusOllama,
+	})
+
 	// 初始化语言设置并移除 --lang 参数
 	args := processLanguageFlag()
 
@@ -31,44 +39,32 @@ func main() {
 	switch args[0] {
 	case "-h", "--help":
 		tasks.ShowHelp()
+
 	case "-v", "--version":
 		fmt.Println("LaziTex v0.0.1")
+
 	case "-c", "--check":
 		tasks.CheckEnvironment()
+
 	case "-t", "--tui":
 		ui.StartTUI()
+
 	case "-r", "--repl":
 		ui.StartREPL()
+
 	case "-i", "--install":
 		tasks.InstallLaTeXEnvironment()
+
 	case "-u", "--uninstall":
 		tasks.UninstallLaTeXEnvironment()
+
 	case "config":
 		tasks.OpenConfigFile()
+
 	case "-o", "--ollama":
-		action, err := internal.ParseOllamaArgs(args[1:])
-		if err != nil {
-			// 按错误类型决定提示
-			switch err {
-			case internal.ErrOllamaNoAction, internal.ErrOllamaMultiActions, internal.ErrOllamaUnknownFlag:
-				fmt.Println(lang.T("msg.ollama_usage"))
-			default:
-				fmt.Println(lang.T("msg.ollama_usage"))
-			}
-			return
-		}
-	
-		switch action {
-		case internal.OllamaCheck:
-			tasks.CheckOllama()
-		case internal.OllamaInstall:
-			tasks.InstallOllama()
-		case internal.OllamaUninstall:
-			tasks.UninstallOllama()
-		case internal.OllamaStatus:
-			tasks.StatusOllama()
-		}
-	
+		internal.HandleOllamaCommand(args[1:], internal.I18nModeMsg, "msg.ollama_usage")
+		return
+
 	case "-m", "--llm":
 		// LLM 管理：智能 / add / link / list / test / remove(unlink)
 		if len(args) < 2 {
@@ -123,6 +119,7 @@ func main() {
 			fmt.Printf("未知操作: %s\n", action)
 			fmt.Println(lang.T("msg.llm.cli_usage"))
 		}
+
 	case "-b", "--build":
 		if len(args) < 2 {
 			fmt.Println(lang.T("msg.build_usage"))
@@ -174,6 +171,7 @@ func main() {
 		}
 
 		tasks.BuildLaTeX(filePath, outputPath, show, quiet, tidy)
+
 	case "-p", "--preview":
 		if len(args) < 2 {
 			// 如果没传文件名，显示用法

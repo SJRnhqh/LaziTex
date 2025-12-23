@@ -142,6 +142,14 @@ func (c *LaTeXCompleter) Do(line []rune, pos int) (newLine [][]rune, length int)
 
 // StartREPL 启动 REPL 模式
 func StartREPL() {
+	// 初始化 ollama 动作处理函数（与 main.go 保持一致）
+	internal.SetOllamaActionHandlers(map[internal.OllamaAction]func(){
+		internal.OllamaCheck:     tasks.CheckOllama,
+		internal.OllamaInstall:   tasks.InstallOllama,
+		internal.OllamaUninstall: tasks.UninstallOllama,
+		internal.OllamaStatus:    tasks.StatusOllama,
+	})
+
 	printLogo()
 	printREPLWelcome()
 
@@ -310,28 +318,9 @@ func handleREPLCommand(input string) bool {
 			return false
 		}
 	
-		action, err := internal.ParseOllamaArgs(parts[1:])
-		if err != nil {
-			switch err {
-			case internal.ErrOllamaNoAction, internal.ErrOllamaMultiActions, internal.ErrOllamaUnknownFlag:
-				fmt.Println(lang.T("repl.ollama_usage"))
-			default:
-				fmt.Println(lang.T("repl.ollama_usage"))
-			}
-			return false
-		}
-	
-		switch action {
-		case internal.OllamaCheck:
-			tasks.CheckOllama()
-		case internal.OllamaInstall:
-			tasks.InstallOllama()
-		case internal.OllamaUninstall:
-			tasks.UninstallOllama()
-		case internal.OllamaStatus:
-			tasks.StatusOllama()
-		}
-	
+		internal.HandleOllamaCommand(parts[1:], internal.I18nModeRepl, "repl.ollama_usage")
+		return false
+
 	case "llm":
 		// llm list | llm add/link/test/remove/unlink [alias] | llm <alias> (智能，暂不实现)
 		if len(parts) < 2 {
@@ -432,6 +421,7 @@ func handleREPLCommand(input string) bool {
 
 		// 调用统一的构建入口
 		tasks.BuildLaTeX(filePath, outputPath, show, quiet, tidy)
+
 	case "preview":
 		if len(parts) < 2 {
 			fmt.Println(lang.T("repl.preview_usage"))
