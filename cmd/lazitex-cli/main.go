@@ -61,7 +61,7 @@ func main() {
 	case "config":
 		tasks.OpenConfigFile()
 
-	case "-o", "--ollama":
+	case "-o", "--ollama":// Ollama 管理 TODO: 测试覆盖
 		internal.HandleOllamaCommand(args[1:], internal.I18nModeMsg, "msg.ollama_usage")
 		return
 

@@ -312,12 +312,7 @@ func handleREPLCommand(input string) bool {
 	case "uninstall":
 		tasks.UninstallLaTeXEnvironment()
 
-	case "ollama":
-		if len(parts) < 2 {
-			fmt.Println(lang.T("repl.ollama_usage"))
-			return false
-		}
-	
+	case "ollama": // Ollama 管理 TODO: 测试覆盖	
 		internal.HandleOllamaCommand(parts[1:], internal.I18nModeRepl, "repl.ollama_usage")
 		return false
 
