@@ -221,13 +221,13 @@ func init() {
 		// LLM 管理相关消息
 		"msg.llm.load_config_failed":                       "❌ 读取配置失败: %v",
 		"msg.llm.no_providers":                             "📝 暂无 LLM 配置，请先添加一个 LLM 提供商",
-		"msg.llm.list_header_id":                           "ID/Name",
-		"msg.llm.list_header_provider":                     "Provider",
-		"msg.llm.list_header_model":                        "Model",
-		"msg.llm.list_header_enabled":                      "Enabled",
-		"msg.llm.list_header_verified":                     "Verified",
-		"msg.llm.list_header_verified_at":                  "VerifiedAt",
-		"msg.llm.list_header_active":                       "Active",
+		"msg.llm.list_header_id":                           "ID/名称",
+		"msg.llm.list_header_provider":                     "提供商",
+		"msg.llm.list_header_model":                        "模型",
+		"msg.llm.list_header_enabled":                      "启用",
+		"msg.llm.list_header_verified":                     "已验证",
+		"msg.llm.list_header_verified_at":                  "验证时间",
+		"msg.llm.list_header_active":                       "当前",
 		"msg.llm.date_format":                              "2006-01-02", // 日期格式（Go time 格式字符串）
 		"msg.llm.test.read_failed":                         "❌ 读取失败: %v",
 		"msg.llm.test.test_failed":                         "❌ 测试失败: %v",
@@ -249,7 +249,7 @@ func init() {
 		"msg.llm.provider.ollama.api_status_error":         "Ollama API 返回错误状态码: %d",
 		"msg.llm.provider.ollama.parse_response_failed":    "解析 Ollama 响应失败: %v",
 		"msg.llm.provider.ollama.serialize_request_failed": "序列化请求失败: %v",
-		"msg.llm.cli_usage":                                "用法: lazitex -m list | lazitex -m [add|link|test|remove|unlink|<模型名称>] （开发中）\n示例:\n  lazitex -m list            # 列出所有已配置的 LLM",
+		"msg.llm.cli_usage":                                "用法: lazitex -m list | lazitex -m test <model/id/name> | lazitex -m [add|link|remove|unlink|<模型名称>] （开发中）\n示例:\n  lazitex -m list            # 列出所有已配置的 LLM\n  lazitex -m test gemma3:1b  # 测试指定模型连通性",
 		"msg.dev_mode_backend_url":                         "💡 后端 API 地址: %s",
 		"msg.prod_mode_embedded":                           "💡 生产模式：前端已嵌入，访问: %s",
 		"msg.dev_mode_custom_port_warning":                 "⚠️  警告：开发模式下使用了自定义端口 (%d)，但 Vite 代理配置硬编码到 8080\n   将强制使用默认端口 8080 以确保前端可以连接后端",
@@ -257,6 +257,8 @@ func init() {
 		"msg.checking_vue_dev_server":                      "🔍 检测 Vue dev server (%s) 是否可用...",
 		"msg.vue_dev_server_available":                     "✅ Vue dev server 可用，使用开发模式",
 		"msg.vue_dev_server_unavailable":                   "⚠️  Vue dev server 不可用，自动回退到生产模式（使用嵌入的前端）",
+		"msg.common.yes":                                   "是",
+		"msg.common.no":                                    "否",
 
 		// 包管理相关
 		"msg.package_missing":             "🔍 检测到缺失的包: %s",
@@ -435,7 +437,7 @@ func init() {
 		"help.config":       "打开配置文件（JSON）",
 		"help.latex":        "LaTeX 管理",
 		"help.ollama":       "Ollama 管理",
-		"help.llm":          "LLM 管理（list 可用，其他功能开发中）",
+		"help.llm":          "LLM 管理：list 列表；test 需指定 <model/id/name>",
 		"help.description":  "LaziTex: 零配置 LaTeX 编译工具，支持 AI 辅助",
 
 		// 工具描述
@@ -602,7 +604,7 @@ func init() {
 		"msg.llm.provider.ollama.api_status_error":         "Ollama API returned error status code: %d",
 		"msg.llm.provider.ollama.parse_response_failed":    "Failed to parse Ollama response: %v",
 		"msg.llm.provider.ollama.serialize_request_failed": "Failed to serialize request: %v",
-		"msg.llm.cli_usage":                                "Usage: lazitex -m list | lazitex -m [add|link|test|remove|unlink|<model_name>] (in development)\nExample:\n  lazitex -m list            # List all configured LLMs",
+		"msg.llm.cli_usage":                                "Usage: lazitex -m list | lazitex -m test <model/id/name> | lazitex -m [add|link|remove|unlink|<model_name>] (in development)\nExample:\n  lazitex -m list            # List all configured LLMs\n  lazitex -m test gemma3:1b  # Test connectivity for the given model",
 		"msg.dev_mode_backend_url":                         "💡 Backend API URL: %s",
 		"msg.prod_mode_embedded":                           "💡 Production mode: Frontend embedded, access: %s",
 		"msg.dev_mode_custom_port_warning":                 "⚠️  Warning: Custom port (%d) used in dev mode, but Vite proxy is hardcoded to 8080\n   Will force use default port 8080 to ensure frontend can connect to backend",
@@ -610,6 +612,8 @@ func init() {
 		"msg.checking_vue_dev_server":                      "🔍 Checking if Vue dev server (%s) is available...",
 		"msg.vue_dev_server_available":                     "✅ Vue dev server is available, using dev mode",
 		"msg.vue_dev_server_unavailable":                   "⚠️  Vue dev server is not available, auto-fallback to production mode (using embedded frontend)",
+		"msg.common.yes":                                   "Yes",
+		"msg.common.no":                                    "No",
 
 		// Package management related
 		"msg.package_missing":             "🔍 Missing package detected: %s",
@@ -788,7 +792,7 @@ func init() {
 		"help.config":       "Open config file (JSON)",
 		"help.latex":        "LaTeX management",
 		"help.ollama":       "Ollama management",
-		"help.llm":          "LLM management (list available, other features in development)",
+		"help.llm":          "LLM management: list; test requires <model/id/name>",
 		"help.description":  "LaziTex: Zero-config LaTeX compilation with AI assistance",
 
 		// Tool descriptions
