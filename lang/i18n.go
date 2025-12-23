@@ -297,6 +297,9 @@ func init() {
 		"msg.mac.uninstall_mactex_manual":  "检测到 MacTeX 官方安装，但未找到卸载脚本，请手动删除：",
 		"msg.mac.removing_residual":        "正在移除残留路径: %s",
 
+		// LaTeX 相关消息
+		"msg.latex_usage":                           "用法: lazitex -x <-c|--check|-i|--install|-u|--uninstall>",
+		
 		// Ollama 相关消息
 		"msg.ollama.already_installed":              "🦙 Ollama 已安装，版本: %s",
 		"msg.ollama.installing":                     "🦙 正在通过 winget 安装 Ollama...",
@@ -623,6 +626,9 @@ func init() {
 		"msg.mac.uninstall_mactex_running": "Detected official MacTeX, attempting uninstall script...",
 		"msg.mac.uninstall_mactex_manual":  "Detected official MacTeX but uninstall script not found. Please remove manually:",
 		"msg.mac.removing_residual":        "Removing residual path: %s",
+        
+		// LaTeX related messages
+		"msg.latex_usage":                           "Usage: lazitex -x <-c|--check|-i|--install|-u|--uninstall>",
 
 		// Ollama related messages
 		"msg.ollama.already_installed":              "🦙 Ollama is already installed, version: %s",

@@ -3,6 +3,7 @@
 package mac
 
 import (
+	// 外部包
 	"bufio"
 	"fmt"
 	"net"
@@ -13,7 +14,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SJRnhqh/lazitex/lang"
+	// 内部包
+	lang "github.com/SJRnhqh/lazitex/lang"
 )
 
 // OllamaManager macOS Ollama 管理器

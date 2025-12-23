@@ -4,10 +4,12 @@
 package internal
 
 import (
+	// 外部包
 	"errors"
 	"fmt"
 	"strings"
 
+	// 内部包
 	lang "github.com/SJRnhqh/lazitex/lang"
 )
 
@@ -37,12 +39,6 @@ func (a OllamaAction) String() string {
 		return "unknown"
 	}
 }
-
-// I18n 模式常量
-const (
-	I18nModeMsg  = "msg"  // 普通命令行模式
-	I18nModeRepl = "repl" // REPL 模式
-)
 
 var (
 	// 哨兵错误：错误消息作为类型标识符，用于映射到国际化键

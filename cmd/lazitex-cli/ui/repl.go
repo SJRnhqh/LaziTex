@@ -142,13 +142,8 @@ func (c *LaTeXCompleter) Do(line []rune, pos int) (newLine [][]rune, length int)
 
 // StartREPL 启动 REPL 模式
 func StartREPL() {
-	// 初始化 ollama 动作处理函数（与 main.go 保持一致）
-	internal.SetOllamaActionHandlers(map[internal.OllamaAction]func(){
-		internal.OllamaCheck:     tasks.CheckOllama,
-		internal.OllamaInstall:   tasks.InstallOllama,
-		internal.OllamaUninstall: tasks.UninstallOllama,
-		internal.OllamaStatus:    tasks.StatusOllama,
-	})
+	// 初始化所有动作处理函数
+	internal.SetAllActionHandlers()
 
 	printLogo()
 	printREPLWelcome()

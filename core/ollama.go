@@ -4,8 +4,10 @@
 package core
 
 import (
+	// 外部包
 	"fmt"
 
+	// 内部包
 	lang "github.com/SJRnhqh/lazitex/lang"
 )
 

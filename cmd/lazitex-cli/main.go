@@ -18,13 +18,8 @@ import (
 )
 
 func main() {
-	// 初始化 ollama 动作处理函数（只需一次）
-	internal.SetOllamaActionHandlers(map[internal.OllamaAction]func(){
-		internal.OllamaCheck:     tasks.CheckOllama,
-		internal.OllamaInstall:   tasks.InstallOllama,
-		internal.OllamaUninstall: tasks.UninstallOllama,
-		internal.OllamaStatus:    tasks.StatusOllama,
-	})
+	// 初始化所有动作处理函数
+	internal.SetAllActionHandlers()
 
 	// 初始化语言设置并移除 --lang 参数
 	args := processLanguageFlag()
@@ -37,31 +32,36 @@ func main() {
 
 	// 简单处理第一个参数
 	switch args[0] {
+	case "config":
+		tasks.OpenConfigFile()
+
 	case "-h", "--help":
 		tasks.ShowHelp()
 
 	case "-v", "--version":
 		fmt.Println("LaziTex v0.0.1")
 
-	case "-c", "--check":
-		tasks.CheckEnvironment()
-
 	case "-t", "--tui":
 		ui.StartTUI()
 
 	case "-r", "--repl":
 		ui.StartREPL()
+	
+	case "-c", "--check":
+		tasks.CheckEnvironment()
 
 	case "-i", "--install":
 		tasks.InstallLaTeXEnvironment()
 
 	case "-u", "--uninstall":
 		tasks.UninstallLaTeXEnvironment()
+	
+	case "-x", "--latex": // LaTeX 管理 TODO: 测试覆盖
+		// internal.HandleLaTeXCommand(args[1:], internal.I18nModeMsg, "msg.latex_usage")
+		fmt.Println(lang.T("msg.latex_usage"))
+		return
 
-	case "config":
-		tasks.OpenConfigFile()
-
-	case "-o", "--ollama":// Ollama 管理 TODO: 测试覆盖
+	case "-o", "--ollama": // Ollama 管理 TODO: 测试覆盖
 		internal.HandleOllamaCommand(args[1:], internal.I18nModeMsg, "msg.ollama_usage")
 		return
 
