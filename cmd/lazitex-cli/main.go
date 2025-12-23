@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	// 内部包
+	internal "github.com/SJRnhqh/lazitex/cmd/lazitex-cli/internal"
 	tasks "github.com/SJRnhqh/lazitex/cmd/lazitex-cli/tasks"
 	ui "github.com/SJRnhqh/lazitex/cmd/lazitex-cli/ui"
 	lang "github.com/SJRnhqh/lazitex/lang"
@@ -45,56 +46,29 @@ func main() {
 	case "config":
 		tasks.OpenConfigFile()
 	case "-o", "--ollama":
-		// 灵活解析：遍历 -o 之后的所有参数，找到 check/install/uninstall/status 中的任意一个
-		checkMode := false
-		installMode := false
-		uninstallMode := false
-		statusMode := false
-		actionCount := 0
-
-		for i := 1; i < len(args); i++ {
-			arg := args[i]
-
-			if arg == "-c" || arg == "--check" {
-				checkMode = true
-				actionCount++
-			} else if arg == "-i" || arg == "--install" {
-				installMode = true
-				actionCount++
-			} else if arg == "-u" || arg == "--uninstall" {
-				uninstallMode = true
-				actionCount++
-			} else if arg == "-s" || arg == "--status" {
-				statusMode = true
-				actionCount++
-			} else if strings.HasPrefix(arg, "-") {
-				// 未知的标志位
-				fmt.Printf(lang.T("msg.unknown_command")+"\n", arg)
-				return
+		action, err := internal.ParseOllamaArgs(args[1:])
+		if err != nil {
+			// 按错误类型决定提示
+			switch err {
+			case internal.ErrOllamaNoAction, internal.ErrOllamaMultiActions, internal.ErrOllamaUnknownFlag:
+				fmt.Println(lang.T("msg.ollama_usage"))
+			default:
+				fmt.Println(lang.T("msg.ollama_usage"))
 			}
-			// 忽略非标志位参数（如果有的话）
-		}
-
-		// 验证：必须且只能有一个操作
-		if actionCount == 0 {
-			fmt.Println(lang.T("msg.ollama_usage"))
 			return
 		}
-		if actionCount > 1 {
-			fmt.Println(lang.T("msg.ollama_usage"))
-			return
-		}
-
-		// 执行对应的操作
-		if checkMode {
+	
+		switch action {
+		case internal.OllamaCheck:
 			tasks.CheckOllama()
-		} else if installMode {
+		case internal.OllamaInstall:
 			tasks.InstallOllama()
-		} else if uninstallMode {
+		case internal.OllamaUninstall:
 			tasks.UninstallOllama()
-		} else if statusMode {
+		case internal.OllamaStatus:
 			tasks.StatusOllama()
 		}
+	
 	case "-m", "--llm":
 		// LLM 管理：智能 / add / link / list / test / remove(unlink)
 		if len(args) < 2 {

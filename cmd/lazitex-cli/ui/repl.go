@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	// 内部包
+	internal "github.com/SJRnhqh/lazitex/cmd/lazitex-cli/internal"
 	tasks "github.com/SJRnhqh/lazitex/cmd/lazitex-cli/tasks"
 	lang "github.com/SJRnhqh/lazitex/lang"
 	lipgloss "github.com/charmbracelet/lipgloss"
@@ -304,53 +305,33 @@ func handleREPLCommand(input string) bool {
 		tasks.UninstallLaTeXEnvironment()
 
 	case "ollama":
-		// 灵活解析：遍历 ollama 之后的所有参数，找到 check/install/uninstall/status 中的任意一个
 		if len(parts) < 2 {
 			fmt.Println(lang.T("repl.ollama_usage"))
 			return false
 		}
-
-		checkMode := false
-		installMode := false
-		uninstallMode := false
-		statusMode := false
-		actionCount := 0
-
-		for i := 1; i < len(parts); i++ {
-			arg := parts[i]
-			if arg == "-c" || arg == "--check" {
-				checkMode = true
-				actionCount++
-			} else if arg == "-i" || arg == "--install" {
-				installMode = true
-				actionCount++
-			} else if arg == "-u" || arg == "--uninstall" {
-				uninstallMode = true
-				actionCount++
-			} else if arg == "-s" || arg == "--status" {
-				statusMode = true
-				actionCount++
-			} else if strings.HasPrefix(arg, "-") {
-				fmt.Printf(lang.T("repl.unknown_command")+"\n", arg)
-				return false
+	
+		action, err := internal.ParseOllamaArgs(parts[1:])
+		if err != nil {
+			switch err {
+			case internal.ErrOllamaNoAction, internal.ErrOllamaMultiActions, internal.ErrOllamaUnknownFlag:
+				fmt.Println(lang.T("repl.ollama_usage"))
+			default:
+				fmt.Println(lang.T("repl.ollama_usage"))
 			}
-			// 忽略其他非标志位参数
-		}
-
-		if actionCount == 0 || actionCount > 1 {
-			fmt.Println(lang.T("repl.ollama_usage"))
 			return false
 		}
-
-		if checkMode {
+	
+		switch action {
+		case internal.OllamaCheck:
 			tasks.CheckOllama()
-		} else if installMode {
+		case internal.OllamaInstall:
 			tasks.InstallOllama()
-		} else if uninstallMode {
+		case internal.OllamaUninstall:
 			tasks.UninstallOllama()
-		} else if statusMode {
+		case internal.OllamaStatus:
 			tasks.StatusOllama()
 		}
+	
 	case "llm":
 		// llm list | llm add/link/test/remove/unlink [alias] | llm <alias> (智能，暂不实现)
 		if len(parts) < 2 {

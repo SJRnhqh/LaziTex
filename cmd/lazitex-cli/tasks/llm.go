@@ -71,7 +71,7 @@ func LinkLLM(alias string) {
 	fmt.Printf("🔗 已切换到 LLM: %s\n", alias)
 }
 
-// 列出所有
+// 列出所有纯粹读取本地已经注册配置的LLM
 func ListLLM() {
 	cfgData, err := cfg.LoadConfig()
 	if err != nil {

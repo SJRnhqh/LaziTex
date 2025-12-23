@@ -5,8 +5,11 @@ package tasks
 
 import (
 	// 外部包
+	"bufio"
 	"fmt"
+	"os"
 	"runtime"
+	"strings"
 
 	// 内部包
 	core "github.com/SJRnhqh/lazitex/core"
@@ -42,7 +45,7 @@ func CheckOllama() {
 			fmt.Println("🦙 " + lang.T("msg.ollama.check_installed_no_version"))
 		}
 	} else {
-		fmt.Println("🦙 " + lang.T("msg.ollama.not_installed"))
+		fmt.Println(lang.T("msg.ollama.not_installed"))
 	}
 }
 
@@ -57,6 +60,31 @@ func InstallOllama() {
 		manager = mac.NewOllamaManager()
 	default:
 		fmt.Printf(lang.T("msg.unsupported_os")+"\n", runtime.GOOS)
+		return
+	}
+
+	// 如果已安装则提示并退出
+	installed, version, err := core.CheckOllama(manager)
+	if err != nil {
+		fmt.Printf("❌ %s: %v\n", lang.T("msg.ollama.check_failed"), err)
+		return
+	}
+	if installed {
+		if version != "" && version != "installed" {
+			fmt.Printf("🦙 %s: %s\n", lang.T("msg.ollama.check_installed"), version)
+		} else {
+			fmt.Println("🦙 " + lang.T("msg.ollama.check_installed_no_version"))
+		}
+		return
+	}
+
+	// 安装前确认（默认否）
+	fmt.Print(lang.T("msg.ollama.confirm_install"))
+	reader := bufio.NewReader(os.Stdin)
+	input, _ := reader.ReadString('\n')
+	input = strings.TrimSpace(strings.ToLower(input))
+	if input != "y" && input != "yes" {
+		fmt.Println(lang.T("msg.ollama.install_cancelled"))
 		return
 	}
 
@@ -78,6 +106,27 @@ func UninstallOllama() {
 		manager = mac.NewOllamaManager()
 	default:
 		fmt.Printf(lang.T("msg.unsupported_os")+"\n", runtime.GOOS)
+		return
+	}
+
+	// 先检查是否已安装，未安装则直接提示
+	installed, _, err := core.CheckOllama(manager)
+	if err != nil {
+		fmt.Printf("❌ %s: %v\n", lang.T("msg.ollama.check_failed"), err)
+		return
+	}
+	if !installed {
+		fmt.Println(lang.T("msg.ollama.not_installed"))
+		return
+	}
+
+	// 卸载前确认（默认否）
+	fmt.Print(lang.T("msg.ollama.confirm_uninstall"))
+	reader := bufio.NewReader(os.Stdin)
+	input, _ := reader.ReadString('\n')
+	input = strings.TrimSpace(strings.ToLower(input))
+	if input != "y" && input != "yes" {
+		fmt.Println(lang.T("msg.ollama.uninstall_cancelled"))
 		return
 	}
 
