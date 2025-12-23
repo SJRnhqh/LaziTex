@@ -8,6 +8,7 @@ import (
 	"time"
 
 	cfg "github.com/SJRnhqh/lazitex/config"
+	llm "github.com/SJRnhqh/lazitex/core/ai/llm"
 	lang "github.com/SJRnhqh/lazitex/lang"
 )
 
@@ -82,46 +83,118 @@ func ListLLM() {
 		fmt.Println(lang.T("msg.llm.no_providers"))
 		return
 	}
-	// 使用固定宽度格式化，确保列对齐
-	fmt.Printf("  %-20s %-15s %-20s %-10s %s\n", "ID/Name", "Provider", "Model", "Enabled", "Active")
+
+	// 表头：使用国际化字符串
+	fmt.Printf("  %-20s %-15s %-20s %-10s %-8s %-12s %s\n",
+		lang.T("msg.llm.list_header_id"),
+		lang.T("msg.llm.list_header_provider"),
+		lang.T("msg.llm.list_header_model"),
+		lang.T("msg.llm.list_header_enabled"),
+		lang.T("msg.llm.list_header_verified"),
+		lang.T("msg.llm.list_header_verified_at"),
+		lang.T("msg.llm.list_header_active"))
+
 	for _, p := range cfgData.LLMProviders {
 		active := ""
 		if cfgData.ActiveLLM == p.ID {
 			active = "*"
 		}
-		fmt.Printf("  %-20s %-15s %-20s %-10v %s\n", p.Name, p.Provider, p.Model, p.Enabled, active)
+
+		// 格式化 Verified 状态
+		verified := "✗"
+		if p.Verified {
+			verified = "✓"
+		}
+
+		// 格式化 VerifiedAt（如果有，只显示日期部分）
+		verifiedAt := ""
+		if p.VerifiedAt != "" {
+			// 解析时间戳并只显示日期部分
+			if t, err := time.Parse(time.RFC3339, p.VerifiedAt); err == nil {
+				verifiedAt = t.Format(lang.T("msg.llm.date_format"))
+			} else if len(p.VerifiedAt) >= 10 {
+				verifiedAt = p.VerifiedAt[:10] // 如果解析失败，直接取前10个字符
+			}
+		}
+
+		fmt.Printf("  %-20s %-15s %-20s %-10v %-8s %-12s %s\n",
+			p.Name, p.Provider, p.Model, p.Enabled, verified, verifiedAt, active)
 	}
 }
 
-// 测试：目前只是检查配置存在与否（后续可扩展真实连通性）
-func TestLLM(alias string) {
-	p, err := cfg.FindLLMProvider(alias)
+// 测试：检查配置并测试真实连通性（支持已注册和未注册两种模式）
+func TestLLM(model string) {
+	// 模式A：尝试作为已注册的 Provider 查找
+	p, err := cfg.FindLLMProvider(model)
 	if err != nil {
-		fmt.Printf("❌ 读取失败: %v\n", err)
+		fmt.Printf(lang.T("msg.llm.test.read_failed")+"\n", err)
 		return
 	}
+
 	if p == nil {
-		fmt.Printf("❌ 未找到 LLM '%s'\n", alias)
+		// 模式B：未注册的模型，创建临时配置（默认使用 ollama）
+		tempProvider := &cfg.LLMProvider{
+			Provider: "ollama",
+			Model:    model,
+			Enabled:  true,
+			Config:   map[string]string{},
+		}
+
+		// 调用核心业务逻辑测试连通性
+		available, err := llm.TestLLMConnectivity(tempProvider)
+		if err != nil {
+			fmt.Printf(lang.T("msg.llm.test.test_failed")+"\n", err)
+			return
+		}
+
+		if available {
+			fmt.Printf(lang.T("msg.llm.test.available_unregistered")+"\n", model, model)
+		} else {
+			fmt.Printf(lang.T("msg.llm.test.unavailable_unregistered")+"\n", model, model)
+		}
 		return
 	}
-	status := "✅ 可用"
-	if !p.Enabled {
-		status = "⚠️ 已禁用"
+
+	// 模式A：已注册的模型，执行完整测试和验证状态更新
+	available, err := llm.TestLLMConnectivity(p)
+	if err != nil {
+		fmt.Printf(lang.T("msg.llm.test.test_failed")+"\n", err)
+		return
 	}
-	fmt.Printf("%s: %s (%s:%s)\n", status, p.Name, p.Provider, p.Model)
+
+	// 根据测试结果更新验证状态
+	if available {
+		// 测试通过，更新 Verified 状态
+		p.Verified = true
+		p.VerifiedAt = time.Now().Format(time.RFC3339)
+
+		// 保存到配置
+		if err := cfg.UpdateLLMProvider(p.ID, p); err != nil {
+			fmt.Printf(lang.T("msg.llm.test.update_config_failed_on_success")+"\n", err)
+		} else {
+			fmt.Printf(lang.T("msg.llm.test.available_verified")+"\n", p.Name, p.Provider, p.Model)
+			return
+		}
+	} else {
+		// 测试失败，清除验证状态
+		p.Verified = false
+		p.VerifiedAt = ""
+
+		// 保存到配置
+		if err := cfg.UpdateLLMProvider(p.ID, p); err != nil {
+			fmt.Printf(lang.T("msg.llm.test.update_config_failed_on_failure")+"\n", err)
+		} else {
+			fmt.Printf(lang.T("msg.llm.test.unavailable")+"\n", p.Name, p.Provider, p.Model)
+			return
+		}
+	}
 }
 
 // 删除
 func RemoveLLM(alias string) {
 	if err := cfg.RemoveLLMProvider(alias); err != nil {
-		fmt.Printf("❌ 删除失败: %v\n", err)
+		fmt.Printf(lang.T("msg.llm.remove.failed")+"\n", err)
 		return
 	}
-	fmt.Printf("🗑️ 已删除 LLM: %s\n", alias)
-}
-
-// 可选：标记验证时间的工具函数，供以后真实验证时使用
-func markVerified(p *cfg.LLMProvider) {
-	p.Verified = true
-	p.VerifiedAt = time.Now().Format(time.RFC3339)
+	fmt.Printf(lang.T("msg.llm.remove.success")+"\n", alias)
 }

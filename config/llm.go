@@ -4,7 +4,7 @@
 package config
 
 import (
-	"fmt" // Added for fmt.Errorf
+	"fmt"
 )
 
 // LLMProvider LLM Provider 配置
@@ -55,7 +55,7 @@ func UpdateLLMProvider(idOrName string, provider *LLMProvider) error {
 			// 检查新名称是否与其他 Provider 冲突（除了自己）
 			for j, other := range config.LLMProviders {
 				if i != j && other.Name == provider.Name {
-					return fmt.Errorf("LLM Provider 名称 '%s' 已被其他配置使用", provider.Name)
+					return fmt.Errorf("LLM Provider 名称 '%s' 已存在", provider.Name)
 				}
 			}
 
