@@ -249,7 +249,7 @@ lazitex/
 ├── 🪟 build.bat                  # Windows build script
 │
 ├── 🧠 core/                       # Core logic - the brain of LaziTex
-│   ├── env.go                     # Environment detection, installer interface & install/uninstall logic
+│   ├── latex.go                   # LaTeX manager interface definition, environment detection & wrapper functions
 │   ├── build.go                   # Build workflow with Strategy Pattern (cross-platform, adaptive multi-pass)
 │   ├── watcher.go                 # File watching for live preview
 │   ├── ollama.go                  # Ollama manager interface definition and wrapper functions
@@ -315,18 +315,22 @@ lazitex/
 │       └── 📦 package.json        # Dependencies
 │
 ├── 🎯 target/                     # Platform-specific implementations
-│   ├── 🪟 win/                    # Windows-specific detection
+│   ├── 🪟 win/                    # Windows platform
 │   │   ├── checker.go             # Detects TeX Live & MiKTeX on Windows
+│   │   ├── installer.go           # Windows LaTeX installer (In Development)
+│   │   ├── latex.go               # Windows LaTeX manager (unified interface)
 │   │   ├── ollama.go              # Windows Ollama manager (✅ Implemented)
 │   │   └── builder.go             # Windows compilation logic (Coming Soon)
-│   ├── 🐧 linux/                  # Linux-specific detection
+│   ├── 🐧 linux/                  # Linux platform
 │   │   ├── checker.go             # Detects distro-specific TeX installations
-│   │   ├── installer.go           # Linux installer (In Development)
+│   │   ├── installer.go           # Linux LaTeX installer (In Development)
+│   │   ├── latex.go               # Linux LaTeX manager (unified interface)
 │   │   ├── ollama.go              # Linux Ollama manager (✅ Implemented)
 │   │   └── builder.go             # Linux compilation logic (Coming Soon)
-│   └── 🍏 mac/                    # macOS-specific detection
+│   └── 🍏 mac/                    # macOS platform
 │       ├── checker.go              # Detects MacTeX, Homebrew, MacPorts
-│       ├── installer.go           # macOS installer (✅ Implemented)
+│       ├── installer.go           # macOS LaTeX installer (✅ Implemented)
+│       ├── latex.go               # macOS LaTeX manager (unified interface)
 │       └── builder.go             # macOS build & preview logic (✅ Implemented)
 │
 ├── 💻 cmd/                       # Command-line interface
@@ -360,6 +364,8 @@ lazitex/
 - **Automatic Package Detection & Installation** - Intelligently extracts missing package names from compilation errors and automatically installs them via tlmgr/mpm, delivering true zero-configuration compilation experience
 
 - **Tool Priority System** - 23 LaTeX tools categorized by priority (⭐ Core, 🔹 Important, 🔸 Optional), helping users quickly identify critical tools and optimize installation recommendations
+
+- **Unified Management Architecture** - Consistent architecture pattern for LaTeX and Ollama management: unified manager interface (LaTeXManager/OllamaManager) with platform-specific implementations, following the same flow from command parsing to task execution to core logic to platform implementation
 
 - **Modular AI Architecture** - Clean separation of AI agents, LLM providers, and tools with extensible registry system for seamless integration
 

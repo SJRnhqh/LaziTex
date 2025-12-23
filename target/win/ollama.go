@@ -1,4 +1,5 @@
 // target/win/ollama.go
+// Windows 平台特定 Ollama 管理器实现
 
 package win
 

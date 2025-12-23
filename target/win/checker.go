@@ -1,13 +1,16 @@
 // target/win/checker.go
+// Windows 平台特定 LaTeX 检查器实现
 
 package win
 
 import (
+	// 外部包
 	"os"
 	"path/filepath"
 	"strings"
 
-	"github.com/SJRnhqh/lazitex/core"
+	// 内部包
+	core "github.com/SJRnhqh/lazitex/core"
 )
 
 // Checker Windows 平台检查器

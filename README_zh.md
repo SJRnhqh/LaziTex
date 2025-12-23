@@ -249,7 +249,7 @@ lazitex/
 ├── 🪟 build.bat                   # Windows 一键编译脚本
 │
 ├── 🧠 core/                       # 核心逻辑 - LaziTex 的大脑
-│   ├── env.go                     # 环境检测、安装器接口定义及安装/卸载逻辑
+│   ├── latex.go                    # LaTeX 管理器接口定义、环境检测及包装函数
 │   ├── build.go                    # 跨平台编译工作流（策略模式，自适应多轮编译）
 │   ├── watcher.go                  # 文件监听（实时预览）
 │   ├── ollama.go                   # Ollama 管理器接口定义和包装函数
@@ -317,16 +317,20 @@ lazitex/
 ├── 🎯 target/                     # 平台特定实现
 │   ├── 🪟 win/                    # Windows 平台
 │   │   ├── checker.go             # 检测 Windows 上的 TeX Live 和 MiKTeX
+│   │   ├── installer.go           # Windows LaTeX 安装器（开发中）
+│   │   ├── latex.go               # Windows LaTeX 管理器（统一接口）
 │   │   ├── ollama.go              # Windows Ollama 管理器（✅ 已实现）
 │   │   └── builder.go             # Windows 编译逻辑（即将推出）
 │   ├── 🐧 linux/                  # Linux 平台
 │   │   ├── checker.go             # 检测各发行版的 TeX 安装
-│   │   ├── installer.go           # Linux 安装器（开发中）
+│   │   ├── installer.go           # Linux LaTeX 安装器（开发中）
+│   │   ├── latex.go               # Linux LaTeX 管理器（统一接口）
 │   │   ├── ollama.go              # Linux Ollama 管理器（✅ 已实现）
 │   │   └── builder.go             # Linux 编译逻辑（即将推出）
 │   └── 🍏 mac/                    # macOS 平台
 │       ├── checker.go              # 检测 MacTeX、Homebrew、MacPorts
-│       ├── installer.go            # macOS 安装器（✅ 已实现）
+│       ├── installer.go            # macOS LaTeX 安装器（✅ 已实现）
+│       ├── latex.go                # macOS LaTeX 管理器（统一接口）
 │       └── builder.go             # macOS 编译与预览逻辑（✅ 已实现）
 │
 ├── 💻 cmd/                       # 命令行界面
@@ -360,6 +364,8 @@ lazitex/
 - **自动包检测与安装** - 从编译错误中智能提取缺失的包名，自动通过 tlmgr/mpm 安装，实现真正的零配置编译体验
 
 - **工具优先级系统** - 23 个 LaTeX 工具按优先级分类（⭐ 核心、🔹 重要、🔸 可选），帮助用户快速识别关键工具，优化安装建议
+
+- **统一管理架构** - LaTeX 和 Ollama 管理采用一致的架构模式：统一管理器接口（LaTeXManager/OllamaManager）配合平台特定实现，遵循相同的调用流程：命令解析 → 任务执行 → 核心逻辑 → 平台实现
 
 - **模块化 AI 架构** - AI 智能体、LLM 提供商和工具的清晰分离，采用可扩展的注册系统实现无缝集成
 

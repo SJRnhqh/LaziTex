@@ -1,5 +1,5 @@
 // cmd/lazitex-cli/tasks/latex.go
-// LaTeX环境相关业务管理
+// LaTeX 管理编排任务
 
 package tasks
 
@@ -16,50 +16,43 @@ import (
 	win "github.com/SJRnhqh/lazitex/target/win"
 )
 
+// getLaTeXManager 根据当前平台创建对应的 LaTeX Manager
+func getLaTeXManager() (core.LaTeXManager, error) {
+	switch runtime.GOOS {
+	case "linux":
+		return linux.NewLaTeXManager(), nil
+	case "darwin":
+		return mac.NewLaTeXManager(), nil
+	case "windows":
+		return win.NewLaTeXManager(), nil
+	default:
+		return nil, fmt.Errorf(lang.T("msg.unsupported_os"), runtime.GOOS)
+	}
+}
+
 // CheckLaTeX 检查 LaTeX 环境
 func CheckLaTeX() {
-	// 根据平台创建对应的检查器
-	var checker core.EnvironmentChecker
-
-	switch runtime.GOOS {
-	case "windows":
-		checker = win.NewChecker()
-	case "linux":
-		checker = linux.NewChecker()
-	case "darwin":
-		checker = mac.NewChecker()
-	default:
-		// 不支持的平台，使用一个简单的错误提示
-		fmt.Printf(lang.T("msg.unsupported_os")+"\n", runtime.GOOS)
+	manager, err := getLaTeXManager()
+	if err != nil {
+		fmt.Println(err)
 		return
 	}
 
 	// 执行检测
-	env := core.CheckLaTeXEnvironment(checker)
+	env := core.CheckLaTeXEnvironment(manager)
 	env.PrintEnvironment()
 }
 
 // InstallLaTeX 安装 LaTeX 环境
 func InstallLaTeX() {
-	// 根据平台创建对应的安装器
-	var installer core.EnvironmentInstaller
-
-	switch runtime.GOOS {
-	case "windows":
-		// TODO: 后续实现 Windows 安装器
-		fmt.Printf(lang.T("msg.unsupported_os")+"\n", runtime.GOOS)
-		return
-	case "linux":
-		installer = linux.NewInstaller()
-	case "darwin":
-		installer = mac.NewInstaller()
-	default:
-		fmt.Printf(lang.T("msg.unsupported_os")+"\n", runtime.GOOS)
+	manager, err := getLaTeXManager()
+	if err != nil {
+		fmt.Println(err)
 		return
 	}
 
 	// 执行安装
-	if err := core.InstallLaTeXEnvironment(installer); err != nil {
+	if err := core.InstallLaTeXEnvironment(manager); err != nil {
 		fmt.Printf(lang.T("msg.install_failed")+": %v\n", err)
 		return
 	}
@@ -68,25 +61,14 @@ func InstallLaTeX() {
 
 // UninstallLaTeX 卸载 LaTeX 环境
 func UninstallLaTeX() {
-	// 根据平台创建对应的安装器
-	var installer core.EnvironmentInstaller
-
-	switch runtime.GOOS {
-	case "windows":
-		// TODO: 后续实现 Windows 安装器
-		fmt.Printf(lang.T("msg.unsupported_os")+"\n", runtime.GOOS)
-		return
-	case "linux":
-		installer = linux.NewInstaller()
-	case "darwin":
-		installer = mac.NewInstaller()
-	default:
-		fmt.Printf(lang.T("msg.unsupported_os")+"\n", runtime.GOOS)
+	manager, err := getLaTeXManager()
+	if err != nil {
+		fmt.Println(err)
 		return
 	}
 
 	// 执行卸载
-	if err := core.UninstallLaTeXEnvironment(installer); err != nil {
+	if err := core.UninstallLaTeXEnvironment(manager); err != nil {
 		fmt.Printf(lang.T("msg.uninstall_failed")+": %v\n", err)
 		return
 	}

@@ -1,4 +1,4 @@
-// core/environment.go
+// core/latex.go
 // 核心业务：安装、卸载、检查LaTeX编译环境
 
 package core
@@ -19,6 +19,22 @@ import (
 	// 内部包
 	lang "github.com/SJRnhqh/lazitex/lang"
 )
+
+// LaTeXManager 定义 LaTeX 管理器接口 TODO：以后重构优化简化代码逻辑
+// 各平台需要实现此接口以提供平台特定的 LaTeX 管理功能
+// 统一了 EnvironmentChecker 和 EnvironmentInstaller 的功能
+type LaTeXManager interface {
+	// EnvironmentChecker 方法
+	GetPlatformName() string
+	GetSearchPaths() []string
+	DetectDistribution(tools map[string]CompilerInfo) string
+	GetInstallGuide() string
+	PostCheck(env *LaTeXEnvironment)
+
+	// EnvironmentInstaller 方法
+	Install() error
+	Uninstall() error
+}
 
 // ToolCategory 工具分类
 type ToolCategory int
