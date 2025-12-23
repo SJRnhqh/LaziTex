@@ -97,8 +97,7 @@ go build -o lazitex ./cmd/lazitex-cli
 ## 🚀 快速开始
 
 | 命令 | 说明 | 示例 |
-|------|------|------|
-
+| ------ | ------ | ------ |
 | `-h, --help` | 显示此帮助 | `lazitex -h` |
 | `-v, --version` | 显示版本号 | `lazitex -v` |
 | `-r, --repl` | 启动 REPL 模式 | `lazitex -r` |
@@ -131,9 +130,7 @@ lazitex --lang en --check  # 本次命令使用英文
 #### 方式二：配置文件
 
 | 平台 | 配置文件位置 |
-
-|------|------------|
-
+| ------ | ------------ |
 | Windows | `%APPDATA%\lazitex\config.json` |
 | Linux | `~/.config/lazitex/config.json` |
 | macOS | `~/Library/Application Support/lazitex/config.json` |
@@ -150,17 +147,13 @@ lazitex --lang en --check  # 本次命令使用英文
 
 ### LaTeX 环境管理
 
-跨平台 LaTeX 环境管理，支持自动平台检测。
-
-- **Windows**：检测 TeX Live 和 MiKTeX，支持自动预览（优先 SumatraPDF）
-- **Linux**：自动识别发行版，提供针对性的安装指南
-- **macOS**：支持 MacTeX、Homebrew、MacPorts，支持自动安装/更新/卸载（Intel 和 Apple Silicon）
+跨平台 LaTeX 环境管理，支持自动检测、安装和卸载。
 
 ```bash
 # CLI 模式
-$ lazitex -x -c        # 检查 LaTeX 环境
-$ lazitex -x -i        # 安装 LaTeX 环境
-$ lazitex -x -u        # 卸载 LaTeX 环境
+$ lazitex -x -c        # 检查
+$ lazitex -x -i        # 安装
+$ lazitex -x -u        # 卸载
 
 # REPL 模式
 lazitex> latex -c      # 检查
@@ -170,11 +163,7 @@ lazitex> latex -u      # 卸载
 
 ### Ollama 管理
 
-一键检查、安装、卸载 Ollama（Windows、Linux & macOS）。
-
-- **Windows**：通过 winget 包管理器安装
-- **Linux**：支持多种包管理器（apt、yum、dnf、pacman、zypper、snap）或官方脚本
-- **macOS**：支持 Homebrew 或官方脚本安装
+跨平台 Ollama 管理，支持检查、安装和卸载。
 
 ```bash
 # CLI 模式
@@ -186,66 +175,6 @@ $ lazitex -o -u        # 卸载
 lazitex> ollama -c     # 检查
 lazitex> ollama -i     # 安装
 lazitex> ollama -u     # 卸载
-```
-
-### LLM 管理
-
-智能 LLM 提供商管理，支持自动注册和链接。目前默认支持 Ollama 作为提供商。
-
-- **智能模式**：自动注册并链接不存在的 LLM
-- **显式模式**：手动添加/链接/列出/测试/删除操作
-- **配置持久化**：提供商设置和当前 LLM 跟踪
-
-```bash
-# CLI 模式
-$ lazitex -m list                    # 列出所有已注册的 LLM
-$ lazitex -m add llama3.2           # 添加新的 LLM 提供商
-$ lazitex -m link llama3.2          # 链接到现有 LLM
-$ lazitex -m test llama3.2          # 测试 LLM 可用性
-$ lazitex -m remove llama3.2        # 删除 LLM 提供商
-
-# REPL 模式
-lazitex> llm list                   # 列出所有 LLM
-lazitex> llm add llama3.2           # 添加 LLM
-lazitex> llm link llama3.2          # 链接 LLM
-lazitex> llm test llama3.2          # 测试 LLM
-lazitex> llm remove llama3.2        # 删除 LLM
-```
-
-### 配置管理
-
-跨平台配置文件管理，支持自动路径检测。
-
-| 平台 | 配置文件位置 |
-
-|------|------------|
-
-| Windows | `%APPDATA%\lazitex\config.json` |
-| Linux | `~/.config/lazitex/config.json` |
-| macOS | `~/Library/Application Support/lazitex/config.json` |
-
-```bash
-# 使用系统默认编辑器打开配置文件
-$ lazitex config
-
-# 配置文件结构
-{
-  "language": "zh",
-  "displayMode": "virtual",
-  "llmProviders": [
-    {
-      "id": "llama3.2",
-      "provider": "ollama",
-      "name": "llama3.2",
-      "model": "llama3.2",
-      "enabled": true,
-      "verified": false,
-      "verifiedAt": "",
-      "config": {}
-    }
-  ],
-  "activeLLM": "llama3.2"
-}
 ```
 
 ### 构建与预览
@@ -278,8 +207,7 @@ lazitex> help                         # 显示帮助
 LaziTex 可以检测 **23 个 LaTeX 工具**，涵盖 7 大类别：
 
 | 类别 | 工具 | 数量 |
-|------|------|------|
-
+| ------ | ------ | ------ |
 | 🔨 **编译器** | pdflatex, xelatex, lualatex, latex, pdftex, tex, etex | 7 |
 | 📚 **文献管理** | bibtex, biber | 2 |
 | 📇 **索引工具** | makeindex, xindy, texindy | 3 |
@@ -326,6 +254,7 @@ lazitex/
 │   ├── watcher.go                  # 文件监听（实时预览）
 │   ├── ollama.go                   # Ollama 管理器接口定义和包装函数
 │   ├── 🚨 errors/                 # 编译错误处理模块
+│   │   ├── formatter.go            # 错误信息提取和格式化
 │   │   ├── package.go              # 自动包检测与安装
 │   │   └── passes.go               # 自适应多轮编译检测
 │   ├── ⚡ performance/             # 编译性能优化模块
@@ -365,7 +294,8 @@ lazitex/
 │       │   │   ├── sse.js         # SSE 相关 API（实时推送）
 │       │   │   └── config.js      # 配置相关 API（应用模式）
 │       │   ├── utils/             # 工具函数 - 纯函数工具库
-│       │   │   └── pdf.js         # PDF 工具函数（解析、缩放、清理、错误格式化）
+│       │   │   ├── pdf.js         # PDF 工具函数（解析、缩放、清理、错误格式化）
+│       │   │   └── pdfDisplay.js  # PDF 显示管理（虚拟滚动、分页导航、配置管理）
 │       │   ├── components/        # Vue 组件
 │       │   │   ├── DynamicPDFViewer.vue  # PDF 预览组件
 │       │   │   └── ModeSwitcher.vue      # 模式切换组件
@@ -387,7 +317,6 @@ lazitex/
 ├── 🎯 target/                     # 平台特定实现
 │   ├── 🪟 win/                    # Windows 平台
 │   │   ├── checker.go             # 检测 Windows 上的 TeX Live 和 MiKTeX
-│   │   ├── installer.go           # Windows 安装器（开发中）
 │   │   ├── ollama.go              # Windows Ollama 管理器（✅ 已实现）
 │   │   └── builder.go             # Windows 编译逻辑（即将推出）
 │   ├── 🐧 linux/                  # Linux 平台
@@ -404,7 +333,6 @@ lazitex/
 │   └── 🚀 lazitex-cli/
 │       ├── main.go                # CLI 入口：解析命令并路由到不同模式
 │       ├── 📋 tasks/              # 任务执行层（统一管理命令执行逻辑）
-│       │   ├── env.go             # 环境操作（检查、安装、卸载）
 │       │   ├── build.go           # 构建功能
 │       │   ├── preview.go         # 实时预览功能
 │       │   ├── ollama.go          # Ollama 管理功能
@@ -443,33 +371,25 @@ lazitex/
 
 ### 已完成 ✅
 
-- [x] **跨平台环境检测** - Windows、Linux、macOS 环境检测
-- [x] **macOS 环境管理** - 自动安装/更新/卸载
-- [x] **REPL 交互模式** - 历史记录、Tab 补全、全语言国际化
-- [x] **编译系统** - 一键编译、智能预览、自动包检测与安装、自适应多轮编译
-- [x] **Web 预览与前端** - Vue 3 前端、SSE 实时刷新、双模式架构
-- [x] **PDF 虚拟滚动** - 多页 PDF 虚拟滚动预览，提升大文档浏览性能
-- [x] **Ollama 管理** - 一键检查、安装、卸载 Ollama（Windows、Linux & macOS）
-- [x] **Vue 前端生产构建** - 通过构建脚本实现单一二进制部署
-- [x] **AI 架构实现** - LLM 和 Agent 模块化架构
-- [x] **LLM 管理系统** - 智能 LLM 提供商管理和配置
+- [x] **跨平台环境检测与管理** - Windows、Linux、macOS 环境检测，macOS 自动安装/更新/卸载
+- [x] **编译系统** - 一键编译、智能预览、自动包检测与安装、自适应多轮编译、性能优化
+- [x] **Web 预览前端** - Vue 3 前端、SSE 实时刷新、PDF 虚拟滚动、双模式架构
+- [x] **Ollama 管理** - 跨平台检查、安装、卸载
+- [x] **AI 架构** - LLM 和 Agent 模块化架构、智能提供商管理
+- [x] **交互模式** - REPL 交互模式（历史记录、Tab 补全、国际化）
 
 ### 进行中 🚧
 
 - [ ] **实时预览优化** - 错误反馈增强
-- [x] **编译性能优化** - 并发执行、任务抢占、超时控制
 - [ ] **Linux 环境管理** - 自动安装/更新/卸载
-- [ ] **PDF 预览增强** - 分页导航、页面跳转、缩放控制
+- [ ] **PDF 预览增强** - 分页导航、缩放控制
 
 ### 计划中 📋
 
-- [ ] **AI Agent 环境管理** - 多 Agent 创建、切换和配置，类似 conda 环境管理
-- [ ] **AI 集成（CLI 内部）** - 编译错误诊断、代码生成与优化、智能补全
-- [ ] **Web 工作区增强** - 文件管理、代码编辑器、终端集成、AI 聊天界面
-- [ ] **项目功能增强** - 项目初始化、多文档支持、自定义编译配置、多人协作
-- [ ] **TUI 完善** - 终端界面功能增强、交互优化
-- [ ] **平台支持扩展** - Windows 环境管理、GUI 图形界面
-- [ ] **AI 原生创作流** - Prompt2PDF、多智能体协同、云端生态
+- [ ] **AI 集成** - CLI 内部错误诊断、代码生成、智能补全
+- [ ] **Web 工作区** - 文件管理、代码编辑器、终端集成、AI 聊天
+- [ ] **项目功能** - 项目初始化、多文档支持、自定义配置
+- [ ] **平台扩展** - Windows 环境管理、TUI 完善、GUI 支持
 
 ---
 

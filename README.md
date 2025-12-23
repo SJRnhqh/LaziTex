@@ -97,8 +97,7 @@ Download pre-built binaries from [Releases](https://github.com/SJRnhqh/lazitex/r
 ## 🚀 Quick Start
 
 | Command | Description | Example |
-|---------|-------------|---------|
-
+| --------- | ------------- | --------- |
 | `-h, --help` | Show this help | `lazitex -h` |
 | `-v, --version` | Show version | `lazitex -v` |
 | `-r, --repl` | Start REPL mode | `lazitex -r` |
@@ -131,9 +130,7 @@ Language preference is automatically saved when using `-l` or `--lang` parameter
 #### Method 2: Configuration File
 
 | Platform | Config Location |
-
-|----------|----------------|
-
+| ---------- | ---------------- |
 | Windows | `%APPDATA%\lazitex\config.json` |
 | Linux | `~/.config/lazitex/config.json` |
 | macOS | `~/Library/Application Support/lazitex/config.json` |
@@ -150,17 +147,13 @@ Edit the config file directly or use `--lang` parameter to update automatically.
 
 ### LaTeX Environment Management
 
-Cross-platform LaTeX environment management with automatic platform detection.
-
-- **Windows**: Environment detection and auto-preview support (prioritizes SumatraPDF)
-- **Linux**: Auto-identifies distributions with distro-specific installation guidance
-- **macOS**: Supports MacTeX, Homebrew, MacPorts with auto install/update/uninstall (Intel and Apple Silicon)
+Cross-platform LaTeX environment management with automatic detection, installation, and uninstallation.
 
 ```bash
 # CLI Mode
-$ lazitex -x -c        # Check LaTeX environment
-$ lazitex -x -i        # Install LaTeX environment
-$ lazitex -x -u        # Uninstall LaTeX environment
+$ lazitex -x -c        # Check
+$ lazitex -x -i        # Install
+$ lazitex -x -u        # Uninstall
 
 # REPL Mode
 lazitex> latex -c      # Check
@@ -170,11 +163,7 @@ lazitex> latex -u      # Uninstall
 
 ### Ollama Management
 
-One-click check, install, and uninstall Ollama (Windows, Linux & macOS).
-
-- **Windows**: Uses winget package manager
-- **Linux**: Supports multiple package managers (apt, yum, dnf, pacman, zypper, snap) or official script
-- **macOS**: Supports Homebrew or official script
+Cross-platform Ollama management with check, install, and uninstall support.
 
 ```bash
 # CLI Mode
@@ -186,66 +175,6 @@ $ lazitex -o -u        # Uninstall
 lazitex> ollama -c     # Check
 lazitex> ollama -i     # Install
 lazitex> ollama -u     # Uninstall
-```
-
-### LLM Management
-
-Intelligent LLM provider management with smart registration and linking. Currently supports Ollama as the default provider.
-
-- **Smart Mode**: Auto-register and link LLM if not exists
-- **Explicit Mode**: Manual add/link/list/test/remove operations
-- **Configuration**: Persistent provider settings and active LLM tracking
-
-```bash
-# CLI Mode
-$ lazitex -m list                    # List all registered LLMs
-$ lazitex -m add llama3.2           # Add a new LLM provider
-$ lazitex -m link llama3.2          # Link to existing LLM
-$ lazitex -m test llama3.2          # Test LLM availability
-$ lazitex -m remove llama3.2        # Remove LLM provider
-
-# REPL Mode
-lazitex> llm list                   # List all LLMs
-lazitex> llm add llama3.2           # Add LLM
-lazitex> llm link llama3.2          # Link LLM
-lazitex> llm test llama3.2          # Test LLM
-lazitex> llm remove llama3.2        # Remove LLM
-```
-
-### Configuration Management
-
-Cross-platform configuration file management with automatic path detection.
-
-| Platform | Config Location |
-
-|----------|----------------|
-
-| Windows | `%APPDATA%\lazitex\config.json` |
-| Linux | `~/.config/lazitex/config.json` |
-| macOS | `~/Library/Application Support/lazitex/config.json` |
-
-```bash
-# Open configuration file with system default editor
-$ lazitex config
-
-# Configuration file structure
-{
-  "language": "zh",
-  "displayMode": "virtual",
-  "llmProviders": [
-    {
-      "id": "llama3.2",
-      "provider": "ollama",
-      "name": "llama3.2",
-      "model": "llama3.2",
-      "enabled": true,
-      "verified": false,
-      "verifiedAt": "",
-      "config": {}
-    }
-  ],
-  "activeLLM": "llama3.2"
-}
 ```
 
 ### Build & Preview
@@ -278,9 +207,7 @@ lazitex> help                         # Show help
 LaziTex can detect **23 LaTeX tools** across 7 categories:
 
 | Category | Tools | Count |
-
-|----------|-------|-------|
-
+| ---------- | ------- | ------- |
 | 🔨 **Compilers** | pdflatex, xelatex, lualatex, latex, pdftex, tex, etex | 7 |
 | 📚 **Bibliography** | bibtex, biber | 2 |
 | 📇 **Indexing** | makeindex, xindy, texindy | 3 |
@@ -327,6 +254,7 @@ lazitex/
 │   ├── watcher.go                 # File watching for live preview
 │   ├── ollama.go                  # Ollama manager interface definition and wrapper functions
 │   ├── 🚨 errors/                 # Compilation error handling module
+│   │   ├── formatter.go           # Error extraction and formatting
 │   │   ├── package.go             # Auto package detection & installation
 │   │   └── passes.go              # Adaptive multi-pass compilation detection
 │   ├── ⚡ performance/             # Compilation performance optimization module
@@ -366,7 +294,8 @@ lazitex/
 │       │   │   ├── sse.js         # SSE-related APIs (real-time push)
 │       │   │   └── config.js      # Config-related APIs (application mode)
 │       │   ├── utils/             # Utility functions - pure function library
-│       │   │   └── pdf.js         # PDF utility functions (parse, scale, cleanup, error formatting)
+│       │   │   ├── pdf.js         # PDF utility functions (parse, scale, cleanup, error formatting)
+│       │   │   └── pdfDisplay.js  # PDF display management (virtual scroll, pagination, config)
 │       │   ├── components/        # Vue components
 │       │   │   ├── DynamicPDFViewer.vue  # PDF preview component
 │       │   │   └── ModeSwitcher.vue      # Mode switching component
@@ -388,7 +317,6 @@ lazitex/
 ├── 🎯 target/                     # Platform-specific implementations
 │   ├── 🪟 win/                    # Windows-specific detection
 │   │   ├── checker.go             # Detects TeX Live & MiKTeX on Windows
-│   │   ├── installer.go           # Windows installer (In Development)
 │   │   ├── ollama.go              # Windows Ollama manager (✅ Implemented)
 │   │   └── builder.go             # Windows compilation logic (Coming Soon)
 │   ├── 🐧 linux/                  # Linux-specific detection
@@ -405,7 +333,6 @@ lazitex/
 │   └── 🚀 lazitex-cli/
 │       ├── main.go                # CLI entry point: parses commands and routes to modes
 │       ├── 📋 tasks/              # Task execution layer (unified command execution logic)
-│       │   ├── env.go             # Environment operations (check, install, uninstall)
 │       │   ├── build.go           # Build functionality
 │       │   ├── preview.go         # Live preview functionality
 │       │   ├── ollama.go          # Ollama management functionality
@@ -444,33 +371,25 @@ lazitex/
 
 ### Completed ✅
 
-- [x] **Cross-Platform Environment Detection** - Windows, Linux, macOS environment detection
-- [x] **macOS Environment Management** - Auto install/update/uninstall
-- [x] **REPL Interactive Mode** - Command history, Tab completion, full i18n support
-- [x] **Build System** - One-click compilation, smart preview, auto package detection & installation, adaptive multi-pass compilation
-- [x] **Web Preview & Frontend** - Vue 3 frontend, SSE real-time refresh, dual-mode architecture
-- [x] **PDF Virtual Scrolling** - Multi-page PDF virtual scrolling preview, improved performance for large documents
-- [x] **Ollama Management** - One-click check, install, and uninstall Ollama (Windows, Linux & macOS)
-- [x] **Vue Frontend Production Build** - Single binary deployment via build script
-- [x] **AI Architecture Implementation** - Modular architecture for LLM and Agent management
-- [x] **LLM Management System** - Intelligent LLM provider management and configuration
+- [x] **Cross-Platform Environment Detection & Management** - Windows, Linux, macOS detection, macOS auto install/update/uninstall
+- [x] **Build System** - One-click compilation, smart preview, auto package detection & installation, adaptive multi-pass compilation, performance optimization
+- [x] **Web Preview Frontend** - Vue 3 frontend, SSE real-time refresh, PDF virtual scrolling, dual-mode architecture
+- [x] **Ollama Management** - Cross-platform check, install, and uninstall
+- [x] **AI Architecture** - Modular architecture for LLM and Agent, intelligent provider management
+- [x] **Interactive Modes** - REPL mode with command history, Tab completion, i18n support
 
 ### In Progress 🚧
 
 - [ ] **Live Preview Optimization** - Enhanced error feedback
-- [x] **Compilation Performance Optimization** - Concurrent execution, task preemption, timeout control
 - [ ] **Linux Environment Management** - Auto install/update/uninstall
-- [ ] **PDF Preview Enhancement** - Pagination mode, page navigation, zoom controls
+- [ ] **PDF Preview Enhancement** - Pagination navigation, zoom controls
 
 ### Planned 📋
 
-- [ ] **AI Agent Environment Management** - Multi-agent creation, switching, and configuration, similar to conda environment management
-- [ ] **AI Integration (CLI Internal)** - Compilation error diagnosis, code generation & optimization, smart completion
-- [ ] **Web Workspace Enhancement** - File management, code editor, terminal integration, AI chat interface
-- [ ] **Project Feature Enhancement** - Project initialization, multi-document support, custom compilation profiles, collaborative editing
-- [ ] **TUI Enhancement** - Terminal UI feature enhancement and interaction optimization
-- [ ] **Platform Support Extension** - Windows environment management, modern GUI support
-- [ ] **AI-Native Authoring Flow** - Prompt2PDF, multi-agent collaboration, cloud ecosystem
+- [ ] **AI Integration** - CLI internal error diagnosis, code generation, smart completion
+- [ ] **Web Workspace** - File management, code editor, terminal integration, AI chat
+- [ ] **Project Features** - Project initialization, multi-document support, custom configurations
+- [ ] **Platform Extension** - Windows environment management, TUI enhancement, GUI support
 
 ---
 
