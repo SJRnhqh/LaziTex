@@ -23,7 +23,9 @@ Instant LaTeX compilation across platforms — powered by Go with local AI to he
 - 📦 **Auto Package Management** - Automatically detects and installs missing packages
 - 🌐 **Web Preview Mode** - Web real-time preview
 - 🦙 **Ollama Management** - One-click Ollama management
-- 🧠 **AI-Powered** (Coming Soon) - Local AI assistant
+- 🤖 **LLM Management** - Intelligent LLM provider management and configuration
+- ⚙️ **Configuration Management** - Cross-platform configuration file management
+- 🧠 **AI Architecture** - Modular AI agent and tool system (Coming Soon)
 - 🎨 **Multiple Modes** - Supports TUI and REPL modes
 
 ---
@@ -96,16 +98,17 @@ Download pre-built binaries from [Releases](https://github.com/SJRnhqh/lazitex/r
 
 | Command | Description | Example |
 |---------|-------------|---------|
+
 | `-h, --help` | Show this help | `lazitex -h` |
 | `-v, --version` | Show version | `lazitex -v` |
-| `-c, --check` | Check LaTeX environment | `lazitex -c` |
 | `-r, --repl` | Start REPL mode | `lazitex -r` |
 | `-t, --tui` | Start terminal UI | `lazitex -t` |
-| `-i, --install` | Install or update LaTeX environment | `lazitex -i` |
-| `-u, --uninstall` | Uninstall LaTeX environment | `lazitex -u` |
+| `-x, --latex` | LaTeX environment management (use `-c/-i/-u` flags) | `lazitex -x -c` |
 | `-o, --ollama` | Ollama management (use `-c/-i/-u` flags) | `lazitex -o -c` |
 | `-b, --build` | Build LaTeX document (supports `-o` output, `-s` show, `-q` quiet, `-t` tidy) | `lazitex -b main.tex [-o out/] [-s] [-q] [-t]` |
 | `-p, --preview` | Live preview PDF (supports `-q` quiet mode, `-t` tidy mode, `:port` custom port) | `lazitex -p main.tex [-q] [-t] [:port]` |
+| `-m, --llm` | LLM management (add/link/list/test/remove) | `lazitex -m list` or `lazitex -m add llama3.2` |
+| `config` | Open configuration file | `lazitex config` |
 | `-l, --lang` | Set language (zh/en) | `lazitex -l zh` |
 
 ---
@@ -128,7 +131,9 @@ Language preference is automatically saved when using `-l` or `--lang` parameter
 #### Method 2: Configuration File
 
 | Platform | Config Location |
+
 |----------|----------------|
+
 | Windows | `%APPDATA%\lazitex\config.json` |
 | Linux | `~/.config/lazitex/config.json` |
 | macOS | `~/Library/Application Support/lazitex/config.json` |
@@ -142,6 +147,26 @@ Example config file:
 ```
 
 Edit the config file directly or use `--lang` parameter to update automatically.
+
+### LaTeX Environment Management
+
+Cross-platform LaTeX environment management with automatic platform detection.
+
+- **Windows**: Environment detection and auto-preview support (prioritizes SumatraPDF)
+- **Linux**: Auto-identifies distributions with distro-specific installation guidance
+- **macOS**: Supports MacTeX, Homebrew, MacPorts with auto install/update/uninstall (Intel and Apple Silicon)
+
+```bash
+# CLI Mode
+$ lazitex -x -c        # Check LaTeX environment
+$ lazitex -x -i        # Install LaTeX environment
+$ lazitex -x -u        # Uninstall LaTeX environment
+
+# REPL Mode
+lazitex> latex -c      # Check
+lazitex> latex -i      # Install
+lazitex> latex -u      # Uninstall
+```
 
 ### Ollama Management
 
@@ -161,6 +186,66 @@ $ lazitex -o -u        # Uninstall
 lazitex> ollama -c     # Check
 lazitex> ollama -i     # Install
 lazitex> ollama -u     # Uninstall
+```
+
+### LLM Management
+
+Intelligent LLM provider management with smart registration and linking. Currently supports Ollama as the default provider.
+
+- **Smart Mode**: Auto-register and link LLM if not exists
+- **Explicit Mode**: Manual add/link/list/test/remove operations
+- **Configuration**: Persistent provider settings and active LLM tracking
+
+```bash
+# CLI Mode
+$ lazitex -m list                    # List all registered LLMs
+$ lazitex -m add llama3.2           # Add a new LLM provider
+$ lazitex -m link llama3.2          # Link to existing LLM
+$ lazitex -m test llama3.2          # Test LLM availability
+$ lazitex -m remove llama3.2        # Remove LLM provider
+
+# REPL Mode
+lazitex> llm list                   # List all LLMs
+lazitex> llm add llama3.2           # Add LLM
+lazitex> llm link llama3.2          # Link LLM
+lazitex> llm test llama3.2          # Test LLM
+lazitex> llm remove llama3.2        # Remove LLM
+```
+
+### Configuration Management
+
+Cross-platform configuration file management with automatic path detection.
+
+| Platform | Config Location |
+
+|----------|----------------|
+
+| Windows | `%APPDATA%\lazitex\config.json` |
+| Linux | `~/.config/lazitex/config.json` |
+| macOS | `~/Library/Application Support/lazitex/config.json` |
+
+```bash
+# Open configuration file with system default editor
+$ lazitex config
+
+# Configuration file structure
+{
+  "language": "zh",
+  "displayMode": "virtual",
+  "llmProviders": [
+    {
+      "id": "llama3.2",
+      "provider": "ollama",
+      "name": "llama3.2",
+      "model": "llama3.2",
+      "enabled": true,
+      "verified": false,
+      "verifiedAt": "",
+      "config": {}
+    }
+  ],
+  "activeLLM": "llama3.2"
+}
 ```
 
 ### Build & Preview
@@ -193,7 +278,9 @@ lazitex> help                         # Show help
 LaziTex can detect **23 LaTeX tools** across 7 categories:
 
 | Category | Tools | Count |
+
 |----------|-------|-------|
+
 | 🔨 **Compilers** | pdflatex, xelatex, lualatex, latex, pdftex, tex, etex | 7 |
 | 📚 **Bibliography** | bibtex, biber | 2 |
 | 📇 **Indexing** | makeindex, xindy, texindy | 3 |
@@ -242,15 +329,25 @@ lazitex/
 │   ├── 🚨 errors/                 # Compilation error handling module
 │   │   ├── package.go             # Auto package detection & installation
 │   │   └── passes.go              # Adaptive multi-pass compilation detection
-│   └── ⚡ performance/             # Compilation performance optimization module
-│       ├── concurrent.go          # Concurrent optimization (parallel execution of intermediate tools)
-│       └── lock.go                # Compilation lock & task management (task preemption, timeout control)
+│   ├── ⚡ performance/             # Compilation performance optimization module
+│   │   ├── concurrent.go          # Concurrent optimization (parallel execution of intermediate tools)
+│   │   └── lock.go                # Compilation lock & task management (task preemption, timeout control)
+│   └── 🤖 ai/                     # AI architecture module (modular design)
+│       ├── agent/                 # AI agent management
+│       │   └── registry.go        # Agent registration and management
+│       ├── llm/                   # LLM provider abstraction
+│       │   └── registry.go        # LLM provider registration and management
+│       ├── providers/             # LLM provider implementations
+│       │   └── ollama.go          # Ollama provider implementation
+│       └── tools/                 # AI tool system
+│           └── registry.go        # Tool registration and management
 │
 ├── 📚 lang/                       # Internationalization module
 │   └── i18n.go                    # Multi-language support (English/Chinese)
 │
 ├── ⚙️  config/                     # Configuration management
-│   └── config.go                  # User preferences & settings
+│   ├── common.go                  # Application configuration management
+│   └── llm.go                     # LLM provider configuration management
 │
 ├── 🗄️  backend/                    # Web server backend
 │   ├── server.go                  # HTTP server core (with mode configuration)
@@ -312,7 +409,14 @@ lazitex/
 │       │   ├── build.go           # Build functionality
 │       │   ├── preview.go         # Live preview functionality
 │       │   ├── ollama.go          # Ollama management functionality
+│       │   ├── latex.go           # LaTeX environment management
+│       │   ├── llm.go             # LLM management functionality
+│       │   ├── config.go          # Configuration file management
 │       │   └── help.go            # Help information
+│       ├── 🧠 internal/           # Internal command processing (unified action handlers)
+│       │   ├── common.go          # Common utilities and action handlers
+│       │   ├── latex.go           # LaTeX command processing logic
+│       │   └── ollama.go          # Ollama command processing logic
 │       └── 🎨 ui/                 # User interface layer (interaction mode implementation)
 │           ├── tui.go             # Terminal UI mode with Bubble Tea
 │           └── repl.go            # Interactive REPL mode (command parsing, completion, history)
@@ -330,6 +434,10 @@ lazitex/
 
 - **Tool Priority System** - 23 LaTeX tools categorized by priority (⭐ Core, 🔹 Important, 🔸 Optional), helping users quickly identify critical tools and optimize installation recommendations
 
+- **Modular AI Architecture** - Clean separation of AI agents, LLM providers, and tools with extensible registry system for seamless integration
+
+- **Intelligent LLM Management** - Smart provider registration, configuration persistence, and active LLM tracking with cross-platform configuration support
+
 ---
 
 ## 🌟 Roadmap
@@ -344,6 +452,8 @@ lazitex/
 - [x] **PDF Virtual Scrolling** - Multi-page PDF virtual scrolling preview, improved performance for large documents
 - [x] **Ollama Management** - One-click check, install, and uninstall Ollama (Windows, Linux & macOS)
 - [x] **Vue Frontend Production Build** - Single binary deployment via build script
+- [x] **AI Architecture Implementation** - Modular architecture for LLM and Agent management
+- [x] **LLM Management System** - Intelligent LLM provider management and configuration
 
 ### In Progress 🚧
 
@@ -351,7 +461,6 @@ lazitex/
 - [x] **Compilation Performance Optimization** - Concurrent execution, task preemption, timeout control
 - [ ] **Linux Environment Management** - Auto install/update/uninstall
 - [ ] **PDF Preview Enhancement** - Pagination mode, page navigation, zoom controls
-- [ ] **AI Architecture Implementation** - Modular architecture for LLM and Agent management
 
 ### Planned 📋
 

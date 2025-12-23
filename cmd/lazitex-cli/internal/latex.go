@@ -107,27 +107,15 @@ func init() {
 }
 
 // GetLaTeXErrorI18nKey 根据错误消息返回对应的国际化键
-// mode 参数：I18nModeMsg 表示普通模式，I18nModeRepl 表示 REPL 模式
 // 如果错误不是 latex 相关错误，返回空字符串
-func GetLaTeXErrorI18nKey(err error, mode string) string {
+func GetLaTeXErrorI18nKey(err error) string {
 	errorType := getLaTeXErrorType(err)
 	if errorType == "" {
 		return ""
 	}
 
-	// 默认为普通模式
-	if mode == "" {
-		mode = I18nModeMsg
-	}
-
-	// 构建国际化键：{mode}.latex.{errorType}
-	// 使用 strings.Builder 优化（仅在频繁调用时有效）
-	var builder strings.Builder
-	builder.Grow(len(mode) + 6 + len(errorType)) // 预分配容量："msg".latex."err_no_action" ≈ 18
-	builder.WriteString(mode)
-	builder.WriteString(".latex.")
-	builder.WriteString(errorType)
-	return builder.String()
+	// 构建国际化键：latex.{errorType}
+	return "latex." + errorType
 }
 
 // GetSupportedLaTeXFlags 返回所有支持的 latex 命令标志
@@ -225,7 +213,7 @@ func SetLaTeXActionHandlers(handlers map[LaTeXAction]func()) {
 func HandleLaTeXCommand(args []string, mode, usageKey string) bool {
 	action, err := ParseLaTeXArgs(args)
 	if err != nil {
-		if i18nKey := GetLaTeXErrorI18nKey(err, mode); i18nKey != "" {
+		if i18nKey := GetLaTeXErrorI18nKey(err); i18nKey != "" {
 			fmt.Println(lang.T(i18nKey))
 		}
 		fmt.Println(lang.T(usageKey))

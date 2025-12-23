@@ -112,27 +112,15 @@ func init() {
 }
 
 // GetOllamaErrorI18nKey 根据错误消息返回对应的国际化键
-// mode 参数：I18nModeMsg 表示普通模式，I18nModeRepl 表示 REPL 模式
 // 如果错误不是 ollama 相关错误，返回空字符串
-func GetOllamaErrorI18nKey(err error, mode string) string {
+func GetOllamaErrorI18nKey(err error) string {
 	errorType := getOllamaErrorType(err)
 	if errorType == "" {
 		return ""
 	}
 
-	// 默认为普通模式
-	if mode == "" {
-		mode = I18nModeMsg
-	}
-
-	// 构建国际化键：{mode}.ollama.{errorType}
-	// 使用 strings.Builder 优化（仅在频繁调用时有效）
-	var builder strings.Builder
-	builder.Grow(len(mode) + 8 + len(errorType)) // 预分配容量："msg".ollama."err_no_action" ≈ 20
-	builder.WriteString(mode)
-	builder.WriteString(".ollama.")
-	builder.WriteString(errorType)
-	return builder.String()
+	// 构建国际化键：ollama.{errorType}
+	return "ollama." + errorType
 }
 
 // GetSupportedOllamaFlags 返回所有支持的 ollama 命令标志
@@ -230,7 +218,7 @@ func SetOllamaActionHandlers(handlers map[OllamaAction]func()) {
 func HandleOllamaCommand(args []string, mode, usageKey string) bool {
 	action, err := ParseOllamaArgs(args)
 	if err != nil {
-		if i18nKey := GetOllamaErrorI18nKey(err, mode); i18nKey != "" {
+		if i18nKey := GetOllamaErrorI18nKey(err); i18nKey != "" {
 			fmt.Println(lang.T(i18nKey))
 		}
 		fmt.Println(lang.T(usageKey))

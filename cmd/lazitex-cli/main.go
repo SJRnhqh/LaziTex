@@ -47,15 +47,6 @@ func main() {
 	case "-r", "--repl":
 		ui.StartREPL()
 	
-	case "-c", "--check":
-		tasks.CheckLaTeX()
-
-	case "-i", "--install":
-		tasks.InstallLaTeX()
-
-	case "-u", "--uninstall":
-		tasks.UninstallLaTeX()
-	
 	case "-x", "--latex": // LaTeX 管理 TODO: 测试覆盖
 		internal.HandleLaTeXCommand(args[1:], internal.I18nModeMsg, "msg.latex_usage")
 		return

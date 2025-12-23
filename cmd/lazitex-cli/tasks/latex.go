@@ -1,4 +1,4 @@
-// cmd/lazitex-cli/tasks/env.go
+// cmd/lazitex-cli/tasks/latex.go
 // LaTeX环境相关业务管理
 
 package tasks

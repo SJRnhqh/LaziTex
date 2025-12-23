@@ -25,9 +25,8 @@ var replCompleter = readline.NewPrefixCompleter(
 	// 1. 核心命令补全
 	readline.PcItem("help"),
 	readline.PcItem("version"),
-	readline.PcItem("check"),
-	readline.PcItem("install"),
-	readline.PcItem("uninstall"),
+	readline.PcItem("latex"),
+	readline.PcItem("ollama"),
 	readline.PcItem("config"),
 	readline.PcItem("exit"),
 	readline.PcItem("quit"),
@@ -298,20 +297,11 @@ func handleREPLCommand(input string) bool {
 	case "version":
 		fmt.Println("LaziTex v0.0.1")
 
-	case "check":
-		tasks.CheckLaTeX()
-
-	case "install":
-		tasks.InstallLaTeX()
-
-	case "uninstall":
-		tasks.UninstallLaTeX()
-
 	case "latex": // LaTeX 管理 TODO: 测试覆盖
 		internal.HandleLaTeXCommand(parts[1:], internal.I18nModeRepl, "repl.latex_usage")
 		return false
 
-	case "ollama": // Ollama 管理 TODO: 测试覆盖	
+	case "ollama": // Ollama 管理 TODO: 测试覆盖
 		internal.HandleOllamaCommand(parts[1:], internal.I18nModeRepl, "repl.ollama_usage")
 		return false
 
