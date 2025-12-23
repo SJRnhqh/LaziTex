@@ -145,7 +145,11 @@ lazitex --lang en --check  # 本次命令使用英文
 
 ### Ollama 管理
 
-一键检查、安装、卸载 Ollama（Windows & macOS）。Windows 通过 winget 安装，macOS 支持 Homebrew 或官方脚本安装。
+一键检查、安装、卸载 Ollama（Windows、Linux & macOS）。
+
+- **Windows**：通过 winget 包管理器安装
+- **Linux**：支持多种包管理器（apt、yum、dnf、pacman、zypper、snap）或官方脚本
+- **macOS**：支持 Homebrew 或官方脚本安装
 
 ```bash
 # CLI 模式
@@ -213,9 +217,9 @@ LaziTex 可以检测 **23 个 LaTeX 工具**，涵盖 7 大类别：
 
 LaziTex 支持 Windows、Linux 和 macOS 三大平台：
 
-- **Windows**：检测 TeX Live 和 MiKTeX，支持自动预览（优先 SumatraPDF）
-- **Linux**：自动识别发行版，提供针对性的安装指南
-- **macOS**：支持 MacTeX、Homebrew、MacPorts，支持自动安装/更新/卸载（Intel 和 Apple Silicon）
+- **Windows**：检测 TeX Live 和 MiKTeX，支持自动预览（优先 SumatraPDF），通过 winget 管理 Ollama
+- **Linux**：自动识别发行版，提供针对性的安装指南，通过多种包管理器或官方脚本管理 Ollama
+- **macOS**：支持 MacTeX、Homebrew、MacPorts，支持自动安装/更新/卸载（Intel 和 Apple Silicon），通过 Homebrew 或官方脚本管理 Ollama
 
 ---
 
@@ -293,6 +297,7 @@ lazitex/
 │   ├── 🐧 linux/                  # Linux 平台
 │   │   ├── checker.go             # 检测各发行版的 TeX 安装
 │   │   ├── installer.go           # Linux 安装器（开发中）
+│   │   ├── ollama.go              # Linux Ollama 管理器（✅ 已实现）
 │   │   └── builder.go             # Linux 编译逻辑（即将推出）
 │   └── 🍏 mac/                    # macOS 平台
 │       ├── checker.go              # 检测 MacTeX、Homebrew、MacPorts
@@ -337,7 +342,7 @@ lazitex/
 - [x] **编译系统** - 一键编译、智能预览、自动包检测与安装、自适应多轮编译
 - [x] **Web 预览与前端** - Vue 3 前端、SSE 实时刷新、双模式架构
 - [x] **PDF 虚拟滚动** - 多页 PDF 虚拟滚动预览，提升大文档浏览性能
-- [x] **Ollama 管理** - 一键检查、安装、卸载 Ollama
+- [x] **Ollama 管理** - 一键检查、安装、卸载 Ollama（Windows、Linux & macOS）
 - [x] **Vue 前端生产构建** - 通过构建脚本实现单一二进制部署
 
 ### 进行中 🚧

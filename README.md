@@ -145,7 +145,11 @@ Edit the config file directly or use `--lang` parameter to update automatically.
 
 ### Ollama Management
 
-One-click check, install, and uninstall Ollama (Windows & macOS). Windows uses winget, macOS supports Homebrew or official script.
+One-click check, install, and uninstall Ollama (Windows, Linux & macOS). 
+
+- **Windows**: Uses winget package manager
+- **Linux**: Supports multiple package managers (apt, yum, dnf, pacman, zypper, snap) or official script
+- **macOS**: Supports Homebrew or official script
 
 ```bash
 # CLI Mode
@@ -213,9 +217,9 @@ LaziTex can detect **23 LaTeX tools** across 7 categories:
 
 LaziTex supports Windows, Linux, and macOS:
 
-- **Windows**: Detects TeX Live and MiKTeX, supports auto preview (prioritizes SumatraPDF)
-- **Linux**: Auto-identifies distributions, provides distro-specific installation guides
-- **macOS**: Supports MacTeX, Homebrew, MacPorts, supports auto install/update/uninstall (Intel and Apple Silicon)
+- **Windows**: Detects TeX Live and MiKTeX, supports auto preview (prioritizes SumatraPDF), Ollama management via winget
+- **Linux**: Auto-identifies distributions, provides distro-specific installation guides, Ollama management via multiple package managers or official script
+- **macOS**: Supports MacTeX, Homebrew, MacPorts, supports auto install/update/uninstall (Intel and Apple Silicon), Ollama management via Homebrew or official script
 
 ---
 
@@ -293,6 +297,7 @@ lazitex/
 │   ├── 🐧 linux/                  # Linux-specific detection
 │   │   ├── checker.go             # Detects distro-specific TeX installations
 │   │   ├── installer.go           # Linux installer (In Development)
+│   │   ├── ollama.go              # Linux Ollama manager (✅ Implemented)
 │   │   └── builder.go             # Linux compilation logic (Coming Soon)
 │   └── 🍏 mac/                    # macOS-specific detection
 │       ├── checker.go              # Detects MacTeX, Homebrew, MacPorts
@@ -337,7 +342,7 @@ lazitex/
 - [x] **Build System** - One-click compilation, smart preview, auto package detection & installation, adaptive multi-pass compilation
 - [x] **Web Preview & Frontend** - Vue 3 frontend, SSE real-time refresh, dual-mode architecture
 - [x] **PDF Virtual Scrolling** - Multi-page PDF virtual scrolling preview, improved performance for large documents
-- [x] **Ollama Management** - One-click check, install, and uninstall Ollama
+- [x] **Ollama Management** - One-click check, install, and uninstall Ollama (Windows, Linux & macOS)
 - [x] **Vue Frontend Production Build** - Single binary deployment via build script
 
 ### In Progress 🚧

@@ -1,5 +1,5 @@
 // cmd/lazitex-cli/tasks/ollama.go
-// Ollama 管理相关业务
+// Ollama 管理编排任务
 
 package tasks
 
@@ -14,21 +14,48 @@ import (
 	// 内部包
 	core "github.com/SJRnhqh/lazitex/core"
 	lang "github.com/SJRnhqh/lazitex/lang"
+	linux "github.com/SJRnhqh/lazitex/target/linux"
 	mac "github.com/SJRnhqh/lazitex/target/mac"
 	win "github.com/SJRnhqh/lazitex/target/win"
 )
 
+// getOllamaManager 根据当前平台创建对应的 Ollama Manager
+func getOllamaManager() (core.OllamaManager, error) {
+	switch runtime.GOOS {
+	case "linux":
+		return linux.NewOllamaManager(), nil
+	case "darwin":
+		return mac.NewOllamaManager(), nil
+	case "windows":
+		return win.NewOllamaManager(), nil
+	default:
+		return nil, fmt.Errorf(lang.T("msg.unsupported_os"), runtime.GOOS)
+	}
+}
+
+// formatVersionMessage 格式化版本信息输出
+func formatVersionMessage(version string) {
+	if version != "" && version != "installed" {
+		fmt.Printf("🦙 %s: %s\n", lang.T("msg.ollama.check_installed"), version)
+	} else {
+		fmt.Println("🦙 " + lang.T("msg.ollama.check_installed_no_version"))
+	}
+}
+
+// askForConfirmation 请求用户确认
+func askForConfirmation(prompt string) bool {
+	fmt.Print(prompt)
+	reader := bufio.NewReader(os.Stdin)
+	input, _ := reader.ReadString('\n')
+	input = strings.TrimSpace(strings.ToLower(input))
+	return input == "y" || input == "yes"
+}
+
 // CheckOllama 检查 Ollama 是否安装
 func CheckOllama() {
-	var manager core.OllamaManager
-
-	switch runtime.GOOS {
-	case "windows":
-		manager = win.NewOllamaManager()
-	case "darwin":
-		manager = mac.NewOllamaManager()
-	default:
-		fmt.Printf(lang.T("msg.unsupported_os")+"\n", runtime.GOOS)
+	manager, err := getOllamaManager()
+	if err != nil {
+		fmt.Println(err)
 		return
 	}
 
@@ -39,11 +66,7 @@ func CheckOllama() {
 	}
 
 	if installed {
-		if version != "" && version != "installed" {
-			fmt.Printf("🦙 %s: %s\n", lang.T("msg.ollama.check_installed"), version)
-		} else {
-			fmt.Println("🦙 " + lang.T("msg.ollama.check_installed_no_version"))
-		}
+		formatVersionMessage(version)
 	} else {
 		fmt.Println(lang.T("msg.ollama.not_installed"))
 	}
@@ -51,15 +74,9 @@ func CheckOllama() {
 
 // InstallOllama 安装 Ollama
 func InstallOllama() {
-	var manager core.OllamaManager
-
-	switch runtime.GOOS {
-	case "windows":
-		manager = win.NewOllamaManager()
-	case "darwin":
-		manager = mac.NewOllamaManager()
-	default:
-		fmt.Printf(lang.T("msg.unsupported_os")+"\n", runtime.GOOS)
+	manager, err := getOllamaManager()
+	if err != nil {
+		fmt.Println(err)
 		return
 	}
 
@@ -70,20 +87,12 @@ func InstallOllama() {
 		return
 	}
 	if installed {
-		if version != "" && version != "installed" {
-			fmt.Printf("🦙 %s: %s\n", lang.T("msg.ollama.check_installed"), version)
-		} else {
-			fmt.Println("🦙 " + lang.T("msg.ollama.check_installed_no_version"))
-		}
+		formatVersionMessage(version)
 		return
 	}
 
 	// 安装前确认（默认否）
-	fmt.Print(lang.T("msg.ollama.confirm_install"))
-	reader := bufio.NewReader(os.Stdin)
-	input, _ := reader.ReadString('\n')
-	input = strings.TrimSpace(strings.ToLower(input))
-	if input != "y" && input != "yes" {
+	if !askForConfirmation(lang.T("msg.ollama.confirm_install")) {
 		fmt.Println(lang.T("msg.ollama.install_cancelled"))
 		return
 	}
@@ -97,15 +106,9 @@ func InstallOllama() {
 
 // UninstallOllama 卸载 Ollama
 func UninstallOllama() {
-	var manager core.OllamaManager
-
-	switch runtime.GOOS {
-	case "windows":
-		manager = win.NewOllamaManager()
-	case "darwin":
-		manager = mac.NewOllamaManager()
-	default:
-		fmt.Printf(lang.T("msg.unsupported_os")+"\n", runtime.GOOS)
+	manager, err := getOllamaManager()
+	if err != nil {
+		fmt.Println(err)
 		return
 	}
 
@@ -121,11 +124,7 @@ func UninstallOllama() {
 	}
 
 	// 卸载前确认（默认否）
-	fmt.Print(lang.T("msg.ollama.confirm_uninstall"))
-	reader := bufio.NewReader(os.Stdin)
-	input, _ := reader.ReadString('\n')
-	input = strings.TrimSpace(strings.ToLower(input))
-	if input != "y" && input != "yes" {
+	if !askForConfirmation(lang.T("msg.ollama.confirm_uninstall")) {
 		fmt.Println(lang.T("msg.ollama.uninstall_cancelled"))
 		return
 	}
@@ -139,19 +138,13 @@ func UninstallOllama() {
 
 // StatusOllama 检查 Ollama 服务状态
 func StatusOllama() {
-	var manager core.OllamaManager
-
-	switch runtime.GOOS {
-	case "windows":
-		manager = win.NewOllamaManager()
-	case "darwin":
-		manager = mac.NewOllamaManager()
-	default:
-		fmt.Printf(lang.T("msg.unsupported_os")+"\n", runtime.GOOS)
+	manager, err := getOllamaManager()
+	if err != nil {
+		fmt.Println(err)
 		return
 	}
 
-	_, err := core.StatusOllama(manager)
+	_, err = core.StatusOllama(manager)
 	if err != nil {
 		fmt.Printf("❌ %v\n", err)
 		return

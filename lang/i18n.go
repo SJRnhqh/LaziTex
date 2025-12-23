@@ -370,6 +370,22 @@ func init() {
 		"msg.ollama.mac.install_note_homebrew":     "💡 注意: 这将通过 Homebrew 安装 Ollama",
 		"msg.ollama.mac.install_note_script":       "💡 注意: 这将使用官方安装脚本安装 Ollama",
 
+		// Linux Ollama 特定消息
+		"msg.ollama.linux.install_method_prompt":  "🦙 请选择安装方式：",
+		"msg.ollama.linux.install_method_option1": "  1. 使用 %s 包管理器安装",
+		"msg.ollama.linux.install_method_option2": "  2. 使用官方脚本安装（推荐）",
+		"msg.ollama.linux.install_method_choice":  "请输入选项 (1/2，默认 2): ",
+		"msg.ollama.linux.installing_via_pm":      "🦙 正在通过 %s 安装 Ollama...",
+		"msg.ollama.linux.installing_via_script":  "🦙 正在通过官方脚本安装 Ollama...",
+		"msg.ollama.linux.install_note_script":    "💡 注意: 官方脚本安装方式适用于所有 Linux 发行版",
+		"msg.ollama.linux.pm_update_failed":       "包列表更新失败",
+		"msg.ollama.linux.unsupported_pm":         "不支持的包管理器",
+		"msg.ollama.linux.uninstall_prompt":       "🦙 检测到 Ollama 已安装，准备卸载",
+		"msg.ollama.linux.uninstall_confirm":      "确定要卸载 Ollama 吗？(y/n，默认 n): ",
+		"msg.ollama.linux.uninstall_cancelled":    "卸载已取消",
+		"msg.ollama.linux.manual_uninstall_hint":  "⚠️  未找到自动卸载脚本，请手动卸载",
+		"msg.ollama.linux.manual_uninstall_steps": "请参考官方文档进行手动卸载：https://ollama.com",
+
 		// 命令行帮助
 		"help.usage":           "使用方法:",
 		"help.commands":        "命令:",
@@ -680,6 +696,22 @@ func init() {
 		"msg.ollama.mac.manual_uninstall_script":   "  - Script installation: Delete ~/.ollama directory and related PATH configuration",
 		"msg.ollama.mac.install_note_homebrew":     "💡 Note: This will install Ollama via Homebrew",
 		"msg.ollama.mac.install_note_script":       "💡 Note: This will install Ollama via official install script",
+
+		// Linux Ollama specific messages
+		"msg.ollama.linux.install_method_prompt":  "🦙 Choose installation method:",
+		"msg.ollama.linux.install_method_option1": "  1. Install via %s package manager",
+		"msg.ollama.linux.install_method_option2": "  2. Install via official script (recommended)",
+		"msg.ollama.linux.install_method_choice":  "Enter option (1/2, default 2): ",
+		"msg.ollama.linux.installing_via_pm":      "🦙 Installing Ollama via %s...",
+		"msg.ollama.linux.installing_via_script":  "🦙 Installing Ollama via official script...",
+		"msg.ollama.linux.install_note_script":    "💡 Note: Official script installation works on all Linux distributions",
+		"msg.ollama.linux.pm_update_failed":       "Package list update failed",
+		"msg.ollama.linux.unsupported_pm":         "Unsupported package manager",
+		"msg.ollama.linux.uninstall_prompt":       "🦙 Ollama is installed, ready to uninstall",
+		"msg.ollama.linux.uninstall_confirm":      "Are you sure you want to uninstall Ollama? (y/n, default n): ",
+		"msg.ollama.linux.uninstall_cancelled":    "Uninstall cancelled",
+		"msg.ollama.linux.manual_uninstall_hint":  "⚠️  Automatic uninstall script not found, please uninstall manually",
+		"msg.ollama.linux.manual_uninstall_steps": "Please refer to official documentation for manual uninstallation: https://ollama.com",
 
 		// CLI help
 		"help.usage":           "Usage:",
