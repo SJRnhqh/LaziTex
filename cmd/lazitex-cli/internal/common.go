@@ -15,11 +15,19 @@ const (
 )
 
 
+
+// SetAllActionHandlers 设置所有动作处理函数
 func SetAllActionHandlers() {
 	SetOllamaActionHandlers(map[OllamaAction]func(){
 		OllamaCheck:     tasks.CheckOllama,
 		OllamaInstall:   tasks.InstallOllama,
 		OllamaUninstall: tasks.UninstallOllama,
 		OllamaStatus:    tasks.StatusOllama,
+	})
+
+	SetLaTeXActionHandlers(map[LaTeXAction]func(){
+		LaTeXCheck:     tasks.CheckLaTeX,
+		LaTeXInstall:   tasks.InstallLaTeX,
+		LaTeXUninstall: tasks.UninstallLaTeX,
 	})
 }

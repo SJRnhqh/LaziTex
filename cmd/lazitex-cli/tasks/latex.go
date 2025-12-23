@@ -16,8 +16,8 @@ import (
 	win "github.com/SJRnhqh/lazitex/target/win"
 )
 
-// 检查 LaTeX 环境
-func CheckEnvironment() {
+// CheckLaTeX 检查 LaTeX 环境
+func CheckLaTeX() {
 	// 根据平台创建对应的检查器
 	var checker core.EnvironmentChecker
 
@@ -39,8 +39,8 @@ func CheckEnvironment() {
 	env.PrintEnvironment()
 }
 
-// InstallLaTeXEnvironment 安装 LaTeX 环境
-func InstallLaTeXEnvironment() {
+// InstallLaTeX 安装 LaTeX 环境
+func InstallLaTeX() {
 	// 根据平台创建对应的安装器
 	var installer core.EnvironmentInstaller
 
@@ -66,8 +66,8 @@ func InstallLaTeXEnvironment() {
 	// 注意：成功消息由安装器内部输出，这里不需要再输出
 }
 
-// UninstallLaTeXEnvironment 卸载 LaTeX 环境
-func UninstallLaTeXEnvironment() {
+// UninstallLaTeX 卸载 LaTeX 环境
+func UninstallLaTeX() {
 	// 根据平台创建对应的安装器
 	var installer core.EnvironmentInstaller
 

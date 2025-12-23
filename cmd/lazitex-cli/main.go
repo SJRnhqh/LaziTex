@@ -48,17 +48,16 @@ func main() {
 		ui.StartREPL()
 	
 	case "-c", "--check":
-		tasks.CheckEnvironment()
+		tasks.CheckLaTeX()
 
 	case "-i", "--install":
-		tasks.InstallLaTeXEnvironment()
+		tasks.InstallLaTeX()
 
 	case "-u", "--uninstall":
-		tasks.UninstallLaTeXEnvironment()
+		tasks.UninstallLaTeX()
 	
 	case "-x", "--latex": // LaTeX 管理 TODO: 测试覆盖
-		// internal.HandleLaTeXCommand(args[1:], internal.I18nModeMsg, "msg.latex_usage")
-		fmt.Println(lang.T("msg.latex_usage"))
+		internal.HandleLaTeXCommand(args[1:], internal.I18nModeMsg, "msg.latex_usage")
 		return
 
 	case "-o", "--ollama": // Ollama 管理 TODO: 测试覆盖

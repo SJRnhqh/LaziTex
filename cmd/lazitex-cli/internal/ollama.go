@@ -88,9 +88,9 @@ func getOllamaErrorType(err error) string {
 	return ""
 }
 
-// actionFlagMap 将命令行标志映射到对应的动作
+// OllamaActionFlagMap 将命令行标志映射到对应的动作
 // 使用 map 可以简化解析逻辑，便于扩展新的 action
-var actionFlagMap = map[string]OllamaAction{
+var OllamaActionFlagMap = map[string]OllamaAction{
 	"-c":          OllamaCheck,
 	"--check":     OllamaCheck,
 	"-i":          OllamaInstall,
@@ -101,13 +101,13 @@ var actionFlagMap = map[string]OllamaAction{
 	"--status":    OllamaStatus,
 }
 
-// actionToFlagsMap 预先构建的动作到标志的映射（按需初始化）
-var actionToFlagsMap map[OllamaAction][]string
+// OllamaActionToFlagsMap 预先构建的动作到标志的映射（按需初始化）
+var OllamaActionToFlagsMap map[OllamaAction][]string
 
 func init() {
-	actionToFlagsMap = make(map[OllamaAction][]string, 4) // 预分配容量
-	for flag, action := range actionFlagMap {
-		actionToFlagsMap[action] = append(actionToFlagsMap[action], flag)
+	OllamaActionToFlagsMap = make(map[OllamaAction][]string, 4) // 预分配容量
+	for flag, action := range OllamaActionFlagMap {
+		OllamaActionToFlagsMap[action] = append(OllamaActionToFlagsMap[action], flag)
 	}
 }
 
@@ -139,8 +139,8 @@ func GetOllamaErrorI18nKey(err error, mode string) string {
 // 用于生成帮助信息等场景
 // 返回的切片按字母顺序排序，便于显示
 func GetSupportedOllamaFlags() []string {
-	flags := make([]string, 0, len(actionFlagMap))
-	for flag := range actionFlagMap {
+	flags := make([]string, 0, len(OllamaActionFlagMap))
+	for flag := range OllamaActionFlagMap {
 		flags = append(flags, flag)
 	}
 	// 简单排序：短标志在前，长标志在后
@@ -148,18 +148,18 @@ func GetSupportedOllamaFlags() []string {
 	return flags
 }
 
-// GetActionForFlag 返回指定标志对应的动作
+// GetOllamaActionForFlag 返回指定标志对应的动作
 // 如果标志无效，返回 OllamaUnknown 和 false
-func GetActionForFlag(flag string) (OllamaAction, bool) {
-	action, ok := actionFlagMap[flag]
+func GetOllamaActionForFlag(flag string) (OllamaAction, bool) {
+	action, ok := OllamaActionFlagMap[flag]
 	return action, ok
 }
 
-// GetFlagsForAction 返回指定动作对应的所有标志
+// GetOllamaFlagsForAction 返回指定动作对应的所有标志
 // 例如 OllamaCheck 会返回 ["-c", "--check"]
 // 使用预构建的映射，O(1) 查找
-func GetFlagsForAction(action OllamaAction) []string {
-	if flags, ok := actionToFlagsMap[action]; ok {
+func GetOllamaFlagsForAction(action OllamaAction) []string {
+	if flags, ok := OllamaActionToFlagsMap[action]; ok {
 		return flags
 	}
 	return nil
@@ -167,7 +167,7 @@ func GetFlagsForAction(action OllamaAction) []string {
 
 // IsValidOllamaFlag 检查给定的字符串是否是有效的 ollama 命令标志
 func IsValidOllamaFlag(flag string) bool {
-	_, ok := actionFlagMap[flag]
+	_, ok := OllamaActionFlagMap[flag]
 	return ok
 }
 
@@ -194,7 +194,7 @@ func ParseOllamaArgs(args []string) (OllamaAction, error) {
 	actionCount := 0
 
 	for _, arg := range args {
-		if action, ok := actionFlagMap[arg]; ok {
+		if action, ok := OllamaActionFlagMap[arg]; ok {
 			// 找到有效的 action 标志
 			if actionCount == 0 {
 				foundAction = action
@@ -218,12 +218,12 @@ func ParseOllamaArgs(args []string) (OllamaAction, error) {
 	return foundAction, nil
 }
 
-// actionHandlers 预定义的动作处理函数映射
-var actionHandlers map[OllamaAction]func()
+// OllamaActionHandlers 预定义的动作处理函数映射
+var OllamaActionHandlers map[OllamaAction]func()
 
 // SetOllamaActionHandlers 设置动作处理函数（初始化时调用一次）
 func SetOllamaActionHandlers(handlers map[OllamaAction]func()) {
-	actionHandlers = handlers
+	OllamaActionHandlers = handlers
 }
 
 // HandleOllamaCommand 统一的 ollama 命令处理入口
@@ -236,11 +236,11 @@ func HandleOllamaCommand(args []string, mode, usageKey string) bool {
 		fmt.Println(lang.T(usageKey))
 		return false
 	}
-	if actionHandlers == nil {
+	if OllamaActionHandlers == nil {
 		fmt.Println(lang.T(usageKey))
 		return false
 	}
-	if handler, ok := actionHandlers[action]; ok {
+	if handler, ok := OllamaActionHandlers[action]; ok {
 		handler()
 		return true
 	}

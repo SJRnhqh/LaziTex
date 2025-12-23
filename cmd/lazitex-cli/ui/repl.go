@@ -299,13 +299,17 @@ func handleREPLCommand(input string) bool {
 		fmt.Println("LaziTex v0.0.1")
 
 	case "check":
-		tasks.CheckEnvironment()
+		tasks.CheckLaTeX()
 
 	case "install":
-		tasks.InstallLaTeXEnvironment()
+		tasks.InstallLaTeX()
 
 	case "uninstall":
-		tasks.UninstallLaTeXEnvironment()
+		tasks.UninstallLaTeX()
+
+	case "latex": // LaTeX 管理 TODO: 测试覆盖
+		internal.HandleLaTeXCommand(parts[1:], internal.I18nModeRepl, "repl.latex_usage")
+		return false
 
 	case "ollama": // Ollama 管理 TODO: 测试覆盖	
 		internal.HandleOllamaCommand(parts[1:], internal.I18nModeRepl, "repl.ollama_usage")
