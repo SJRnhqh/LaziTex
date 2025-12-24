@@ -134,14 +134,7 @@ func (s *Server) HandleConfig(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
 		// GET 请求：返回配置
-		userConfig, err := cfg.LoadConfig()
-		if err != nil {
-			// 如果加载失败，使用默认值
-			userConfig = &cfg.Config{
-				Language:    "en",
-				DisplayMode: "virtual",
-			}
-		}
+		userConfig := cfg.LoadConfig()
 
 		response := map[string]string{
 			"mode":        s.mode,                 // 服务器模式（LaziView/LaziWorkspace）
@@ -167,7 +160,7 @@ func (s *Server) HandleConfig(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// 返回更新后的配置
-		userConfig, _ := cfg.LoadConfig()
+		userConfig := cfg.LoadConfig()
 		response := map[string]string{
 			"mode":        s.mode,
 			"language":    userConfig.Language,

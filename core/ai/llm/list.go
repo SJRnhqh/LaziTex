@@ -22,10 +22,7 @@ type ProviderListItem struct {
 
 // BuildProviderList 负责构建展示层需要的 LLM 列表数据
 func BuildProviderList(dateFormat string) ([]ProviderListItem, error) {
-	cfgData, err := cfg.LoadConfig()
-	if err != nil {
-		return nil, err
-	}
+	cfgData := cfg.LoadConfig()
 
 	items := make([]ProviderListItem, 0, len(cfgData.LLMProviders))
 	for _, p := range cfgData.LLMProviders {

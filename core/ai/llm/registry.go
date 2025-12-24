@@ -6,7 +6,7 @@ package llm
 import (
 	"sync"
 
-	"github.com/SJRnhqh/lazitex/core/ai/providers"
+	providers "github.com/SJRnhqh/lazitex/core/ai/providers"
 )
 
 var (

@@ -33,10 +33,7 @@ func SaveLanguagePreference(lang Language) error {
 
 // LoadLanguagePreference 加载语言偏好
 func LoadLanguagePreference() Language {
-	jsonConfig, err := cfg.LoadConfig()
-	if err != nil {
-		return LangEN // 默认英文
-	}
+	jsonConfig := cfg.LoadConfig()
 
 	if jsonConfig.Language == "zh" {
 		return LangZH
@@ -210,7 +207,6 @@ func init() {
 		"msg.browser_error":     "⚠️  无法打开浏览器: %v",
 		"msg.manual_open":       "💡 请手动打开浏览器访问: %s",
 		"msg.config_path_error": "获取配置路径失败",
-		"msg.config_load_error": "加载配置失败",
 		"msg.config_save_error": "创建默认配置失败",
 		"msg.config_open_error": "打开配置文件失败",
 		"msg.config_opening":    "正在打开配置文件",
@@ -254,8 +250,13 @@ func init() {
 		"msg.llm.unlink.failed":      "❌ 取消连接失败: %v",
 		"msg.llm.unlink.success":     "🔗 已取消连接: %s (%s)",
 		// 删除
-		"msg.llm.remove.failed":  "❌ 删除失败: %v",
-		"msg.llm.remove.success": "🗑️ 已删除 LLM: %s",
+		"msg.llm.remove.success":          "🗑️ 已删除 LLM: %s",
+		"msg.llm.remove.save_failed":      "⚠️ 保存配置失败: %s",
+		"msg.llm.remove.not_found":        "❌ 未找到 LLM: %s",
+		"msg.llm.remove.cancelled":        "已取消删除",
+		"msg.llm.remove.multiple_matches": "找到 %d 个匹配的 LLM Provider，请选择：",
+		"msg.llm.remove.confirm_prompt":   "确定要删除该 LLM Provider 吗？[y/N]: ",
+		"msg.llm.remove.select_prompt":    "请选择要删除的 LLM Provider (输入序号，或输入 q 取消): ",
 		// Provider 基础错误
 		"msg.llm.provider.id_exists":   "LLM Provider ID '%s' 已存在",
 		"msg.llm.provider.name_exists": "LLM Provider 名称 '%s' 已存在",
@@ -590,7 +591,6 @@ func init() {
 		"msg.browser_error":     "⚠️  Failed to open browser: %v",
 		"msg.manual_open":       "💡 Please manually open browser: %s",
 		"msg.config_path_error": "Failed to get config path",
-		"msg.config_load_error": "Failed to load config",
 		"msg.config_save_error": "Failed to create default config",
 		"msg.config_open_error": "Failed to open config file",
 		"msg.config_opening":    "Opening config file",
@@ -634,8 +634,13 @@ func init() {
 		"msg.llm.unlink.failed":      "❌ Failed to disconnect: %v",
 		"msg.llm.unlink.success":     "🔗 Disconnected: %s (%s)",
 		// Remove
-		"msg.llm.remove.failed":  "❌ Failed to remove: %v",
-		"msg.llm.remove.success": "🗑️ Removed LLM: %s",
+		"msg.llm.remove.success":          "🗑️ Removed LLM: %s",
+		"msg.llm.remove.save_failed":      "⚠️ Failed to save config: %s",
+		"msg.llm.remove.not_found":        "❌ LLM not found: %s",
+		"msg.llm.remove.cancelled":        "Deletion cancelled",
+		"msg.llm.remove.multiple_matches": "Found %d matching LLM Providers, please select:",
+		"msg.llm.remove.confirm_prompt":   "Are you sure you want to remove this LLM Provider? [y/N]: ",
+		"msg.llm.remove.select_prompt":    "Please select the LLM Provider to remove (enter number, or 'q' to cancel): ",
 		// Provider base errors
 		"msg.llm.provider.unsupported": "Unsupported provider: %s",
 		// Provider: Ollama

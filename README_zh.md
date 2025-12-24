@@ -179,7 +179,7 @@ lazitex> ollama -u     # 卸载
 
 ### LLM 管理
 
-智能 LLM 提供商管理，支持注册、连接、测试和多激活。
+智能 LLM 提供商管理，支持注册、连接、测试、删除和多激活。
 
 ```bash
 # CLI 模式
@@ -187,7 +187,7 @@ $ lazitex -m list                    # 列出所有已注册的 LLM
 $ lazitex -m test gemma3:1b           # 测试 LLM 连通性
 $ lazitex -m link gemma3:1b           # 连接并激活 LLM（需测试通过）
 $ lazitex -m unlink gemma3:1b         # 取消连接指定 LLM
-$ lazitex -m add gemma3:1b            # 注册 LLM（不自动连接）
+$ lazitex -m add <model> -p <provider> -n <name>  # 注册 LLM（需指定提供商和名称）
 $ lazitex -m remove gemma3:1b         # 删除 LLM 注册
 
 # REPL 模式
@@ -195,6 +195,8 @@ lazitex> llm list                     # 列出所有已注册的 LLM
 lazitex> llm test gemma3:1b           # 测试 LLM 连通性
 lazitex> llm link gemma3:1b           # 连接并激活 LLM
 lazitex> llm unlink gemma3:1b         # 取消连接指定 LLM
+lazitex> llm add <model> -p <provider> -n <name>  # 注册 LLM
+lazitex> llm remove gemma3:1b         # 删除 LLM 注册
 ```
 
 **特性：**
@@ -202,6 +204,8 @@ lazitex> llm unlink gemma3:1b         # 取消连接指定 LLM
 - **多激活支持**：可同时激活多个 LLM
 - **智能连接**：`link` 会在激活前自动测试连通性
 - **选择性断开**：`unlink` 可从激活列表中移除指定 LLM，不删除注册信息
+- **灵活删除**：`remove` 支持通过 ID、名称或模型匹配 - 如找到多个匹配项，会列出所有匹配项供您选择删除
+- **安全删除**：删除前会显示确认提示，防止误删
 
 ### 构建与预览
 
@@ -290,7 +294,10 @@ lazitex/
 │       ├── agent/                 # AI 智能体管理
 │       │   └── registry.go        # 智能体注册和管理
 │       ├── llm/                   # LLM 提供商抽象
-│       │   └── registry.go        # LLM 提供商注册和管理
+│       │   ├── registry.go        # LLM 提供商注册和管理
+│       │   ├── connectivity.go    # LLM 连通性测试
+│       │   ├── list.go            # LLM 列表构建逻辑
+│       │   └── remove.go          # LLM 删除逻辑（匹配、格式化）
 │       ├── providers/             # LLM 提供商实现
 │       │   └── ollama.go          # Ollama 提供商实现
 │       └── tools/                 # AI 工具系统
@@ -367,7 +374,7 @@ lazitex/
 │       │   ├── preview.go         # 实时预览功能
 │       │   ├── ollama.go          # Ollama 管理功能
 │       │   ├── latex.go           # LaTeX 环境管理功能
-│       │   ├── llm.go             # LLM 管理功能
+│       │   ├── llm.go             # LLM 管理功能（注册/连接/断开/删除/测试/列表，包含用户交互编排）
 │       │   ├── config.go          # 配置文件管理功能
 │       │   └── help.go            # 帮助信息
 │       ├── 🧠 internal/           # 内部命令处理（统一动作处理器）
@@ -395,7 +402,7 @@ lazitex/
 
 - **模块化 AI 架构** - AI 智能体、LLM 提供商和工具的清晰分离，采用可扩展的注册系统实现无缝集成
 
-- **智能 LLM 管理** - 智能提供商注册、配置持久化和当前 LLM 跟踪，支持跨平台配置
+- **完善的 LLM 管理** - 智能的提供商注册、配置持久化、激活状态跟踪，以及支持 ID/名称/模型匹配的灵活删除功能，所有功能都支持跨平台配置
 
 ---
 

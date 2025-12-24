@@ -10,19 +10,19 @@ import (
 	lang "github.com/SJRnhqh/lazitex/lang"
 )
 
-// TestLLMConnectivity 测试 LLM 是否可用（统一入口）
-func TestLLMConnectivity(providerCfg *cfg.LLMProvider) (bool, error) {
+// LLMConnectivity 测试 LLM 是否可用（统一入口）
+func LLMConnectivity(llmprovider *cfg.LLMProvider) (bool, error) {
 	// 如果已禁用，直接返回 false（不进行连通性测试）
-	if !providerCfg.Enabled {
+	if !llmprovider.Enabled {
 		return false, nil
 	}
 
 	// 从注册表获取 Provider 实现
-	provider := GetProvider(providerCfg.Provider)
+	provider := GetProvider(llmprovider.Provider)
 	if provider == nil {
-		return false, fmt.Errorf(lang.T("msg.llm.provider.unsupported"), providerCfg.Provider)
+		return false, fmt.Errorf(lang.T("msg.llm.provider.unsupported"), llmprovider.Provider)
 	}
 
 	// 调用 provider 的测试方法
-	return provider.Connectivity(providerCfg.Model, providerCfg.Config)
+	return provider.Connectivity(llmprovider.Model, llmprovider.Config)
 }

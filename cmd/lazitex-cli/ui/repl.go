@@ -232,21 +232,6 @@ func printLogo() {
 		}
 	}
 
-	// 打印带白色横条背景的Logo
-	// fmt.Println()
-
-	// 计算总宽度
-	// totalWidth := (maxWidth+1)*len(letters) - 1
-
-	// 白色横条样式
-	// whiteBarStyle := lipgloss.NewStyle().
-	// 	Background(lipgloss.Color("#FFFFFF")).
-	// 	Foreground(lipgloss.Color("#000000"))
-
-	// 顶部白色横条
-	// topBar := strings.Repeat(" ", totalWidth)
-	// fmt.Println(whiteBarStyle.Render(topBar))
-
 	// 打印彩色Logo
 	for i := 0; i < maxHeight; i++ {
 		var line string
@@ -266,11 +251,6 @@ func printLogo() {
 		}
 		fmt.Println(line)
 	}
-
-	// 底部白色横条
-	// bottomBar := strings.Repeat(" ", totalWidth)
-	// fmt.Println(whiteBarStyle.Render(bottomBar))
-	// fmt.Println()
 }
 
 // StartREPL 启动 REPL 模式
@@ -325,7 +305,72 @@ func handleREPLCommand(input string) bool {
 				fmt.Println(lang.T("repl.llm_usage"))
 				return false
 			}
-			tasks.AddLLM(sub[1])
+			// 解析参数：llm add <model> 必须首位，-p <provider> 和 -n <name> 顺序任意
+			var provider string
+			var name string
+			var model string
+
+			// sub[1] 是model
+			if strings.HasPrefix(sub[1], "-") {
+				fmt.Println("❌ 需要提供注册模型名称")
+				fmt.Println(lang.T("repl.llm_usage"))
+				return false
+			}
+			model = sub[1]
+
+			// 从 sub[2] 开始解析必要参数 -p <provider> 和 -n <name> 可选且顺序任意
+			i := 2
+			for i < len(sub) {
+				arg := sub[i]
+
+				if arg == "-p" || arg == "--provider" {
+					// 检查是否有下一个参数
+					if i+1 >= len(sub) {
+						fmt.Println("❌ 需要提供提供商名称")
+						fmt.Println(lang.T("repl.llm_usage"))
+						return false
+					}
+					if strings.HasPrefix(sub[i+1], "-") {
+						fmt.Println("❌ 需要提供提供商名称")
+						fmt.Println(lang.T("repl.llm_usage"))
+						return false
+					}
+					provider = sub[i+1]
+					i += 2
+					continue
+				} else if arg == "-n" || arg == "--name" {
+					// 检查是否有下一个参数
+					if i+1 >= len(sub) {
+						fmt.Println("❌ 需要提供模型名称")
+						fmt.Println(lang.T("repl.llm_usage"))
+						return false
+					}
+					if strings.HasPrefix(sub[i+1], "-") {
+						fmt.Println("❌ 需要提供模型名称")
+						fmt.Println(lang.T("repl.llm_usage"))
+						return false
+					}
+					name = sub[i+1]
+					i += 2
+					continue
+				} else {
+					fmt.Printf("❌ 未知参数 %s\n", arg)
+					fmt.Println(lang.T("repl.llm_usage"))
+					return false
+				}
+			}
+
+			if provider == "" {
+				fmt.Println("❌ 需要提供提供商")
+				fmt.Println(lang.T("repl.llm_usage"))
+				return false
+			}
+			if name == "" {
+				fmt.Println("❌ 需要提供模型名称")
+				fmt.Println(lang.T("repl.llm_usage"))
+				return false
+			}
+			tasks.AddLLM(provider, name, model)
 			return false
 		case "link":
 			if len(sub) < 2 {

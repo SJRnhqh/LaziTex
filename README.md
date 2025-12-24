@@ -179,7 +179,7 @@ lazitex> ollama -u     # Uninstall
 
 ### LLM Management
 
-Intelligent LLM provider management with registration, connection, testing, and multi-activation support.
+Intelligent LLM provider management with registration, connection, testing, removal, and multi-activation support.
 
 ```bash
 # CLI Mode
@@ -187,7 +187,7 @@ $ lazitex -m list                    # List all registered LLMs
 $ lazitex -m test gemma3:1b         # Test LLM connectivity
 $ lazitex -m link gemma3:1b         # Connect and activate LLM (requires test pass)
 $ lazitex -m unlink gemma3:1b       # Disconnect specific LLM
-$ lazitex -m add gemma3:1b           # Register LLM (without connecting)
+$ lazitex -m add <model> -p <provider> -n <name>  # Register LLM (with provider and name)
 $ lazitex -m remove gemma3:1b       # Remove LLM registration
 
 # REPL Mode
@@ -195,6 +195,8 @@ lazitex> llm list                   # List all registered LLMs
 lazitex> llm test gemma3:1b         # Test LLM connectivity
 lazitex> llm link gemma3:1b         # Connect and activate LLM
 lazitex> llm unlink gemma3:1b       # Disconnect specific LLM
+lazitex> llm add <model> -p <provider> -n <name>  # Register LLM
+lazitex> llm remove gemma3:1b       # Remove LLM registration
 ```
 
 **Features:**
@@ -202,6 +204,8 @@ lazitex> llm unlink gemma3:1b       # Disconnect specific LLM
 - **Multi-activation**: Support multiple active LLMs simultaneously
 - **Smart connection**: `link` automatically tests connectivity before activation
 - **Selective disconnect**: `unlink` removes specific LLM from active list without deleting registration
+- **Flexible removal**: `remove` supports matching by ID, Name, or Model - if multiple matches found, you'll be prompted to select which one to remove
+- **Safe deletion**: Confirmation prompt before removing to prevent accidental deletion
 
 ### Build & Preview
 
@@ -290,7 +294,10 @@ lazitex/
 │       ├── agent/                 # AI agent management
 │       │   └── registry.go        # Agent registration and management
 │       ├── llm/                   # LLM provider abstraction
-│       │   └── registry.go        # LLM provider registration and management
+│       │   ├── registry.go        # LLM provider registration and management
+│       │   ├── connectivity.go    # LLM connectivity testing
+│       │   ├── list.go            # LLM list building logic
+│       │   └── remove.go          # LLM removal logic (matching, formatting)
 │       ├── providers/             # LLM provider implementations
 │       │   └── ollama.go          # Ollama provider implementation
 │       └── tools/                 # AI tool system
@@ -367,7 +374,7 @@ lazitex/
 │       │   ├── preview.go         # Live preview functionality
 │       │   ├── ollama.go          # Ollama management functionality
 │       │   ├── latex.go           # LaTeX environment management
-│       │   ├── llm.go             # LLM management functionality
+│       │   ├── llm.go             # LLM management functionality (add/link/unlink/remove/test/list with user interaction orchestration)
 │       │   ├── config.go          # Configuration file management
 │       │   └── help.go            # Help information
 │       ├── 🧠 internal/           # Internal command processing (unified action handlers)
@@ -395,7 +402,7 @@ lazitex/
 
 - **Modular AI Architecture** - Clean separation of AI agents, LLM providers, and tools with extensible registry system for seamless integration
 
-- **Intelligent LLM Management** - Smart provider registration, configuration persistence, and active LLM tracking with cross-platform configuration support
+- **Intelligent LLM Management** - Smart provider registration, configuration persistence, active LLM tracking, and flexible removal with ID/Name/Model matching support, all with cross-platform configuration support
 
 ---
 

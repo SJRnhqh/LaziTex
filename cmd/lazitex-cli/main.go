@@ -75,7 +75,81 @@ func main() {
 				fmt.Println(lang.T("msg.llm.cli_usage"))
 				return
 			}
-			tasks.AddLLM(sub[1])
+			// 解析参数：-m add <model> 必须首位，-p <provider> 和 -n <name> 顺序任意
+			var provider string
+			var name string
+			var model string
+
+			// sub[1] 是 model
+			if strings.HasPrefix(sub[1], "-") {
+				fmt.Println("❌ 需要提供注册模型名称")
+				fmt.Println(lang.T("msg.llm.cli_usage"))
+				return
+			}
+			model = sub[1]
+
+			// 从 sub[2] 开始解析必要参数 -p <provider> 和 -n <name> 可选且顺序任意
+			i := 2
+			for i < len(sub) {
+				arg := sub[i]
+
+				if arg == "-p" || arg == "--provider" {
+					// 检查是否有下一个参数
+					if i+1 >= len(sub) {
+						fmt.Println("❌ 需要提供提供商名称")
+						fmt.Println(lang.T("msg.llm.cli_usage"))
+						return
+					}
+					if strings.HasPrefix(sub[i+1], "-") {
+						fmt.Println("❌ 需要提供提供商名称")
+						fmt.Println(lang.T("msg.llm.cli_usage"))
+						return
+					}
+					provider = sub[i+1]
+					i += 2
+					continue
+				} else if arg == "-n" || arg == "--name" {
+					// 检查是否有下一个参数
+					if i+1 >= len(sub) {
+						fmt.Println("❌ 需要为注册模型自定义名称")
+						fmt.Println(lang.T("msg.llm.cli_usage"))
+						return
+					}
+					if strings.HasPrefix(sub[i+1], "-") {
+						fmt.Println("❌ 需要为自定义模型自定义名称")
+						fmt.Println(lang.T("msg.llm.cli_usage"))
+						return
+					}
+					name = sub[i+1]
+					i += 2
+					continue
+				}
+
+				if strings.HasPrefix(arg, "-") {
+					fmt.Println(lang.T("msg.unknown_command")+"\n", arg)
+					fmt.Println(lang.T("msg.llm.cli_usage"))
+					return
+				}
+
+				// 非flag参数，不应该出现在这里
+				fmt.Println("❌ 意外的非flag参数: ", arg)
+				fmt.Println(lang.T("msg.llm.cli_usage"))
+				return
+			}
+
+			if provider == "" {
+				fmt.Println("❌ 需要提供提供商")
+				fmt.Println(lang.T("msg.llm.cli_usage"))
+				return
+			}
+
+			if name == "" {
+				fmt.Println("❌ 需要为注册模型自定义名称")
+				fmt.Println(lang.T("msg.llm.cli_usage"))
+				return
+			}
+
+			tasks.AddLLM(provider, name, model)
 			return
 		case "link":
 			if len(sub) < 2 {

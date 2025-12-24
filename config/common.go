@@ -20,8 +20,26 @@ type Config struct {
 	ActiveLLMs   []string      `json:"activeLLMs,omitempty"`   // 当前连接的 LLM Provider ID 列表（支持多激活）
 }
 
-// getConfigPath 获取配置文件路径
-func getConfigPath() (string, error) {
+// GetConfigPath 获取配置文件路径
+//
+// 返回 LaziTex 配置文件的完整路径，位置因操作系统而异：
+//   - Linux/Unix: ~/.config/lazitex/config.json
+//   - macOS: ~/Library/Application Support/lazitex/config.json
+//   - Windows: %APPDATA%\lazitex\config.json
+//
+// 可能返回的错误：
+//   - os.UserConfigDir() 失败：无法获取用户配置目录
+//     * 用户主目录不存在
+//     * 系统环境变量问题（Windows: %APPDATA%, Unix: $XDG_CONFIG_HOME 或 ~/.config）
+//   - os.MkdirAll() 失败：无法创建配置目录
+//     * 父目录权限不足
+//     * 磁盘空间不足
+//     * 文件系统只读
+//
+// 返回值：
+//   - string: 配置文件路径
+//   - error: 错误信息，如果成功则为nil
+func GetConfigPath() (string, error) {
 	// 获取用户配置目录
 	configDir, err := os.UserConfigDir()
 	if err != nil {
@@ -37,21 +55,27 @@ func getConfigPath() (string, error) {
 	return filepath.Join(lazitexDir, "config.json"), nil
 }
 
-// GetConfigPath 对外公开配置文件路径，供 CLI/REPL 打开配置文件
-func GetConfigPath() (string, error) {
-	return getConfigPath()
-}
-
 // LoadConfig 加载配置
-func LoadConfig() (*Config, error) {
-	configPath, err := getConfigPath()
+//
+// 加载用户配置文件，如果文件不存在或损坏则返回默认配置。
+// 此函数保证总是返回有效的配置对象，不会出错。
+//
+// 配置文件位置因操作系统而异：
+//   - Linux/Unix: ~/.config/lazitex/config.json
+//   - macOS: ~/Library/Application Support/lazitex/config.json
+//   - Windows: %APPDATA%\lazitex\config.json
+//
+// 返回值：
+//   - *Config: 有效的配置对象，失败时返回默认配置
+func LoadConfig() *Config {
+	configPath, err := GetConfigPath()
 	if err != nil {
 		return &Config{
 			Language:     "en",
 			DisplayMode:  "virtual",
 			LLMProviders: []LLMProvider{},
 			ActiveLLMs:   []string{},
-		}, nil
+		}
 	}
 
 	// 如果配置文件不存在，返回默认配置
@@ -61,7 +85,7 @@ func LoadConfig() (*Config, error) {
 			DisplayMode:  "virtual",
 			LLMProviders: []LLMProvider{},
 			ActiveLLMs:   []string{},
-		}, nil
+		}
 	}
 
 	// 读取配置文件
@@ -72,7 +96,7 @@ func LoadConfig() (*Config, error) {
 			DisplayMode:  "virtual",
 			LLMProviders: []LLMProvider{},
 			ActiveLLMs:   []string{},
-		}, nil
+		}
 	}
 
 	var config Config
@@ -82,7 +106,7 @@ func LoadConfig() (*Config, error) {
 			DisplayMode:  "virtual",
 			LLMProviders: []LLMProvider{},
 			ActiveLLMs:   []string{},
-		}, nil
+		}
 	}
 
 	// 设置默认值
@@ -99,12 +123,12 @@ func LoadConfig() (*Config, error) {
 		config.ActiveLLMs = []string{}
 	}
 
-	return &config, nil
+	return &config
 }
 
 // SaveConfig 保存配置
 func SaveConfig(config *Config) error {
-	configPath, err := getConfigPath()
+	configPath, err := GetConfigPath()
 	if err != nil {
 		return err
 	}
@@ -120,10 +144,7 @@ func SaveConfig(config *Config) error {
 // UpdateConfig 部分更新配置（只更新提供的字段）
 func UpdateConfig(updates map[string]interface{}) error {
 	// 加载现有配置
-	config, err := LoadConfig()
-	if err != nil {
-		return err
-	}
+	config := LoadConfig()
 
 	// 更新提供的字段
 	if displayMode, ok := updates["displayMode"].(string); ok {
