@@ -177,6 +177,32 @@ lazitex> ollama -i     # 安装
 lazitex> ollama -u     # 卸载
 ```
 
+### LLM 管理
+
+智能 LLM 提供商管理，支持注册、连接、测试和多激活。
+
+```bash
+# CLI 模式
+$ lazitex -m list                    # 列出所有已注册的 LLM
+$ lazitex -m test gemma3:1b           # 测试 LLM 连通性
+$ lazitex -m link gemma3:1b           # 连接并激活 LLM（需测试通过）
+$ lazitex -m unlink gemma3:1b         # 取消连接指定 LLM
+$ lazitex -m add gemma3:1b            # 注册 LLM（不自动连接）
+$ lazitex -m remove gemma3:1b         # 删除 LLM 注册
+
+# REPL 模式
+lazitex> llm list                     # 列出所有已注册的 LLM
+lazitex> llm test gemma3:1b           # 测试 LLM 连通性
+lazitex> llm link gemma3:1b           # 连接并激活 LLM
+lazitex> llm unlink gemma3:1b         # 取消连接指定 LLM
+```
+
+**特性：**
+
+- **多激活支持**：可同时激活多个 LLM
+- **智能连接**：`link` 会在激活前自动测试连通性
+- **选择性断开**：`unlink` 可从激活列表中移除指定 LLM，不删除注册信息
+
 ### 构建与预览
 
 一键构建 LaTeX 文档，支持自动包检测与安装、自适应多轮编译、智能预览和 Web 实时预览。支持静默模式（`-q`）和清理模式（`-t`）。

@@ -240,13 +240,19 @@ func init() {
 		"msg.llm.test.unavailable":                     "❌ 不可用: %s (%s:%s)",
 		"msg.llm.test.update_config_failed_on_success": "⚠️  测试通过，但更新配置失败: %v",
 		"msg.llm.test.update_config_failed_on_failure": "⚠️  测试失败，但更新配置失败: %v",
-		// 链接
+		// 连接
 		"msg.llm.link.read_failed":       "❌ 读取配置失败: %v",
-		"msg.llm.link.not_found":         "❌ LLM 未接入: %s",
+		"msg.llm.link.not_found":         "❌ LLM 未注册: %s",
 		"msg.llm.link.test_failed":       "❌ 连通性测试失败: %v",
-		"msg.llm.link.unavailable":       "❌ LLM 不可用，已取消连接: %s (%s)",
+		"msg.llm.link.unavailable":       "⚠️  LLM 无法接入: %s (%s)",
 		"msg.llm.link.set_active_failed": "❌ 连接失败: %v",
-		"msg.llm.link.success":           "🔗 已连接并设为当前 LLM: %s (%s)",
+		"msg.llm.link.success":           "🔗 已连接: %s (%s)",
+		// 取消连接
+		"msg.llm.unlink.read_failed": "❌ 读取配置失败: %v",
+		"msg.llm.unlink.not_found":   "❌ LLM 未注册: %s",
+		"msg.llm.unlink.not_active":  "⚠️  LLM '%s (%s)' 不在激活列表中",
+		"msg.llm.unlink.failed":      "❌ 取消连接失败: %v",
+		"msg.llm.unlink.success":     "🔗 已取消连接: %s (%s)",
 		// 删除
 		"msg.llm.remove.failed":  "❌ 删除失败: %v",
 		"msg.llm.remove.success": "🗑️ 已删除 LLM: %s",
@@ -262,7 +268,7 @@ func init() {
 		"msg.llm.provider.ollama.parse_response_failed":    "解析 Ollama 响应失败: %v",
 		"msg.llm.provider.ollama.serialize_request_failed": "序列化请求失败: %v",
 		// CLI 用法
-		"msg.llm.cli_usage":                "用法: lazitex -m list | lazitex -m test <model/id/name> | lazitex -m link <model/id/name> | lazitex -m [add|remove|unlink|<模型名称>] （开发中）",
+		"msg.llm.cli_usage":                "用法: lazitex -m list | lazitex -m add <model/id/name> | lazitex -m link <model/id/name> | lazitex -m test <model/id/name> | lazitex -m unlink | lazitex -m remove <model/id/name>",
 		"msg.dev_mode_backend_url":         "💡 后端 API 地址: %s",
 		"msg.prod_mode_embedded":           "💡 生产模式：前端已嵌入，访问: %s",
 		"msg.dev_mode_custom_port_warning": "⚠️  警告：开发模式下使用了自定义端口 (%d)，但 Vite 代理配置硬编码到 8080\n   将强制使用默认端口 8080 以确保前端可以连接后端",
@@ -452,7 +458,7 @@ func init() {
 		"help.config":       "打开配置文件（JSON）",
 		"help.latex":        "LaTeX 管理",
 		"help.ollama":       "Ollama 管理",
-		"help.llm":          "LLM 管理：list；test <model/id/name>；link <model/id/name>",
+		"help.llm":          "LLM 管理",
 		"help.description":  "LaziTex: 零配置 LaTeX 编译工具，支持 AI 辅助",
 
 		// 工具描述
@@ -501,8 +507,10 @@ func init() {
 		"repl.lang_desc":        "切换语言 (zh/en)",
 		"repl.quit_desc":        "退出 REPL",
 		"repl.config_desc":      "打开配置文件（JSON）",
-		"repl.llm_desc":         "LLM 管理：list；test <model/id/name>；link <model/id/name>",
-		"repl.llm_usage":        "用法: llm list | llm test <model/id/name> | llm link <model/id/name> | llm [add|remove|unlink|<模型名称>] （开发中）",
+		"repl.llm_desc":         "LLM 管理：list；add；test；remove",
+		"repl.llm.link":         "连接并激活 LLM",
+		"repl.llm.unlink":       "取消连接 LLM",
+		"repl.llm_usage":        "用法: llm list | llm add <model/id/name> | llm link <model/id/name> | llm test <model/id/name> | llm unlink <model/id/name> | llm remove <model/id/name>",
 		"repl.lang_usage":       "用法: lang <zh|en>",
 		"repl.lang_current":     "当前语言: ",
 		"repl.lang_switched":    "✓ 语言已切换并保存",
@@ -612,13 +620,19 @@ func init() {
 		"msg.llm.test.unavailable":                     "❌ Unavailable: %s (%s:%s)",
 		"msg.llm.test.update_config_failed_on_success": "⚠️  Test passed, but failed to update config: %v",
 		"msg.llm.test.update_config_failed_on_failure": "⚠️  Test failed, but failed to update config: %v",
-		// Link
+		// Connect
 		"msg.llm.link.read_failed":       "❌ Failed to read config: %v",
 		"msg.llm.link.not_found":         "❌ LLM not registered: %s",
 		"msg.llm.link.test_failed":       "❌ Connectivity test failed: %v",
-		"msg.llm.link.unavailable":       "❌ LLM unavailable, switch cancelled: %s (%s)",
-		"msg.llm.link.set_active_failed": "❌ Failed to switch: %v",
-		"msg.llm.link.success":           "🔗 Switched to LLM: %s (%s)",
+		"msg.llm.link.unavailable":       "⚠️  LLM cannot be connected: %s (%s)",
+		"msg.llm.link.set_active_failed": "❌ Failed to connect: %v",
+		"msg.llm.link.success":           "🔗 Connected: %s (%s)",
+		// Disconnect
+		"msg.llm.unlink.read_failed": "❌ Failed to read config: %v",
+		"msg.llm.unlink.not_found":   "❌ LLM not registered: %s",
+		"msg.llm.unlink.not_active":  "⚠️  LLM '%s (%s)' is not in the active list",
+		"msg.llm.unlink.failed":      "❌ Failed to disconnect: %v",
+		"msg.llm.unlink.success":     "🔗 Disconnected: %s (%s)",
 		// Remove
 		"msg.llm.remove.failed":  "❌ Failed to remove: %v",
 		"msg.llm.remove.success": "🗑️ Removed LLM: %s",
@@ -632,7 +646,7 @@ func init() {
 		"msg.llm.provider.ollama.parse_response_failed":    "Failed to parse Ollama response: %v",
 		"msg.llm.provider.ollama.serialize_request_failed": "Failed to serialize request: %v",
 		// CLI usage
-		"msg.llm.cli_usage":                "Usage: lazitex -m list | lazitex -m test <model/id/name> | lazitex -m link <model/id/name> | lazitex -m [add|remove|unlink|<model_name>] (in development)",
+		"msg.llm.cli_usage":                "Usage: lazitex -m list | lazitex -m add <model/id/name> | lazitex -m link <model/id/name> | lazitex -m test <model/id/name> | lazitex -m unlink | lazitex -m remove <model/id/name>",
 		"msg.dev_mode_backend_url":         "💡 Backend API URL: %s",
 		"msg.prod_mode_embedded":           "💡 Production mode: Frontend embedded, access: %s",
 		"msg.dev_mode_custom_port_warning": "⚠️  Warning: Custom port (%d) used in dev mode, but Vite proxy is hardcoded to 8080\n   Will force use default port 8080 to ensure frontend can connect to backend",
@@ -822,7 +836,7 @@ func init() {
 		"help.config":       "Open config file (JSON)",
 		"help.latex":        "LaTeX management",
 		"help.ollama":       "Ollama management",
-		"help.llm":          "LLM management: list; test <model/id/name>; link <model/id/name>",
+		"help.llm":          "LLM management",
 		"help.description":  "LaziTex: Zero-config LaTeX compilation with AI assistance",
 
 		// Tool descriptions
@@ -871,8 +885,10 @@ func init() {
 		"repl.lang_desc":        "Switch language (zh/en)",
 		"repl.quit_desc":        "Exit REPL",
 		"repl.config_desc":      "Open config file (JSON)",
-		"repl.llm_desc":         "LLM management: list; test <model/id/name>; link <model/id/name>",
-		"repl.llm_usage":        "Usage: llm list | llm test <model/id/name> | llm link <model/id/name> | llm [add|remove|unlink|<model_name>] (in development)",
+		"repl.llm_desc":         "LLM management: list; add; test; remove",
+		"repl.llm.link":         "Connect and activate LLM",
+		"repl.llm.unlink":       "Disconnect LLM",
+		"repl.llm_usage":        "Usage: llm list | llm add <model/id/name> | llm link <model/id/name> | llm test <model/id/name> | llm unlink <model/id/name> | llm remove <model/id/name>",
 		"repl.lang_usage":       "Usage: lang <zh|en>",
 		"repl.lang_current":     "Current language: ",
 		"repl.lang_switched":    "✓ Language switched and saved",

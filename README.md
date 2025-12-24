@@ -177,6 +177,32 @@ lazitex> ollama -i     # Install
 lazitex> ollama -u     # Uninstall
 ```
 
+### LLM Management
+
+Intelligent LLM provider management with registration, connection, testing, and multi-activation support.
+
+```bash
+# CLI Mode
+$ lazitex -m list                    # List all registered LLMs
+$ lazitex -m test gemma3:1b         # Test LLM connectivity
+$ lazitex -m link gemma3:1b         # Connect and activate LLM (requires test pass)
+$ lazitex -m unlink gemma3:1b       # Disconnect specific LLM
+$ lazitex -m add gemma3:1b           # Register LLM (without connecting)
+$ lazitex -m remove gemma3:1b       # Remove LLM registration
+
+# REPL Mode
+lazitex> llm list                   # List all registered LLMs
+lazitex> llm test gemma3:1b         # Test LLM connectivity
+lazitex> llm link gemma3:1b         # Connect and activate LLM
+lazitex> llm unlink gemma3:1b       # Disconnect specific LLM
+```
+
+**Features:**
+
+- **Multi-activation**: Support multiple active LLMs simultaneously
+- **Smart connection**: `link` automatically tests connectivity before activation
+- **Selective disconnect**: `unlink` removes specific LLM from active list without deleting registration
+
 ### Build & Preview
 
 One-click LaTeX document compilation with auto package detection & installation, adaptive multi-pass compilation, smart preview, and web real-time preview. Supports quiet mode (`-q`) and tidy mode (`-t`).

@@ -38,8 +38,12 @@ func BuildProviderList(dateFormat string) ([]ProviderListItem, error) {
 			VerifiedAt:   formatVerifiedAt(p.VerifiedAt, dateFormat),
 		}
 
-		if cfgData.ActiveLLM == p.ID {
-			item.ActiveMark = "*"
+		// 检查是否在激活列表中
+		for _, activeID := range cfgData.ActiveLLMs {
+			if activeID == p.ID {
+				item.ActiveMark = "*"
+				break
+			}
 		}
 
 		items = append(items, item)

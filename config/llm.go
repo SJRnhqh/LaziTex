@@ -87,10 +87,14 @@ func RemoveLLMProvider(idOrName string) error {
 	for _, provider := range config.LLMProviders {
 		if provider.ID == idOrName || provider.Name == idOrName {
 			found = true
-			// 如果删除的是当前激活的 LLM，清除激活状态
-			if config.ActiveLLM == provider.ID {
-				config.ActiveLLM = ""
+			// 如果删除的是当前激活的 LLM，从激活列表中移除
+			newActiveLLMs := []string{}
+			for _, activeID := range config.ActiveLLMs {
+				if activeID != provider.ID {
+					newActiveLLMs = append(newActiveLLMs, activeID)
+				}
 			}
+			config.ActiveLLMs = newActiveLLMs
 		} else {
 			newProviders = append(newProviders, provider)
 		}
@@ -120,7 +124,7 @@ func FindLLMProvider(idOrName string) (*LLMProvider, error) {
 	return nil, nil // 未找到，返回 nil
 }
 
-// SetActiveLLM 设置当前激活的 LLM Provider
+// SetActiveLLM 添加 LLM Provider 到激活列表（如果已存在则不重复添加）
 func SetActiveLLM(idOrName string) error {
 	// 验证 LLM Provider 是否存在
 	provider, err := FindLLMProvider(idOrName)
@@ -131,7 +135,62 @@ func SetActiveLLM(idOrName string) error {
 		return fmt.Errorf("LLM Provider '%s' 不存在", idOrName)
 	}
 
-	return UpdateConfig(map[string]interface{}{
-		"activeLLM": provider.ID,
-	})
+	// 加载配置
+	config, err := LoadConfig()
+	if err != nil {
+		return err
+	}
+
+	// 检查是否已在激活列表中
+	for _, activeID := range config.ActiveLLMs {
+		if activeID == provider.ID {
+			// 已在列表中，直接返回成功
+			return nil
+		}
+	}
+
+	// 添加到激活列表
+	config.ActiveLLMs = append(config.ActiveLLMs, provider.ID)
+	return SaveConfig(config)
+}
+
+// UnsetActiveLLM 从激活列表中移除指定的 LLM Provider（需要验证）
+func UnsetActiveLLM(idOrName string) error {
+	// 验证 LLM Provider 是否存在
+	provider, err := FindLLMProvider(idOrName)
+	if err != nil {
+		return err
+	}
+	if provider == nil {
+		return fmt.Errorf("LLM Provider '%s' 不存在", idOrName)
+	}
+
+	// 加载配置检查当前激活状态
+	config, err := LoadConfig()
+	if err != nil {
+		return err
+	}
+
+	// 验证指定的 LLM 是否在激活列表中
+	found := false
+	for _, activeID := range config.ActiveLLMs {
+		if activeID == provider.ID {
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		return fmt.Errorf("LLM Provider '%s' 不在激活列表中", idOrName)
+	}
+
+	// 从激活列表中移除
+	newActiveLLMs := []string{}
+	for _, activeID := range config.ActiveLLMs {
+		if activeID != provider.ID {
+			newActiveLLMs = append(newActiveLLMs, activeID)
+		}
+	}
+	config.ActiveLLMs = newActiveLLMs
+	return SaveConfig(config)
 }

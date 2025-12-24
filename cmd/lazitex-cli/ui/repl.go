@@ -306,7 +306,7 @@ func handleREPLCommand(input string) bool {
 		return false
 
 	case "llm":
-		// llm list | llm add/link/test/remove/unlink [alias] | llm <alias> (智能，暂不实现)
+		// llm list | llm add/link/test/unlink | llm remove <alias> | llm <alias> (智能，暂不实现)
 		if len(parts) < 2 {
 			fmt.Println(lang.T("repl.llm_usage"))
 			return false
@@ -341,7 +341,14 @@ func handleREPLCommand(input string) bool {
 			}
 			tasks.TestLLM(sub[1])
 			return false
-		case "remove", "unlink":
+		case "unlink":
+			if len(sub) < 2 {
+				fmt.Println(lang.T("repl.llm_usage"))
+				return false
+			}
+			tasks.UnlinkLLM(sub[1])
+			return false
+		case "remove":
 			if len(sub) < 2 {
 				fmt.Println(lang.T("repl.llm_usage"))
 				return false
@@ -351,8 +358,8 @@ func handleREPLCommand(input string) bool {
 		default:
 			// 默认当作模型名（智能模式）：暂时不实现，显示提示
 			if len(sub) == 1 {
-				fmt.Println("⚠️  智能注册/链接功能暂未实现")
-				fmt.Println("请使用: llm add <model> 注册，或 llm link <model> 链接")
+				fmt.Println("⚠️  智能注册/连接功能暂未实现")
+				fmt.Println("请使用: llm add <model> 注册，或 llm link <model> 连接")
 				return false
 			}
 			// 未知命令

@@ -17,7 +17,7 @@ type Config struct {
 
 	// LLM 配置
 	LLMProviders []LLMProvider `json:"llmProviders,omitempty"` // LLM Provider列表
-	ActiveLLM    string        `json:"activeLLM,omitempty"`    // 当前link的LLM Provider ID
+	ActiveLLMs   []string      `json:"activeLLMs,omitempty"`   // 当前连接的 LLM Provider ID 列表（支持多激活）
 }
 
 // getConfigPath 获取配置文件路径
@@ -50,6 +50,7 @@ func LoadConfig() (*Config, error) {
 			Language:     "en",
 			DisplayMode:  "virtual",
 			LLMProviders: []LLMProvider{},
+			ActiveLLMs:   []string{},
 		}, nil
 	}
 
@@ -59,6 +60,7 @@ func LoadConfig() (*Config, error) {
 			Language:     "en",
 			DisplayMode:  "virtual",
 			LLMProviders: []LLMProvider{},
+			ActiveLLMs:   []string{},
 		}, nil
 	}
 
@@ -69,6 +71,7 @@ func LoadConfig() (*Config, error) {
 			Language:     "en",
 			DisplayMode:  "virtual",
 			LLMProviders: []LLMProvider{},
+			ActiveLLMs:   []string{},
 		}, nil
 	}
 
@@ -78,6 +81,7 @@ func LoadConfig() (*Config, error) {
 			Language:     "en",
 			DisplayMode:  "virtual",
 			LLMProviders: []LLMProvider{},
+			ActiveLLMs:   []string{},
 		}, nil
 	}
 
@@ -90,6 +94,9 @@ func LoadConfig() (*Config, error) {
 	}
 	if config.LLMProviders == nil {
 		config.LLMProviders = []LLMProvider{}
+	}
+	if config.ActiveLLMs == nil {
+		config.ActiveLLMs = []string{}
 	}
 
 	return &config, nil
@@ -129,8 +136,28 @@ func UpdateConfig(updates map[string]interface{}) error {
 			config.Language = language
 		}
 	}
+	// 支持更新 activeLLMs（列表）
+	if activeLLMs, ok := updates["activeLLMs"].([]string); ok {
+		config.ActiveLLMs = activeLLMs
+	}
+	// 向后兼容：如果传入了 activeLLM（单值），转换为列表
 	if activeLLM, ok := updates["activeLLM"].(string); ok {
-		config.ActiveLLM = activeLLM
+		if activeLLM != "" {
+			// 如果不在列表中，添加
+			found := false
+			for _, id := range config.ActiveLLMs {
+				if id == activeLLM {
+					found = true
+					break
+				}
+			}
+			if !found {
+				config.ActiveLLMs = append(config.ActiveLLMs, activeLLM)
+			}
+		} else {
+			// 如果为空字符串，清空列表（向后兼容）
+			config.ActiveLLMs = []string{}
+		}
 	}
 
 	// 保存更新后的配置

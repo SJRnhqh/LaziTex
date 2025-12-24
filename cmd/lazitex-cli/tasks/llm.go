@@ -14,7 +14,7 @@ import (
 	"github.com/mattn/go-runewidth"
 )
 
-// 默认用 Ollama，把模型名和 ID/Name 统一成传入的别名，方便「智能注册+链接」
+// 默认用 Ollama，把模型名和 ID/Name 统一成传入的别名，方便「智能注册+连接」
 func newDefaultProvider(alias string) *cfg.LLMProvider {
 	return &cfg.LLMProvider{
 		ID:       alias,
@@ -36,10 +36,10 @@ func SmartLinkOrAddLLM(alias string) {
 
 	if existing != nil {
 		if err := cfg.SetActiveLLM(existing.ID); err != nil {
-			fmt.Printf("❌ 链接失败: %v\n", err)
+			fmt.Printf("❌ 连接失败: %v\n", err)
 			return
 		}
-		fmt.Printf("🔗 已链接到现有 LLM: %s (%s)\n", existing.Name, existing.Model)
+		fmt.Printf("🔗 已连接到现有 LLM: %s (%s)\n", existing.Name, existing.Model)
 		return
 	}
 
@@ -49,13 +49,13 @@ func SmartLinkOrAddLLM(alias string) {
 		return
 	}
 	if err := cfg.SetActiveLLM(provider.ID); err != nil {
-		fmt.Printf("❌ 注册成功但链接失败: %v\n", err)
+		fmt.Printf("❌ 注册成功但连接失败: %v\n", err)
 		return
 	}
-	fmt.Printf("✅ 已注册并链接 LLM: %s (%s)\n", provider.Name, provider.Model)
+	fmt.Printf("✅ 已注册并连接 LLM: %s (%s)\n", provider.Name, provider.Model)
 }
 
-// 显式注册（不自动链接）
+// 显式注册（不自动连接）
 func AddLLM(alias string) {
 	provider := newDefaultProvider(alias)
 	if err := cfg.AddLLMProvider(provider); err != nil {
@@ -65,14 +65,14 @@ func AddLLM(alias string) {
 	fmt.Printf("✅ 已注册 LLM: %s (%s)\n", provider.Name, provider.Model)
 }
 
-func LinkLLM(alias string) {
-	p, err := cfg.FindLLMProvider(alias)
+func LinkLLM(model string) {
+	p, err := cfg.FindLLMProvider(model)
 	if err != nil {
 		fmt.Printf(lang.T("msg.llm.link.read_failed")+"\n", err)
 		return
 	}
 	if p == nil {
-		fmt.Printf(lang.T("msg.llm.link.not_found")+"\n", alias)
+		fmt.Printf(lang.T("msg.llm.link.not_found")+"\n", model)
 		return
 	}
 
@@ -91,6 +91,62 @@ func LinkLLM(alias string) {
 		return
 	}
 	fmt.Printf(lang.T("msg.llm.link.success")+"\n", p.Name, p.Model)
+}
+
+// UnlinkLLM 取消连接指定的 LLM（不清除配置）
+func UnlinkLLM(model string) {
+	// 先查找 provider 以便显示名称
+	provider, err := cfg.FindLLMProvider(model)
+	if err != nil {
+		fmt.Printf(lang.T("msg.llm.unlink.read_failed")+"\n", err)
+		return
+	}
+	if provider == nil {
+		fmt.Printf(lang.T("msg.llm.unlink.not_found")+"\n", model)
+		return
+	}
+
+	// 调用 config 层的 UnsetActiveLLM，它会验证激活状态
+	if err := cfg.UnsetActiveLLM(model); err != nil {
+		// 根据错误类型显示不同的消息
+		if err.Error() == fmt.Sprintf("LLM Provider '%s' 不在激活列表中", model) {
+			fmt.Printf(lang.T("msg.llm.unlink.not_active")+"\n", provider.Name, provider.Model)
+		} else {
+			fmt.Printf(lang.T("msg.llm.unlink.failed")+"\n", err)
+		}
+		return
+	}
+
+	// 成功消息
+	fmt.Printf(lang.T("msg.llm.unlink.success")+"\n", provider.Name, provider.Model)
+}
+
+// 测试：检查配置并测试真实连通性（支持已注册和未注册两种模式）
+func TestLLM(model string) {
+	// 尝试作为已注册的 Provider 查找
+	p, err := cfg.FindLLMProvider(model)
+	if err != nil {
+		fmt.Printf(lang.T("msg.llm.test.read_failed")+"\n", err)
+		return
+	}
+
+	if p == nil {
+		// 未注册的模型，执行完整测试和验证状态
+		testUnregisteredLLM(model)
+		return
+	}
+
+	// 已注册的模型，执行完整测试和验证状态更新
+	testRegisteredLLM(p)
+}
+
+// 删除
+func RemoveLLM(alias string) {
+	if err := cfg.RemoveLLMProvider(alias); err != nil {
+		fmt.Printf(lang.T("msg.llm.remove.failed")+"\n", err)
+		return
+	}
+	fmt.Printf(lang.T("msg.llm.remove.success")+"\n", alias)
 }
 
 // 列出所有纯粹读取本地已经注册配置的LLM
@@ -132,34 +188,6 @@ func ListLLM() {
 			item.ActiveMark,
 		)
 	}
-}
-
-// 测试：检查配置并测试真实连通性（支持已注册和未注册两种模式）
-func TestLLM(model string) {
-	// 尝试作为已注册的 Provider 查找
-	p, err := cfg.FindLLMProvider(model)
-	if err != nil {
-		fmt.Printf(lang.T("msg.llm.test.read_failed")+"\n", err)
-		return
-	}
-
-	if p == nil {
-		// 未注册的模型，执行完整测试和验证状态
-		testUnregisteredLLM(model)
-		return
-	}
-
-	// 已注册的模型，执行完整测试和验证状态更新
-	testRegisteredLLM(p)
-}
-
-// 删除
-func RemoveLLM(alias string) {
-	if err := cfg.RemoveLLMProvider(alias); err != nil {
-		fmt.Printf(lang.T("msg.llm.remove.failed")+"\n", err)
-		return
-	}
-	fmt.Printf(lang.T("msg.llm.remove.success")+"\n", alias)
 }
 
 // 未注册模型的连通性测试（默认使用 ollama）

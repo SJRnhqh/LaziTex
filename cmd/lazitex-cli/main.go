@@ -24,9 +24,9 @@ func main() {
 	// 初始化语言设置并移除 --lang 参数
 	args := processLanguageFlag()
 
-	// 如果没有其他参数，输出当前语言即可
+	// 如果没有其他参数，显示帮助信息
 	if len(args) == 0 {
-		fmt.Println(lang.T("repl.lang_current") + lang.GetCurrentLanguageName())
+		tasks.ShowHelp()
 		return
 	}
 
@@ -46,7 +46,7 @@ func main() {
 
 	case "-r", "--repl":
 		ui.StartREPL()
-	
+
 	case "-x", "--latex": // LaTeX 管理 TODO: 测试覆盖
 		internal.HandleLaTeXCommand(args[1:], internal.I18nModeMsg, "msg.latex_usage")
 		return
@@ -56,7 +56,7 @@ func main() {
 		return
 
 	case "-m", "--llm":
-		// LLM 管理：智能 / add / link / list / test / remove(unlink)
+		// LLM 管理：智能 / add / link / list / test / unlink / remove
 		if len(args) < 2 {
 			fmt.Println(lang.T("msg.llm.cli_usage"))
 			return
@@ -91,7 +91,14 @@ func main() {
 			}
 			tasks.TestLLM(sub[1])
 			return
-		case "remove", "unlink":
+		case "unlink":
+			if len(sub) < 2 {
+				fmt.Println(lang.T("msg.llm.cli_usage"))
+				return
+			}
+			tasks.UnlinkLLM(sub[1])
+			return
+		case "remove":
 			if len(sub) < 2 {
 				fmt.Println(lang.T("msg.llm.cli_usage"))
 				return
@@ -101,8 +108,8 @@ func main() {
 		default:
 			// 默认当作模型名（智能模式）：暂时不实现，显示提示
 			if len(sub) == 1 {
-				fmt.Println("⚠️  智能注册/链接功能暂未实现")
-				fmt.Println("请使用: lazitex -m add <model> 注册，或 lazitex -m link <model> 链接")
+				fmt.Println("⚠️  智能注册/连接功能暂未实现")
+				fmt.Println("请使用: lazitex -m add <model> 注册，或 lazitex -m link <model> 连接")
 				return
 			}
 			// 未知命令
