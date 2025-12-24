@@ -23,9 +23,9 @@
 - 📦 **自动包管理** - 自动检测并安装缺失的包
 - 🌐 **Web 预览模式** - Web 实时预览
 - 🦙 **Ollama 管理** - 一键管理 Ollama
-- 🤖 **LLM 管理** - 智能 LLM 提供商管理和配置
+- 🤖 **LLM 管理** - 完整的 LLM 提供商注册、连接、测试和管理
 - ⚙️ **配置管理** - 跨平台配置文件管理
-- 🧠 **AI 架构** - 模块化 AI 智能体和工具系统 (即将推出)
+- 🧠 **AI 架构** - 模块化 AI 智能体和工具系统 (开发中)
 - 🎨 **多种模式** - 支持 TUI 和 REPL 模式
 
 ---
@@ -106,7 +106,7 @@ go build -o lazitex ./cmd/lazitex-cli
 | `-o, --ollama` | Ollama 管理 (使用 `-c/-i/-u` 标志) | `lazitex -o -c` |
 | `-b, --build` | 构建 LaTeX 文档 (支持 `-o` 输出, `-s` 编译后展示, `-q` 静默模式, `-t` 清理辅助文件) | `lazitex -b main.tex [-o out/] [-s] [-q] [-t]` |
 | `-p, --preview` | 实时预览 PDF 文档 (支持 `-q` 静默模式, `-t` 清理辅助文件, `:端口号` 自定义端口) | `lazitex -p main.tex [-q] [-t] [:端口号]` |
-| `-m, --llm` | LLM 管理 (list/test/link/add/remove/unlink) | `lazitex -m list` 或 `lazitex -m link gemma3:1b` |
+| `-m, --llm` | LLM 管理 | `lazitex -m list` 或 `lazitex -m add llama3 -p ollama -n my-llm` |
 | `config` | 打开配置文件 | `lazitex config` |
 | `-l, --lang` | 设置语言 (zh/en) | `lazitex -l zh` |
 
@@ -179,33 +179,32 @@ lazitex> ollama -u     # 卸载
 
 ### LLM 管理
 
-智能 LLM 提供商管理，支持注册、连接、测试、删除和多激活。
+完整的 LLM 提供商管理，支持注册、连接、测试和删除。
 
 ```bash
 # CLI 模式
-$ lazitex -m list                    # 列出所有已注册的 LLM
-$ lazitex -m test gemma3:1b           # 测试 LLM 连通性
-$ lazitex -m link gemma3:1b           # 连接并激活 LLM（需测试通过）
-$ lazitex -m unlink gemma3:1b         # 取消连接指定 LLM
-$ lazitex -m add <model> -p <provider> -n <name>  # 注册 LLM（需指定提供商和名称）
-$ lazitex -m remove gemma3:1b         # 删除 LLM 注册
+$ lazitex -m add <model> -p <provider> -n <name>  # 注册 LLM
+$ lazitex -m remove <id/name/model>              # 删除 LLM（交互式选择）
+$ lazitex -m link <id/name/model>                # 连接并激活 LLM
+$ lazitex -m unlink <id/name/model>              # 断开 LLM 连接
+$ lazitex -m test <id/name/model>                # 测试 LLM 连通性
+$ lazitex -m list                                 # 列出所有已注册的 LLM
 
 # REPL 模式
-lazitex> llm list                     # 列出所有已注册的 LLM
-lazitex> llm test gemma3:1b           # 测试 LLM 连通性
-lazitex> llm link gemma3:1b           # 连接并激活 LLM
-lazitex> llm unlink gemma3:1b         # 取消连接指定 LLM
 lazitex> llm add <model> -p <provider> -n <name>  # 注册 LLM
-lazitex> llm remove gemma3:1b         # 删除 LLM 注册
+lazitex> llm remove <id/name/model>              # 删除 LLM
+lazitex> llm link <id/name/model>                # 连接 LLM
+lazitex> llm unlink <id/name/model>              # 断开 LLM
+lazitex> llm test <id/name/model>                # 测试 LLM
+lazitex> llm list                                 # 列出 LLM
 ```
 
 **特性：**
 
+- **灵活匹配**：支持 ID、名称或模型匹配，多个匹配时提供交互式选择
 - **多激活支持**：可同时激活多个 LLM
-- **智能连接**：`link` 会在激活前自动测试连通性
-- **选择性断开**：`unlink` 可从激活列表中移除指定 LLM，不删除注册信息
-- **灵活删除**：`remove` 支持通过 ID、名称或模型匹配 - 如找到多个匹配项，会列出所有匹配项供您选择删除
-- **安全删除**：删除前会显示确认提示，防止误删
+- **自动验证**：注册和连接时自动测试连通性
+- **安全删除**：删除前显示确认提示
 
 ### 构建与预览
 
@@ -294,10 +293,10 @@ lazitex/
 │       ├── agent/                 # AI 智能体管理
 │       │   └── registry.go        # 智能体注册和管理
 │       ├── llm/                   # LLM 提供商抽象
-│       │   ├── registry.go        # LLM 提供商注册和管理
+│       │   ├── registry.go        # 提供商注册和 LLM 注册逻辑
 │       │   ├── connectivity.go    # LLM 连通性测试
 │       │   ├── list.go            # LLM 列表构建逻辑
-│       │   └── remove.go          # LLM 删除逻辑（匹配、格式化）
+│       │   └── select.go           # 提供商匹配和交互式选择
 │       ├── providers/             # LLM 提供商实现
 │       │   └── ollama.go          # Ollama 提供商实现
 │       └── tools/                 # AI 工具系统
@@ -374,7 +373,7 @@ lazitex/
 │       │   ├── preview.go         # 实时预览功能
 │       │   ├── ollama.go          # Ollama 管理功能
 │       │   ├── latex.go           # LaTeX 环境管理功能
-│       │   ├── llm.go             # LLM 管理功能（注册/连接/断开/删除/测试/列表，包含用户交互编排）
+│       │   ├── llm.go             # LLM 管理（注册、连接、测试、删除，支持交互式选择）
 │       │   ├── config.go          # 配置文件管理功能
 │       │   └── help.go            # 帮助信息
 │       ├── 🧠 internal/           # 内部命令处理（统一动作处理器）
@@ -402,7 +401,7 @@ lazitex/
 
 - **模块化 AI 架构** - AI 智能体、LLM 提供商和工具的清晰分离，采用可扩展的注册系统实现无缝集成
 
-- **完善的 LLM 管理** - 智能的提供商注册、配置持久化、激活状态跟踪，以及支持 ID/名称/模型匹配的灵活删除功能，所有功能都支持跨平台配置
+- **完整的 LLM 管理** - 全生命周期管理：带验证的注册、智能匹配（ID/名称/模型）、连接/断开、测试，以及带确认的安全删除
 
 ---
 
@@ -414,18 +413,19 @@ lazitex/
 - [x] **编译系统** - 一键编译、智能预览、自动包检测与安装、自适应多轮编译、性能优化
 - [x] **Web 预览前端** - Vue 3 前端、SSE 实时刷新、PDF 虚拟滚动、双模式架构
 - [x] **Ollama 管理** - 跨平台检查、安装、卸载
-- [x] **AI 架构** - LLM 和 Agent 模块化架构、智能提供商管理
+- [x] **LLM 管理** - 完整的提供商注册、连接、测试、删除和多激活支持
+- [x] **AI 架构基础** - LLM 提供商和智能体的模块化架构
 - [x] **交互模式** - REPL 交互模式（历史记录、Tab 补全、国际化）
 
 ### 进行中 🚧
 
+- [ ] **AI 应用功能** - LLM 驱动的错误诊断、代码生成、智能补全
+- [ ] **智能体系统** - AI 智能体构建和编排框架
 - [ ] **实时预览优化** - 错误反馈增强
 - [ ] **Linux 环境管理** - 自动安装/更新/卸载
-- [ ] **PDF 预览增强** - 分页导航、缩放控制
 
 ### 计划中 📋
 
-- [ ] **AI 集成** - CLI 内部错误诊断、代码生成、智能补全
 - [ ] **Web 工作区** - 文件管理、代码编辑器、终端集成、AI 聊天
 - [ ] **项目功能** - 项目初始化、多文档支持、自定义配置
 - [ ] **平台扩展** - Windows 环境管理、TUI 完善、GUI 支持

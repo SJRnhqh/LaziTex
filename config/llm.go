@@ -36,6 +36,12 @@ func NewLLMProvider(provider, name, model string) *LLMProvider {
 	}
 }
 
+// 错误定义
+var (
+	ErrProviderIDExists   = fmt.Errorf("LLM Provider ID already exists")
+	ErrProviderNameExists = fmt.Errorf("LLM Provider name already exists")
+)
+
 // AddLLMProvider 添加新的 LLM Provider（如果已存在则返回错误）
 func AddLLMProvider(llmProvider *LLMProvider) error {
 	config := LoadConfig()
@@ -43,10 +49,10 @@ func AddLLMProvider(llmProvider *LLMProvider) error {
 	// 检查是否已存在相同 ID 或名称的 Provider
 	for _, existing := range config.LLMProviders {
 		if existing.ID == llmProvider.ID {
-			return fmt.Errorf("LLM Provider ID '%s' 已存在", llmProvider.ID)
+			return fmt.Errorf("%w: %s", ErrProviderIDExists, llmProvider.ID)
 		}
 		if existing.Name == llmProvider.Name {
-			return fmt.Errorf("LLM Provider 名称 '%s' 已存在", llmProvider.Name)
+			return fmt.Errorf("%w: %s", ErrProviderNameExists, llmProvider.Name)
 		}
 	}
 
@@ -89,42 +95,42 @@ func UpdateLLMProvider(idOrNameOrModel string, provider *LLMProvider) error {
 // 只通过 ID 进行精确删除，确保无歧义
 // 返回值：(是否找到并删除成功, 错误信息)
 func RemoveLLMProvider(PID string) (bool, error) {
-    config := LoadConfig()
+	config := LoadConfig()
 
-    // 查找要删除的provider
-    targetIndex := -1
-    for i, llmprovider := range config.LLMProviders {
-        if llmprovider.ID == PID {
-            targetIndex = i
-            break
-        }
-    }
+	// 查找要删除的provider
+	targetIndex := -1
+	for i, llmprovider := range config.LLMProviders {
+		if llmprovider.ID == PID {
+			targetIndex = i
+			break
+		}
+	}
 
-    // 未找到
-    if targetIndex == -1 {
-        return false, nil
-    }
+	// 未找到
+	if targetIndex == -1 {
+		return false, nil
+	}
 
-    // 获取要删除的provider ID（用于清理激活列表）
-    removedID := config.LLMProviders[targetIndex].ID
+	// 获取要删除的provider ID（用于清理激活列表）
+	removedID := config.LLMProviders[targetIndex].ID
 
-    // 从Providers列表中删除
-    config.LLMProviders = append(
-        config.LLMProviders[:targetIndex],
-        config.LLMProviders[targetIndex+1:]...,
-    )
+	// 从Providers列表中删除
+	config.LLMProviders = append(
+		config.LLMProviders[:targetIndex],
+		config.LLMProviders[targetIndex+1:]...,
+	)
 
-    // 从激活列表中移除
-    newActiveLLMs := []string{}
-    for _, activeID := range config.ActiveLLMs {
-        if activeID != removedID {
-            newActiveLLMs = append(newActiveLLMs, activeID)
-        }
-    }
-    config.ActiveLLMs = newActiveLLMs
+	// 从激活列表中移除
+	newActiveLLMs := []string{}
+	for _, activeID := range config.ActiveLLMs {
+		if activeID != removedID {
+			newActiveLLMs = append(newActiveLLMs, activeID)
+		}
+	}
+	config.ActiveLLMs = newActiveLLMs
 
-    // 保存配置
-    return true, SaveConfig(config)
+	// 保存配置
+	return true, SaveConfig(config)
 }
 
 // FindLLMProvider 根据ID、名称或模型查找 LLM Provider

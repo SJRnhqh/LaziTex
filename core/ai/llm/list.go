@@ -11,7 +11,8 @@ import (
 
 // ProviderListItem 用于展示的 LLM Provider 列表项
 type ProviderListItem struct {
-	Name         string
+	ID           string // 唯一标识（哈希值）
+	Name         string // 用户自定义名称
 	Provider     string
 	Model        string
 	Enabled      bool
@@ -27,6 +28,7 @@ func BuildProviderList(dateFormat string) ([]ProviderListItem, error) {
 	items := make([]ProviderListItem, 0, len(cfgData.LLMProviders))
 	for _, p := range cfgData.LLMProviders {
 		item := ProviderListItem{
+			ID:           p.ID,
 			Name:         p.Name,
 			Provider:     p.Provider,
 			Model:        p.Model,

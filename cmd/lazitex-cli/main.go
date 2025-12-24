@@ -56,7 +56,10 @@ func main() {
 		return
 
 	case "-m", "--llm":
-		// LLM 管理：智能 / add / link / list / test / unlink / remove
+		// LLM 管理命令组织：
+		// - list: 单独使用，无需参数
+		// - add: 需要 -p <provider> 和 -n <name>，model 作为位置参数
+		// - remove/link/unlink/test: 都可以对 id/name/model 进行直接操作
 		if len(args) < 2 {
 			fmt.Println(lang.T("msg.llm.cli_usage"))
 			return
@@ -65,30 +68,32 @@ func main() {
 		sub := args[1:]
 		action := sub[0]
 
-		// 先处理不需要额外参数的命令（如 list）
-		switch action {
-		case "list":
+		// list: 单独使用，无需参数
+		if action == "list" {
 			tasks.ListLLM()
 			return
-		case "add":
+		}
+
+		// add: 需要 -p <provider> 和 -n <name>，model 作为位置参数
+		if action == "add" {
 			if len(sub) < 2 {
 				fmt.Println(lang.T("msg.llm.cli_usage"))
 				return
 			}
-			// 解析参数：-m add <model> 必须首位，-p <provider> 和 -n <name> 顺序任意
+			// 解析参数：-m add <model> -p <provider> -n <name>
 			var provider string
 			var name string
 			var model string
 
-			// sub[1] 是 model
+			// sub[1] 是 model（位置参数）
 			if strings.HasPrefix(sub[1], "-") {
-				fmt.Println("❌ 需要提供注册模型名称")
+				fmt.Println(lang.T("msg.llm.add.model_required"))
 				fmt.Println(lang.T("msg.llm.cli_usage"))
 				return
 			}
 			model = sub[1]
 
-			// 从 sub[2] 开始解析必要参数 -p <provider> 和 -n <name> 可选且顺序任意
+			// 从 sub[2] 开始解析必要参数 -p <provider> 和 -n <name>（顺序任意）
 			i := 2
 			for i < len(sub) {
 				arg := sub[i]
@@ -96,12 +101,12 @@ func main() {
 				if arg == "-p" || arg == "--provider" {
 					// 检查是否有下一个参数
 					if i+1 >= len(sub) {
-						fmt.Println("❌ 需要提供提供商名称")
+						fmt.Println(lang.T("msg.llm.add.provider_required"))
 						fmt.Println(lang.T("msg.llm.cli_usage"))
 						return
 					}
 					if strings.HasPrefix(sub[i+1], "-") {
-						fmt.Println("❌ 需要提供提供商名称")
+						fmt.Println(lang.T("msg.llm.add.provider_required"))
 						fmt.Println(lang.T("msg.llm.cli_usage"))
 						return
 					}
@@ -111,12 +116,12 @@ func main() {
 				} else if arg == "-n" || arg == "--name" {
 					// 检查是否有下一个参数
 					if i+1 >= len(sub) {
-						fmt.Println("❌ 需要为注册模型自定义名称")
+						fmt.Println(lang.T("msg.llm.add.name_required"))
 						fmt.Println(lang.T("msg.llm.cli_usage"))
 						return
 					}
 					if strings.HasPrefix(sub[i+1], "-") {
-						fmt.Println("❌ 需要为自定义模型自定义名称")
+						fmt.Println(lang.T("msg.llm.add.name_required"))
 						fmt.Println(lang.T("msg.llm.cli_usage"))
 						return
 					}
@@ -126,68 +131,51 @@ func main() {
 				}
 
 				if strings.HasPrefix(arg, "-") {
-					fmt.Println(lang.T("msg.unknown_command")+"\n", arg)
+					fmt.Printf(lang.T("msg.unknown_command")+"\n", arg)
 					fmt.Println(lang.T("msg.llm.cli_usage"))
 					return
 				}
 
 				// 非flag参数，不应该出现在这里
-				fmt.Println("❌ 意外的非flag参数: ", arg)
+				fmt.Printf(lang.T("msg.llm.add.unexpected_nonflag")+"\n", arg)
 				fmt.Println(lang.T("msg.llm.cli_usage"))
 				return
 			}
 
 			if provider == "" {
-				fmt.Println("❌ 需要提供提供商")
+				fmt.Println(lang.T("msg.llm.add.provider_missing"))
 				fmt.Println(lang.T("msg.llm.cli_usage"))
 				return
 			}
 
 			if name == "" {
-				fmt.Println("❌ 需要为注册模型自定义名称")
+				fmt.Println(lang.T("msg.llm.add.name_required"))
 				fmt.Println(lang.T("msg.llm.cli_usage"))
 				return
 			}
 
 			tasks.AddLLM(provider, name, model)
 			return
-		case "link":
-			if len(sub) < 2 {
-				fmt.Println(lang.T("msg.llm.cli_usage"))
-				return
-			}
-			tasks.LinkLLM(sub[1])
+		}
+
+		// remove/link/unlink/test: 都可以对 id/name/model 进行直接操作
+		if len(sub) < 2 {
+			fmt.Println(lang.T("msg.llm.cli_usage"))
 			return
-		case "test":
-			if len(sub) < 2 {
-				fmt.Println(lang.T("msg.llm.cli_usage"))
-				return
-			}
-			tasks.TestLLM(sub[1])
-			return
-		case "unlink":
-			if len(sub) < 2 {
-				fmt.Println(lang.T("msg.llm.cli_usage"))
-				return
-			}
-			tasks.UnlinkLLM(sub[1])
-			return
+		}
+
+		switch action {
 		case "remove":
-			if len(sub) < 2 {
-				fmt.Println(lang.T("msg.llm.cli_usage"))
-				return
-			}
 			tasks.RemoveLLM(sub[1])
-			return
+		case "link":
+			tasks.LinkLLM(sub[1])
+		case "unlink":
+			tasks.UnlinkLLM(sub[1])
+		case "test":
+			tasks.TestLLM(sub[1])
 		default:
-			// 默认当作模型名（智能模式）：暂时不实现，显示提示
-			if len(sub) == 1 {
-				fmt.Println("⚠️  智能注册/连接功能暂未实现")
-				fmt.Println("请使用: lazitex -m add <model> 注册，或 lazitex -m link <model> 连接")
-				return
-			}
 			// 未知命令
-			fmt.Printf("未知操作: %s\n", action)
+			fmt.Printf(lang.T("msg.llm.unknown_action")+"\n", action)
 			fmt.Println(lang.T("msg.llm.cli_usage"))
 		}
 
