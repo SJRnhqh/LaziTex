@@ -344,6 +344,7 @@ func init() {
 		"latex.err_no_action":             "❌ 错误: 未指定操作",
 		"latex.err_multi_actions":         "❌ 错误: 指定了多个操作，只能选择一个",
 		"latex.err_unknown_flag":          "❌ 错误: 未知的标志",
+		"latex.err_extra_argument":        "❌ 错误: 意外的参数 '%s'，此命令不接受额外参数",
 		"msg.latex.not_implemented":       "❌ 功能尚未实现（开发中）",
 		"msg.latex.linux.not_implemented": "❌ Linux 平台的安装/卸载功能尚未实现（开发中）",
 		"msg.latex.win.not_implemented":   "❌ Windows 平台的安装/卸载功能尚未实现（开发中）",
@@ -402,6 +403,7 @@ func init() {
 		"ollama.err_no_action":                      "❌ 错误: 未指定操作",
 		"ollama.err_multi_actions":                  "❌ 错误: 指定了多个操作，只能选择一个",
 		"ollama.err_unknown_flag":                   "❌ 错误: 未知的标志",
+		"ollama.err_extra_argument":                 "❌ 错误: 意外的参数 '%s'，此命令不接受额外参数",
 
 		// macOS Ollama 特定消息
 		"msg.ollama.mac.installing_via_homebrew":   "🦙 正在通过 Homebrew 安装 Ollama...",
@@ -712,6 +714,7 @@ func init() {
 		"latex.err_no_action":             "❌ Error: No action specified",
 		"latex.err_multi_actions":         "❌ Error: Multiple actions specified, only one allowed",
 		"latex.err_unknown_flag":          "❌ Error: Unknown flag",
+		"latex.err_extra_argument":        "❌ Error: Unexpected argument '%s', this command does not accept extra arguments",
 		"msg.latex.not_implemented":       "❌ Feature not implemented (under development)",
 		"msg.latex.linux.not_implemented": "❌ Installation/uninstallation on Linux is not implemented (under development)",
 		"msg.latex.win.not_implemented":   "❌ Installation/uninstallation on Windows is not implemented (under development)",
@@ -767,9 +770,10 @@ func init() {
 		"msg.ollama.mac.install_method_option2":     "  2. Official install script (direct installation)",
 		"msg.ollama.mac.install_method_choice":      "Choose [1/2] (default: 1): ",
 		"msg.ollama_usage":                          "Usage: lazitex -o <-c|--check|-i|--install|-u|--uninstall|-s|--status>",
-		"msg.ollama.err_no_action":                  "❌ Error: No action specified",
-		"msg.ollama.err_multi_actions":              "❌ Error: Multiple actions specified, only one allowed",
-		"msg.ollama.err_unknown_flag":               "❌ Error: Unknown flag",
+		"ollama.err_no_action":                      "❌ Error: No action specified",
+		"ollama.err_multi_actions":                  "❌ Error: Multiple actions specified, only one allowed",
+		"ollama.err_unknown_flag":                   "❌ Error: Unknown flag",
+		"ollama.err_extra_argument":                 "❌ Error: Unexpected argument '%s', this command does not accept extra arguments",
 
 		// macOS Ollama specific messages
 		"msg.ollama.mac.installing_via_homebrew":   "🦙 Installing Ollama via Homebrew...",

@@ -32,16 +32,24 @@ type ActionType interface {
 // ActionErrorConfig 错误配置结构，用于配置不同命令的错误处理
 type ActionErrorConfig struct {
 	// 哨兵错误
-	NoAction     error
-	MultiActions error
-	UnknownFlag  error
+	NoAction      error
+	MultiActions  error
+	UnknownFlag   error
+	ExtraArgument error
 
 	// 创建 UnknownFlagError 的工厂函数
 	// 参数是未知标志字符串，返回对应的错误
 	NewUnknownFlagError func(flag string) error
 
+	// 创建 ExtraArgumentError 的工厂函数
+	// 参数是额外参数字符串，返回对应的错误
+	NewExtraArgumentError func(arg string) error
+
 	// 错误类型检查函数：检查错误是否是 UnknownFlagError 类型
 	IsUnknownFlagError func(err error) (string, bool)
+
+	// 错误类型检查函数：检查错误是否是 ExtraArgumentError 类型
+	IsExtraArgumentError func(err error) (string, bool)
 
 	// 国际化键前缀（如 "ollama" 或 "latex"）
 	I18nPrefix string
@@ -51,6 +59,14 @@ type ActionErrorConfig struct {
 func getActionErrorType(err error, config ActionErrorConfig) string {
 	if err == nil {
 		return ""
+	}
+
+	// 先检查是否是自定义 ExtraArgumentError 类型
+	if config.IsExtraArgumentError != nil {
+		if arg, ok := config.IsExtraArgumentError(err); ok {
+			_ = arg // 参数信息可用于日志等
+			return "err_extra_argument"
+		}
 	}
 
 	// 先检查是否是自定义 UnknownFlagError 类型
@@ -70,6 +86,9 @@ func getActionErrorType(err error, config ActionErrorConfig) string {
 	}
 	if errors.Is(err, config.UnknownFlag) {
 		return "err_unknown_flag"
+	}
+	if errors.Is(err, config.ExtraArgument) {
+		return "err_extra_argument"
 	}
 
 	return ""
@@ -161,8 +180,13 @@ func ParseActionArgs[Action ActionType](
 				return unknownAction, config.NewUnknownFlagError(arg)
 			}
 			return unknownAction, config.UnknownFlag
+		} else {
+			// 非 flag 参数：这些命令不接受额外的非标志参数
+			if config.NewExtraArgumentError != nil {
+				return unknownAction, config.NewExtraArgumentError(arg)
+			}
+			return unknownAction, config.ExtraArgument
 		}
-		// 非 flag 参数忽略
 	}
 
 	// 验证：必须指定且只能指定一个 action
@@ -220,7 +244,22 @@ func HandleCommandError(err error, mapper func(error) string, usageKey string) b
 	// 如果提供了映射器，尝试获取错误消息
 	if mapper != nil {
 		if i18nKey := mapper(err); i18nKey != "" {
-			fmt.Println(lang.T(i18nKey))
+			// 检查错误消息是否包含格式字符串（%s, %v 等）
+			msg := lang.T(i18nKey)
+			if strings.Contains(msg, "%") {
+				// 尝试从错误中提取参数值
+				// 检查是否是 ExtraArgumentError 或 UnknownFlagError
+				if argErr, ok := err.(interface{ GetArg() string }); ok {
+					fmt.Printf(msg+"\n", argErr.GetArg())
+				} else if flagErr, ok := err.(interface{ GetFlag() string }); ok {
+					fmt.Printf(msg+"\n", flagErr.GetFlag())
+				} else {
+					// 如果无法提取参数，直接显示消息
+					fmt.Println(msg)
+				}
+			} else {
+				fmt.Println(msg)
+			}
 		}
 	}
 

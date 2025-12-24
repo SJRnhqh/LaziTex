@@ -37,9 +37,10 @@ func (a OllamaAction) String() string {
 
 // 错误定义
 var (
-	ErrOllamaNoAction     = errors.New("err_no_action")
-	ErrOllamaMultiActions = errors.New("err_multi_actions")
-	ErrOllamaUnknownFlag  = errors.New("err_unknown_flag")
+	ErrOllamaNoAction      = errors.New("err_no_action")
+	ErrOllamaMultiActions  = errors.New("err_multi_actions")
+	ErrOllamaUnknownFlag   = errors.New("err_unknown_flag")
+	ErrOllamaExtraArgument = errors.New("err_extra_argument")
 )
 
 // OllamaUnknownFlagError 包含未知标志的具体信息
@@ -53,6 +54,29 @@ func (e *OllamaUnknownFlagError) Error() string {
 
 func (e *OllamaUnknownFlagError) Unwrap() error {
 	return ErrOllamaUnknownFlag
+}
+
+// OllamaExtraArgumentError 包含额外参数的具体信息
+type OllamaExtraArgumentError struct {
+	Arg string
+}
+
+func (e *OllamaExtraArgumentError) Error() string {
+	return "err_extra_argument"
+}
+
+func (e *OllamaExtraArgumentError) Unwrap() error {
+	return ErrOllamaExtraArgument
+}
+
+// GetArg 返回额外参数的值
+func (e *OllamaExtraArgumentError) GetArg() string {
+	return e.Arg
+}
+
+// GetFlag 返回标志的值（用于 UnknownFlagError）
+func (e *OllamaUnknownFlagError) GetFlag() string {
+	return e.Flag
 }
 
 // OllamaActionFlagMap 将命令行标志映射到对应的动作
@@ -72,13 +96,21 @@ var OllamaActionToFlagsMap map[OllamaAction][]string
 
 // ollamaErrorConfig 错误配置
 var ollamaErrorConfig = ActionErrorConfig{
-	NoAction:            ErrOllamaNoAction,
-	MultiActions:        ErrOllamaMultiActions,
-	UnknownFlag:         ErrOllamaUnknownFlag,
-	NewUnknownFlagError: func(flag string) error { return &OllamaUnknownFlagError{Flag: flag} },
+	NoAction:              ErrOllamaNoAction,
+	MultiActions:          ErrOllamaMultiActions,
+	UnknownFlag:           ErrOllamaUnknownFlag,
+	ExtraArgument:         ErrOllamaExtraArgument,
+	NewUnknownFlagError:   func(flag string) error { return &OllamaUnknownFlagError{Flag: flag} },
+	NewExtraArgumentError: func(arg string) error { return &OllamaExtraArgumentError{Arg: arg} },
 	IsUnknownFlagError: func(err error) (string, bool) {
 		if flagErr, ok := err.(*OllamaUnknownFlagError); ok {
-			return flagErr.Flag, true
+			return flagErr.GetFlag(), true
+		}
+		return "", false
+	},
+	IsExtraArgumentError: func(err error) (string, bool) {
+		if argErr, ok := err.(*OllamaExtraArgumentError); ok {
+			return argErr.GetArg(), true
 		}
 		return "", false
 	},

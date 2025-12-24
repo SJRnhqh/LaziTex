@@ -34,9 +34,10 @@ func (a LaTeXAction) String() string {
 
 // 错误定义
 var (
-	ErrLaTeXNoAction     = errors.New("err_no_action")
-	ErrLaTeXMultiActions = errors.New("err_multi_actions")
-	ErrLaTeXUnknownFlag  = errors.New("err_unknown_flag")
+	ErrLaTeXNoAction      = errors.New("err_no_action")
+	ErrLaTeXMultiActions  = errors.New("err_multi_actions")
+	ErrLaTeXUnknownFlag   = errors.New("err_unknown_flag")
+	ErrLaTeXExtraArgument = errors.New("err_extra_argument")
 )
 
 // LaTeXUnknownFlagError 包含未知标志的具体信息
@@ -50,6 +51,29 @@ func (e *LaTeXUnknownFlagError) Error() string {
 
 func (e *LaTeXUnknownFlagError) Unwrap() error {
 	return ErrLaTeXUnknownFlag
+}
+
+// LaTeXExtraArgumentError 包含额外参数的具体信息
+type LaTeXExtraArgumentError struct {
+	Arg string
+}
+
+func (e *LaTeXExtraArgumentError) Error() string {
+	return "err_extra_argument"
+}
+
+func (e *LaTeXExtraArgumentError) Unwrap() error {
+	return ErrLaTeXExtraArgument
+}
+
+// GetArg 返回额外参数的值
+func (e *LaTeXExtraArgumentError) GetArg() string {
+	return e.Arg
+}
+
+// GetFlag 返回标志的值（用于 UnknownFlagError）
+func (e *LaTeXUnknownFlagError) GetFlag() string {
+	return e.Flag
 }
 
 // LaTeXActionFlagMap 将命令行标志映射到对应的动作
@@ -67,13 +91,21 @@ var LaTeXActionToFlagsMap map[LaTeXAction][]string
 
 // latexErrorConfig 错误配置
 var latexErrorConfig = ActionErrorConfig{
-	NoAction:            ErrLaTeXNoAction,
-	MultiActions:        ErrLaTeXMultiActions,
-	UnknownFlag:         ErrLaTeXUnknownFlag,
-	NewUnknownFlagError: func(flag string) error { return &LaTeXUnknownFlagError{Flag: flag} },
+	NoAction:              ErrLaTeXNoAction,
+	MultiActions:          ErrLaTeXMultiActions,
+	UnknownFlag:           ErrLaTeXUnknownFlag,
+	ExtraArgument:         ErrLaTeXExtraArgument,
+	NewUnknownFlagError:   func(flag string) error { return &LaTeXUnknownFlagError{Flag: flag} },
+	NewExtraArgumentError: func(arg string) error { return &LaTeXExtraArgumentError{Arg: arg} },
 	IsUnknownFlagError: func(err error) (string, bool) {
 		if flagErr, ok := err.(*LaTeXUnknownFlagError); ok {
-			return flagErr.Flag, true
+			return flagErr.GetFlag(), true
+		}
+		return "", false
+	},
+	IsExtraArgumentError: func(err error) (string, bool) {
+		if argErr, ok := err.(*LaTeXExtraArgumentError); ok {
+			return argErr.GetArg(), true
 		}
 		return "", false
 	},
