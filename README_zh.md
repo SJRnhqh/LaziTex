@@ -106,7 +106,7 @@ go build -o lazitex ./cmd/lazitex-cli
 | `-o, --ollama` | Ollama 管理 (使用 `-c/-i/-u` 标志) | `lazitex -o -c` |
 | `-b, --build` | 构建 LaTeX 文档 (支持 `-o` 输出, `-s` 编译后展示, `-q` 静默模式, `-t` 清理辅助文件) | `lazitex -b main.tex [-o out/] [-s] [-q] [-t]` |
 | `-p, --preview` | 实时预览 PDF 文档 (支持 `-q` 静默模式, `-t` 清理辅助文件, `:端口号` 自定义端口) | `lazitex -p main.tex [-q] [-t] [:端口号]` |
-| `-m, --llm` | LLM 管理 (add/link/list/test/remove) | `lazitex -m list` 或 `lazitex -m add llama3.2` |
+| `-m, --llm` | LLM 管理 (list/test/link/add/remove/unlink) | `lazitex -m list` 或 `lazitex -m link gemma3:1b` |
 | `config` | 打开配置文件 | `lazitex config` |
 | `-l, --lang` | 设置语言 (zh/en) | `lazitex -l zh` |
 

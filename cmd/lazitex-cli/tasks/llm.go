@@ -65,13 +65,32 @@ func AddLLM(alias string) {
 	fmt.Printf("✅ 已注册 LLM: %s (%s)\n", provider.Name, provider.Model)
 }
 
-// 显式链接已存在的
 func LinkLLM(alias string) {
-	if err := cfg.SetActiveLLM(alias); err != nil {
-		fmt.Printf("❌ 链接失败: %v\n", err)
+	p, err := cfg.FindLLMProvider(alias)
+	if err != nil {
+		fmt.Printf(lang.T("msg.llm.link.read_failed")+"\n", err)
 		return
 	}
-	fmt.Printf("🔗 已切换到 LLM: %s\n", alias)
+	if p == nil {
+		fmt.Printf(lang.T("msg.llm.link.not_found")+"\n", alias)
+		return
+	}
+
+	available, testErr := llm.TestLLMConnectivity(p)
+	if testErr != nil {
+		fmt.Printf(lang.T("msg.llm.link.test_failed")+"\n", testErr)
+		return
+	}
+	if !available {
+		fmt.Printf(lang.T("msg.llm.link.unavailable")+"\n", p.Name, p.Model)
+		return
+	}
+
+	if err := cfg.SetActiveLLM(p.ID); err != nil {
+		fmt.Printf(lang.T("msg.llm.link.set_active_failed")+"\n", err)
+		return
+	}
+	fmt.Printf(lang.T("msg.llm.link.success")+"\n", p.Name, p.Model)
 }
 
 // 列出所有纯粹读取本地已经注册配置的LLM
@@ -117,7 +136,7 @@ func ListLLM() {
 
 // 测试：检查配置并测试真实连通性（支持已注册和未注册两种模式）
 func TestLLM(model string) {
-	// 模式A：尝试作为已注册的 Provider 查找
+	// 尝试作为已注册的 Provider 查找
 	p, err := cfg.FindLLMProvider(model)
 	if err != nil {
 		fmt.Printf(lang.T("msg.llm.test.read_failed")+"\n", err)
@@ -125,11 +144,12 @@ func TestLLM(model string) {
 	}
 
 	if p == nil {
+		// 未注册的模型，执行完整测试和验证状态
 		testUnregisteredLLM(model)
 		return
 	}
 
-	// 模式A：已注册的模型，执行完整测试和验证状态更新
+	// 已注册的模型，执行完整测试和验证状态更新
 	testRegisteredLLM(p)
 }
 

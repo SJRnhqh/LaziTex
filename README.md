@@ -106,7 +106,7 @@ Download pre-built binaries from [Releases](https://github.com/SJRnhqh/lazitex/r
 | `-o, --ollama` | Ollama management (use `-c/-i/-u` flags) | `lazitex -o -c` |
 | `-b, --build` | Build LaTeX document (supports `-o` output, `-s` show, `-q` quiet, `-t` tidy) | `lazitex -b main.tex [-o out/] [-s] [-q] [-t]` |
 | `-p, --preview` | Live preview PDF (supports `-q` quiet mode, `-t` tidy mode, `:port` custom port) | `lazitex -p main.tex [-q] [-t] [:port]` |
-| `-m, --llm` | LLM management (add/link/list/test/remove) | `lazitex -m list` or `lazitex -m add llama3.2` |
+| `-m, --llm` | LLM management (list/test/link/add/remove/unlink) | `lazitex -m list` or `lazitex -m link gemma3:1b` |
 | `config` | Open configuration file | `lazitex config` |
 | `-l, --lang` | Set language (zh/en) | `lazitex -l zh` |
 
