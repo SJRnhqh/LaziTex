@@ -14,6 +14,7 @@ import (
 	// 内部包
 	internal "github.com/SJRnhqh/lazitex/cmd/lazitex-cli/internal"
 	tasks "github.com/SJRnhqh/lazitex/cmd/lazitex-cli/tasks"
+	llm "github.com/SJRnhqh/lazitex/core/ai/llm"
 	lang "github.com/SJRnhqh/lazitex/lang"
 	lipgloss "github.com/charmbracelet/lipgloss"
 	readline "github.com/chzyer/readline"
@@ -139,6 +140,16 @@ func (c *LaTeXCompleter) Do(line []rune, pos int) (newLine [][]rune, length int)
 	return replCompleter.Do(line, pos)
 }
 
+// getREPLPrompt 动态生成 REPL prompt，显示当前激活的 LLM
+func getREPLPrompt() string {
+	provider, _ := llm.GetCurrentLLM()
+	if provider != nil {
+		activeMark := llm.FormatActivePrompt(provider, "m")
+		return fmt.Sprintf("%slazitex> ", activeMark)
+	}
+	return lang.T("repl.prompt")
+}
+
 // StartREPL 启动 REPL 模式
 func StartREPL() {
 	// 初始化所有动作处理函数
@@ -153,7 +164,7 @@ func StartREPL() {
 
 	// 2. 初始化 readline 实例
 	rl, err := readline.NewEx(&readline.Config{
-		Prompt:          lang.T("repl.prompt"),
+		Prompt:          getREPLPrompt(),
 		HistoryFile:     historyFile,
 		AutoComplete:    &LaTeXCompleter{},
 		InterruptPrompt: "^C",
@@ -181,6 +192,9 @@ func StartREPL() {
 		if shouldExit := handleREPLCommand(input); shouldExit {
 			break
 		}
+
+		// 每次命令执行后更新 prompt（因为可能切换了 LLM）
+		rl.SetPrompt(getREPLPrompt())
 	}
 	fmt.Println(lang.T("repl.goodbye"))
 }
@@ -392,15 +406,18 @@ func handleREPLCommand(input string) bool {
 			return false
 		}
 
+		identifier := sub[1]
 		switch action {
 		case "remove":
-			tasks.RemoveLLM(sub[1])
+			tasks.RemoveLLM(identifier)
 		case "link":
-			tasks.LinkLLM(sub[1])
+			tasks.LinkLLM(identifier)
 		case "unlink":
-			tasks.UnlinkLLM(sub[1])
+			tasks.UnlinkLLM(identifier)
 		case "test":
-			tasks.TestLLM(sub[1])
+			tasks.TestLLM(identifier)
+		case "switch":
+			tasks.SwitchLLM(identifier)
 		default:
 			// 未知命令
 			fmt.Printf(lang.T("repl.unknown_command")+"\n", action)

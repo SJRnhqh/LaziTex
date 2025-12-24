@@ -187,6 +187,7 @@ $ lazitex -m add <model> -p <provider> -n <name>  # Register LLM
 $ lazitex -m remove <id/name/model>              # Remove LLM (interactive selection)
 $ lazitex -m link <id/name/model>                # Connect and activate LLM
 $ lazitex -m unlink <id/name/model>              # Disconnect LLM
+$ lazitex -m switch <id/name/model>              # Switch between linked LLMs
 $ lazitex -m test <id/name/model>                # Test LLM connectivity
 $ lazitex -m list                                 # List all registered LLMs
 
@@ -195,6 +196,7 @@ lazitex> llm add <model> -p <provider> -n <name>  # Register LLM
 lazitex> llm remove <id/name/model>              # Remove LLM
 lazitex> llm link <id/name/model>                # Connect LLM
 lazitex> llm unlink <id/name/model>              # Disconnect LLM
+lazitex> llm switch <id/name/model>              # Switch between linked LLMs
 lazitex> llm test <id/name/model>                # Test LLM
 lazitex> llm list                                 # List LLMs
 ```
@@ -202,7 +204,8 @@ lazitex> llm list                                 # List LLMs
 **Features:**
 
 - **Flexible matching**: Supports ID, Name, or Model matching with interactive selection for multiple matches
-- **Multi-activation**: Support multiple active LLMs simultaneously
+- **Current LLM management**: Link automatically sets as current, switch between linked LLMs
+- **Dynamic prompt**: REPL mode shows current active LLM in prompt: `(name:m)lazitex>`
 - **Auto verification**: Registration and connection automatically test connectivity
 - **Safe deletion**: Confirmation prompt before removal
 

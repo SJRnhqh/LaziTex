@@ -18,6 +18,7 @@ type Config struct {
 	// LLM 配置
 	LLMProviders []LLMProvider `json:"llmProviders,omitempty"` // LLM Provider列表
 	ActiveLLMs   []string      `json:"activeLLMs,omitempty"`   // 当前连接的 LLM Provider ID 列表（支持多激活）
+	CurrentLLM   string        `json:"currentLLM,omitempty"`   // 当前激活的 LLM Provider ID（用于 ask/chat）
 }
 
 // GetConfigPath 获取配置文件路径
@@ -29,12 +30,12 @@ type Config struct {
 //
 // 可能返回的错误：
 //   - os.UserConfigDir() 失败：无法获取用户配置目录
-//     * 用户主目录不存在
-//     * 系统环境变量问题（Windows: %APPDATA%, Unix: $XDG_CONFIG_HOME 或 ~/.config）
+//   - 用户主目录不存在
+//   - 系统环境变量问题（Windows: %APPDATA%, Unix: $XDG_CONFIG_HOME 或 ~/.config）
 //   - os.MkdirAll() 失败：无法创建配置目录
-//     * 父目录权限不足
-//     * 磁盘空间不足
-//     * 文件系统只读
+//   - 父目录权限不足
+//   - 磁盘空间不足
+//   - 文件系统只读
 //
 // 返回值：
 //   - string: 配置文件路径
@@ -75,6 +76,7 @@ func LoadConfig() *Config {
 			DisplayMode:  "virtual",
 			LLMProviders: []LLMProvider{},
 			ActiveLLMs:   []string{},
+			CurrentLLM:   "",
 		}
 	}
 
@@ -121,6 +123,8 @@ func LoadConfig() *Config {
 	}
 	if config.ActiveLLMs == nil {
 		config.ActiveLLMs = []string{}
+	}
+	if config.CurrentLLM == "" {
 	}
 
 	return &config

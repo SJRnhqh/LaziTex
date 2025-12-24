@@ -187,6 +187,7 @@ $ lazitex -m add <model> -p <provider> -n <name>  # 注册 LLM
 $ lazitex -m remove <id/name/model>              # 删除 LLM（交互式选择）
 $ lazitex -m link <id/name/model>                # 连接并激活 LLM
 $ lazitex -m unlink <id/name/model>              # 断开 LLM 连接
+$ lazitex -m switch <id/name/model>              # 在已链接的 LLM 之间切换
 $ lazitex -m test <id/name/model>                # 测试 LLM 连通性
 $ lazitex -m list                                 # 列出所有已注册的 LLM
 
@@ -195,6 +196,7 @@ lazitex> llm add <model> -p <provider> -n <name>  # 注册 LLM
 lazitex> llm remove <id/name/model>              # 删除 LLM
 lazitex> llm link <id/name/model>                # 连接 LLM
 lazitex> llm unlink <id/name/model>              # 断开 LLM
+lazitex> llm switch <id/name/model>              # 在已链接的 LLM 之间切换
 lazitex> llm test <id/name/model>                # 测试 LLM
 lazitex> llm list                                 # 列出 LLM
 ```
@@ -202,7 +204,8 @@ lazitex> llm list                                 # 列出 LLM
 **特性：**
 
 - **灵活匹配**：支持 ID、名称或模型匹配，多个匹配时提供交互式选择
-- **多激活支持**：可同时激活多个 LLM
+- **当前 LLM 管理**：link 自动设置为当前激活，可在已链接的 LLM 之间切换
+- **动态提示符**：REPL 模式显示当前激活的 LLM：`(name:m)lazitex>`
 - **自动验证**：注册和连接时自动测试连通性
 - **安全删除**：删除前显示确认提示
 

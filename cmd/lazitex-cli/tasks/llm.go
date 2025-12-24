@@ -84,6 +84,15 @@ func LinkLLM(identifier string) {
 		fmt.Printf(lang.T("msg.llm.link.set_active_failed")+"\n", err)
 		return
 	}
+
+	// 新增：link 成功后自动设置为当前激活的 LLM
+	if err := llm.SetCurrentLLM(p.ID); err != nil {
+		// 如果设置失败，只记录错误但不影响 link 操作
+		// 因为 link 已经成功，只是当前激活状态设置失败
+		fmt.Printf(lang.T("msg.llm.link.set_current_failed")+"\n", err)
+		// 不 return，继续执行成功消息
+	}
+
 	fmt.Printf(lang.T("msg.llm.link.success")+"\n", p.Name, p.Model)
 }
 
@@ -120,7 +129,67 @@ func UnlinkLLM(identifier string) {
 		return
 	}
 
+	// 新增：如果 unlink 的是当前激活的 LLM，需要清空 CurrentLLM
+	current, _ := llm.GetCurrentLLM()
+	if current != nil && current.ID == provider.ID {
+		// 清空当前激活的 LLM
+		config := cfg.LoadConfig()
+		config.CurrentLLM = ""
+		if err := cfg.SaveConfig(config); err != nil {
+			// 清空失败不影响 unlink 操作，只记录错误
+			fmt.Printf(lang.T("msg.llm.unlink.clear_current_failed")+"\n", err)
+		}
+	}
+
 	fmt.Printf(lang.T("msg.llm.unlink.success")+"\n", provider.Name, provider.Model)
+}
+
+// SwitchLLM 在已 link 的 LLM 之间切换
+func SwitchLLM(identifier string) {
+	config := cfg.LoadConfig()
+
+	// 使用统一的选择函数
+	p, err := llm.FindOrSelectProvider(
+		config.LLMProviders,
+		identifier,
+		&llm.SelectProviderOptions{
+			MultipleMatchesPrompt: lang.T("msg.llm.switch.multiple_matches"),
+			SelectPrompt:          lang.T("msg.llm.select_prompt"),
+			OnSelect:              selectProviderIndex,
+		},
+	)
+
+	if err != nil {
+		if strings.Contains(err.Error(), "cancelled") || strings.Contains(err.Error(), "已取消") {
+			fmt.Println(lang.T("msg.llm.cancelled"))
+		} else {
+			fmt.Printf(lang.T("msg.llm.switch.not_found")+"\n", identifier)
+		}
+		return
+	}
+
+	// 验证是否已 link（必须在 ActiveLLMs 列表中）
+	linked := llm.GetLinkedLLMs()
+	found := false
+	for _, linkedProvider := range linked {
+		if linkedProvider.ID == p.ID {
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		fmt.Printf(lang.T("msg.llm.switch.not_linked")+"\n", p.Name)
+		return
+	}
+
+	// 切换当前激活的 LLM
+	if err := llm.SetCurrentLLM(p.ID); err != nil {
+		fmt.Printf(lang.T("msg.llm.switch.failed")+"\n", err)
+		return
+	}
+
+	fmt.Printf(lang.T("msg.llm.switch.success")+"\n", p.Name, p.Model)
 }
 
 // TestLLM 使用统一函数

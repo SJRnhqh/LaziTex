@@ -164,15 +164,18 @@ func main() {
 			return
 		}
 
+		identifier := sub[1]
 		switch action {
 		case "remove":
-			tasks.RemoveLLM(sub[1])
+			tasks.RemoveLLM(identifier)
 		case "link":
-			tasks.LinkLLM(sub[1])
+			tasks.LinkLLM(identifier)
 		case "unlink":
-			tasks.UnlinkLLM(sub[1])
+			tasks.UnlinkLLM(identifier)
 		case "test":
-			tasks.TestLLM(sub[1])
+			tasks.TestLLM(identifier)
+		case "switch":
+			tasks.SwitchLLM(identifier)
 		default:
 			// 未知命令
 			fmt.Printf(lang.T("msg.llm.unknown_action")+"\n", action)
