@@ -5,7 +5,9 @@ package providers
 
 import (
 	// 外部包
+	"bytes"
 	"encoding/json"
+	"io"
 	"fmt"
 	"net"
 	"net/http"
@@ -138,4 +140,44 @@ func (p *OllamaProvider) testModelGeneration(modelName string) (bool, error) {
 
 	// 如果响应成功且有内容，说明模型可用
 	return result.Done, nil
+}
+
+func (p *OllamaProvider) Generate(model, prompt string, config map[string]string) (string, error) {
+    baseURL := config["baseURL"]
+    if baseURL == "" {
+        baseURL = "http://localhost:11434"
+    }
+    endpoint := strings.TrimSuffix(baseURL, "/") + "/api/generate"
+
+    body := map[string]any{
+        "model":  model,
+        "prompt": prompt,
+        "stream": false,
+    }
+    payload, err := json.Marshal(body)
+    if err != nil {
+        return "", fmt.Errorf("序列化请求失败: %w", err)
+    }
+
+    client := &http.Client{Timeout: 60 * time.Second}
+    resp, err := client.Post(endpoint, "application/json", bytes.NewReader(payload))
+    if err != nil {
+        return "", fmt.Errorf("调用 Ollama 失败: %w", err)
+    }
+    defer resp.Body.Close()
+
+    if resp.StatusCode != http.StatusOK {
+        msg, _ := io.ReadAll(io.LimitReader(resp.Body, 512))
+        return "", fmt.Errorf("Ollama 状态码 %d: %s", resp.StatusCode, strings.TrimSpace(string(msg)))
+    }
+
+    var result struct {
+        Response string `json:"response"`
+        Done     bool   `json:"done"`
+    }
+    if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+        return "", fmt.Errorf("解析 Ollama 响应失败: %w", err)
+    }
+
+    return strings.TrimSpace(result.Response), nil
 }

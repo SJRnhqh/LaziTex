@@ -418,6 +418,9 @@ func handleREPLCommand(input string) bool {
 			tasks.TestLLM(identifier)
 		case "switch":
 			tasks.SwitchLLM(identifier)
+		case "ask":
+			prompt := strings.Join(sub[1:], " ")
+			tasks.AskLLM(prompt)
 		default:
 			// 未知命令
 			fmt.Printf(lang.T("repl.unknown_command")+"\n", action)
