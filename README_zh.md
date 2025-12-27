@@ -23,9 +23,8 @@
 - 📦 **自动包管理** - 自动检测并安装缺失的包
 - 🌐 **Web 预览模式** - Web 实时预览
 - 🦙 **Ollama 管理** - 一键管理 Ollama
-- 🤖 **LLM 管理** - 完整的 LLM 提供商注册、连接、测试和管理
+- 🤖 **LLM 管理** - 完整的 LLM 提供商管理与 AI 交互（注册、激活、切换、测试、删除、列表、单次对话、持续对话）
 - ⚙️ **配置管理** - 跨平台配置文件管理
-- 🧠 **AI 架构** - 模块化 AI 智能体和工具系统 (开发中)
 - 🎨 **多种模式** - 支持 TUI 和 REPL 模式
 
 ---
@@ -106,7 +105,6 @@ go build -o lazitex ./cmd/lazitex-cli
 | `-o, --ollama` | Ollama 管理 (使用 `-c/-i/-u` 标志) | `lazitex -o -c` |
 | `-b, --build` | 构建 LaTeX 文档 (支持 `-o` 输出, `-s` 编译后展示, `-q` 静默模式, `-t` 清理辅助文件) | `lazitex -b main.tex [-o out/] [-s] [-q] [-t]` |
 | `-p, --preview` | 实时预览 PDF 文档 (支持 `-q` 静默模式, `-t` 清理辅助文件, `:端口号` 自定义端口) | `lazitex -p main.tex [-q] [-t] [:端口号]` |
-| `-m, --llm` | LLM 管理 | `lazitex -m list` 或 `lazitex -m add llama3 -p ollama -n my-llm` |
 | `config` | 打开配置文件 | `lazitex config` |
 | `-l, --lang` | 设置语言 (zh/en) | `lazitex -l zh` |
 
@@ -179,35 +177,26 @@ lazitex> ollama -u     # 卸载
 
 ### LLM 管理
 
-完整的 LLM 提供商管理，支持注册、连接、测试和删除。
+完整的 LLM 提供商管理功能，支持注册、激活、切换、测试和删除。支持交互式选择、批量操作和 AI 交互。
 
 ```bash
-# CLI 模式
-$ lazitex -m add <model> -p <provider> -n <name>  # 注册 LLM
-$ lazitex -m remove <id/name/model>              # 删除 LLM（交互式选择）
-$ lazitex -m link <id/name/model>                # 连接并激活 LLM
-$ lazitex -m unlink <id/name/model>              # 断开 LLM 连接
-$ lazitex -m switch <id/name/model>              # 在已链接的 LLM 之间切换
-$ lazitex -m test <id/name/model>                # 测试 LLM 连通性
-$ lazitex -m list                                 # 列出所有已注册的 LLM
+# REPL 模式 - 提供商管理
+lazitex> llm link              # 注册新的 LLM 提供商
+lazitex> llm link <name>       # 激活 LLM 提供商
+lazitex> llm unlink           # 取消激活当前 LLM
+lazitex> llm unlink <name>    # 取消激活指定 LLM
+lazitex> llm switch           # 切换前台 LLM（交互式）
+lazitex> llm switch <name>    # 切换到指定 LLM
+lazitex> llm test            # 测试当前 LLM
+lazitex> llm test <name>      # 测试指定 LLM
+lazitex> llm remove          # 删除 LLM 提供商（交互式）
+lazitex> llm list            # 列出所有已注册的 LLM
+lazitex> llm list <name>     # 列出指定 LLM
 
-# REPL 模式
-lazitex> llm add <model> -p <provider> -n <name>  # 注册 LLM
-lazitex> llm remove <id/name/model>              # 删除 LLM
-lazitex> llm link <id/name/model>                # 连接 LLM
-lazitex> llm unlink <id/name/model>              # 断开 LLM
-lazitex> llm switch <id/name/model>              # 在已链接的 LLM 之间切换
-lazitex> llm test <id/name/model>                # 测试 LLM
-lazitex> llm list                                 # 列出 LLM
+# REPL 模式 - AI 交互
+lazitex> llm ask <message>    # 单次对话
+lazitex> llm chat             # 持续对话（输入 'quit' 退出）
 ```
-
-**特性：**
-
-- **灵活匹配**：支持 ID、名称或模型匹配，多个匹配时提供交互式选择
-- **当前 LLM 管理**：link 自动设置为当前激活，可在已链接的 LLM 之间切换
-- **动态提示符**：REPL 模式显示当前激活的 LLM：`(name:m)lazitex>`
-- **自动验证**：注册和连接时自动测试连通性
-- **安全删除**：删除前显示确认提示
 
 ### 构建与预览
 
@@ -292,25 +281,24 @@ lazitex/
 │   ├── ⚡ performance/             # 编译性能优化模块
 │   │   ├── concurrent.go           # 并发优化（中间工具并发执行）
 │   │   └── lock.go                 # 编译锁与任务管理（任务抢占、超时控制）
-│   └── 🤖 ai/                     # AI 架构模块（模块化设计）
-│       ├── agent/                 # AI 智能体管理
-│       │   └── registry.go        # 智能体注册和管理
-│       ├── llm/                   # LLM 提供商抽象
-│       │   ├── registry.go        # 提供商注册和 LLM 注册逻辑
-│       │   ├── connectivity.go    # LLM 连通性测试
-│       │   ├── list.go            # LLM 列表构建逻辑
-│       │   └── select.go           # 提供商匹配和交互式选择
-│       ├── providers/             # LLM 提供商实现
-│       │   └── ollama.go          # Ollama 提供商实现
-│       └── tools/                 # AI 工具系统
-│           └── registry.go        # 工具注册和管理
+│   └── 🤖 ai/                      # AI & LLM 管理模块
+│       └── llm/                     # LLM 提供商管理
+│           ├── registry.go          # LLM 提供商注册
+│           ├── link.go              # LLM 激活、取消激活与切换
+│           ├── test.go              # LLM 连接测试
+│           ├── remove.go           # LLM 提供商删除
+│           ├── list.go             # LLM 提供商列表（表格格式）
+│           ├── select.go           # 交互式选择工具
+│           ├── client.go          # LLM 客户端接口与工厂（ChatModelClient）
+│           ├── ask.go              # 单次 AI 交互
+│           └── chat.go             # 多轮 AI 对话
 │
 ├── 📚 lang/                       # 国际化模块
 │   └── i18n.go                    # 多语言支持（中英文）
 │
 ├── ⚙️  config/                     # 配置管理
-│   ├── common.go                  # 应用配置管理
-│   └── llm.go                     # LLM 提供商配置管理
+│   ├── common.go                   # 应用配置管理
+│   └── llm.go                      # LLM 提供商配置管理
 │
 ├── 🗄️  backend/                    # Web 服务器后端
 │   ├── server.go                  # HTTP 服务器核心（支持模式配置）
@@ -376,9 +364,9 @@ lazitex/
 │       │   ├── preview.go         # 实时预览功能
 │       │   ├── ollama.go          # Ollama 管理功能
 │       │   ├── latex.go           # LaTeX 环境管理功能
-│       │   ├── llm.go             # LLM 管理（注册、连接、测试、删除，支持交互式选择）
+│       │   ├── llm.go             # LLM 管理功能
 │       │   ├── config.go          # 配置文件管理功能
-│       │   └── help.go            # 帮助信息
+│       │   └── help.go           # 帮助信息
 │       ├── 🧠 internal/           # 内部命令处理（统一动作处理器）
 │       │   ├── common.go          # 通用工具和动作处理器
 │       │   ├── latex.go           # LaTeX 命令处理逻辑
@@ -402,9 +390,7 @@ lazitex/
 
 - **统一管理架构** - LaTeX 和 Ollama 管理采用一致的架构模式：统一管理器接口（LaTeXManager/OllamaManager）配合平台特定实现，遵循相同的调用流程：命令解析 → 任务执行 → 核心逻辑 → 平台实现
 
-- **模块化 AI 架构** - AI 智能体、LLM 提供商和工具的清晰分离，采用可扩展的注册系统实现无缝集成
-
-- **完整的 LLM 管理** - 全生命周期管理：带验证的注册、智能匹配（ID/名称/模型）、连接/断开、测试，以及带确认的安全删除
+- **可扩展的 LLM 集成** - 抽象的 LLM 客户端接口（ChatModelClient）配合工厂模式，支持轻松集成新的提供商（Ollama、OpenAI 等），无需修改核心 ask/chat 逻辑
 
 ---
 
@@ -412,26 +398,24 @@ lazitex/
 
 ### 已完成 ✅
 
-- [x] **跨平台环境检测与管理** - Windows、Linux、macOS 环境检测，macOS 自动安装/更新/卸载
-- [x] **编译系统** - 一键编译、智能预览、自动包检测与安装、自适应多轮编译、性能优化
-- [x] **Web 预览前端** - Vue 3 前端、SSE 实时刷新、PDF 虚拟滚动、双模式架构
-- [x] **Ollama 管理** - 跨平台检查、安装、卸载
-- [x] **LLM 管理** - 完整的提供商注册、连接、测试、删除和多激活支持
-- [x] **AI 架构基础** - LLM 提供商和智能体的模块化架构
-- [x] **交互模式** - REPL 交互模式（历史记录、Tab 补全、国际化）
+- [x] 跨平台环境检测与管理（macOS 自动安装/更新/卸载）
+- [x] 编译系统（自适应多轮编译、自动包管理）
+- [x] Web 预览前端（Vue 3、SSE 实时刷新、PDF 虚拟滚动）
+- [x] Ollama 管理（跨平台检查、安装、卸载）
+- [x] LLM 管理（注册、激活、切换、测试、删除、列表，完整国际化支持）
+- [x] 交互式 REPL 模式（命令历史、Tab 补全、国际化）
 
 ### 进行中 🚧
 
-- [ ] **AI 应用功能** - LLM 驱动的错误诊断、代码生成、智能补全
-- [ ] **智能体系统** - AI 智能体构建和编排框架
-- [ ] **实时预览优化** - 错误反馈增强
-- [ ] **Linux 环境管理** - 自动安装/更新/卸载
+- [ ] AI 应用功能（错误诊断、代码生成、智能补全）
+- [ ] 智能体系统框架
+- [ ] Linux 环境自动管理
 
 ### 计划中 📋
 
-- [ ] **Web 工作区** - 文件管理、代码编辑器、终端集成、AI 聊天
-- [ ] **项目功能** - 项目初始化、多文档支持、自定义配置
-- [ ] **平台扩展** - Windows 环境管理、TUI 完善、GUI 支持
+- [ ] Web 工作区（文件管理、编辑器、终端、AI 聊天）
+- [ ] 项目功能（初始化、多文档支持）
+- [ ] Windows 环境自动管理
 
 ---
 

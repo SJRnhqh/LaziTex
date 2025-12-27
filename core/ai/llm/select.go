@@ -1,139 +1,317 @@
 // core/ai/llm/select.go
-// LLM Provider 智能匹配和选择逻辑
-// 支持通过 ID、Name 或 Model 进行匹配，并提供交互式选择功能
-// 主要用于已注册的 LLM Provider 的查找和选择
+// 统一的 Provider 选择交互逻辑
 
 package llm
 
 import (
-	"errors"
+	// 外部包
+	"bufio"
 	"fmt"
+	"os"
+	"strconv"
+	"strings"
 
+	// 内部包
 	cfg "github.com/SJRnhqh/lazitex/config"
+	lang "github.com/SJRnhqh/lazitex/lang"
 )
 
-// FindMatchingProviders 查找匹配的 LLM providers
-// 支持通过 ID、Name 或 Model 进行匹配（针对已注册的 Provider）
-func FindMatchingProviders(providers []cfg.LLMProvider, identifier string) []cfg.LLMProvider {
-	var matches []cfg.LLMProvider
-	for _, provider := range providers {
-		if provider.ID == identifier ||
-			provider.Name == identifier ||
-			provider.Model == identifier {
-			matches = append(matches, provider)
+// ProviderFormatter 用于格式化显示每个 Provider 的函数类型
+type ProviderFormatter func(index int, provider *cfg.LLMProvider) string
+
+// SelectAndLinkProviders 通用的 Provider 选择和激活函数
+// providers: 要显示的 Provider 列表
+// title: 显示标题（例如："模型 'xxx' 匹配到多个 LLM" 或 "已注册的 LLM Provider"）
+// formatter: 格式化每个 Provider 显示的函数，如果为 nil 则使用默认格式
+func SelectAndLinkProviders(providers []*cfg.LLMProvider, title string, formatter ProviderFormatter) {
+	if len(providers) == 0 {
+		fmt.Println(lang.T("msg.llm.link.no_available"))
+		return
+	}
+
+	// 显示标题
+	fmt.Printf("\n%s：\n\n", title)
+
+	// 显示列表
+	for i, p := range providers {
+		if formatter != nil {
+			fmt.Println(formatter(i+1, p))
+		} else {
+			// 默认格式
+			fmt.Printf(lang.T("msg.llm.link.provider_format")+"\n",
+				i+1, p.Name, p.Provider, p.Model)
 		}
 	}
-	return matches
-}
 
-// SelectProviderResult 选择结果
-type SelectProviderResult struct {
-	Provider *cfg.LLMProvider
-	Error    error
-}
+	// 显示选择提示
+	fmt.Println("\n" + lang.T("msg.llm.link.select_prompt"))
+	fmt.Printf(lang.T("msg.llm.link.select_number")+"\n", len(providers))
+	fmt.Println(lang.T("msg.llm.link.select_all"))
+	fmt.Println(lang.T("msg.llm.link.select_cancel"))
+	fmt.Print("\n" + lang.T("msg.llm.link.select_input"))
 
-// SelectProviderOptions 选择选项
-type SelectProviderOptions struct {
-	// MultipleMatchesPrompt 多个匹配时的提示信息（支持 %d 占位符）
-	MultipleMatchesPrompt string
-	// SelectPrompt 选择提示信息
-	SelectPrompt string
-	// OnSelect 选择函数，接收匹配数量和提示信息，返回选中的索引（0-based），-1 表示取消
-	OnSelect func(count int, selectPrompt string) int
-}
-
-// FindOrSelectProvider 查找或选择 Provider（统一入口）
-//
-// 逻辑：
-// - ID 和 Name 是唯一的，如果匹配到直接返回
-// - Model 可能匹配多个，需要调用 OnSelect 让用户选择
-// - 如果未找到，返回错误
-//
-// 参数：
-//   - providers: 所有已注册的 Provider 列表
-//   - identifier: 标识符（ID、Name 或 Model）
-//   - options: 选择选项（仅在多个匹配时使用）
-//
-// 返回：
-//   - 选中的 Provider 指针，如果未找到或取消则返回 nil
-//   - 错误信息
-func FindOrSelectProvider(
-	providers []cfg.LLMProvider,
-	identifier string,
-	options *SelectProviderOptions,
-) (*cfg.LLMProvider, error) {
-	// 查找所有匹配项
-	matches := FindMatchingProviders(providers, identifier)
-
-	// 未找到
-	if len(matches) == 0 {
-		return nil, fmt.Errorf("no matching LLM Provider found: %s", identifier)
+	// 读取用户输入
+	reader := bufio.NewReader(os.Stdin)
+	input, err := reader.ReadString('\n')
+	if err != nil {
+		fmt.Printf(lang.T("msg.llm.link.read_input_failed")+"\n", err)
+		return
 	}
 
-	// 单个匹配：直接返回（ID 和 Name 是唯一的，Model 如果只有一个也直接返回）
-	if len(matches) == 1 {
-		return &matches[0], nil
+	input = strings.TrimSpace(strings.ToLower(input))
+
+	// 处理取消
+	if input == "q" || input == "quit" {
+		fmt.Println(lang.T("msg.llm.cancelled"))
+		return
 	}
 
-	// 多个匹配：需要用户选择（通常是 Model 匹配到多个）
-	if options == nil || options.OnSelect == nil {
-		return nil, fmt.Errorf("found %d matching LLM Providers, but no selection function provided", len(matches))
+	// 处理全选
+	if input == "a" || input == "all" {
+		activateAllProviders(providers)
+		return
 	}
 
-	// 显示匹配列表
-	if options.MultipleMatchesPrompt != "" {
-		fmt.Printf(options.MultipleMatchesPrompt+"\n", len(matches))
+	// 处理数字选择
+	choice, err := strconv.Atoi(input)
+	if err != nil || choice < 1 || choice > len(providers) {
+		fmt.Printf(lang.T("msg.llm.link.invalid_choice")+"\n", input)
+		return
+	}
+
+	// 激活选中的 Provider
+	selectedProvider := providers[choice-1]
+	activateSingleProvider(selectedProvider)
+}
+
+// activateAllProviders 激活所有 Provider（不设置前台）
+func activateAllProviders(providers []*cfg.LLMProvider) {
+	activatedCount := 0
+
+	for _, p := range providers {
+		if err := cfg.SetActiveLLMByID(p.ID); err != nil {
+			fmt.Printf(lang.T("msg.llm.link.activate_failed")+"\n", p.Name, err)
+		} else {
+			fmt.Printf(lang.T("msg.llm.link.activate_success")+"\n", p.Name)
+			activatedCount++
+		}
+	}
+
+	fmt.Printf("\n"+lang.T("msg.llm.link.activate_all_count")+"\n", activatedCount)
+}
+
+// activateSingleProvider 激活单个 Provider 并设为前台
+func activateSingleProvider(provider *cfg.LLMProvider) {
+	// 激活选中的 Provider
+	if err := cfg.SetActiveLLMByID(provider.ID); err != nil {
+		fmt.Printf(lang.T("msg.llm.link.activate_failed")+"\n", err)
+		return
+	}
+	fmt.Printf(lang.T("msg.llm.link.activate_success")+"\n", provider.Name)
+
+	// 设置为前台
+	if err := cfg.SetCurrentLLM(provider.ID); err != nil {
+		fmt.Printf(lang.T("msg.llm.link.set_current_failed")+"\n", err)
+		return
+	}
+	fmt.Println(lang.T("msg.llm.link.set_current_success"))
+}
+
+// formatProviderWithStatus 格式化显示 Provider（带状态信息）
+func formatProviderWithStatus(index int, provider *cfg.LLMProvider) string {
+	config := cfg.LoadConfig()
+
+	// 检查状态
+	isActive := false
+	for _, activeID := range config.ActiveLLMs {
+		if activeID == provider.ID {
+			isActive = true
+			break
+		}
+	}
+	isCurrent := config.CurrentLLM == provider.ID
+
+	status := ""
+	if isCurrent {
+		status = lang.T("msg.llm.link.status_current")
+	} else if isActive {
+		status = lang.T("msg.llm.link.status_active")
 	} else {
-		fmt.Printf("Found %d matching LLM Providers, please select:\n", len(matches))
+		status = lang.T("msg.llm.link.status_inactive")
 	}
 
-	formattedList := FormatProviderList(matches)
-	for _, item := range formattedList {
-		fmt.Println("  " + item)
-	}
-
-	// 调用选择函数
-	selectPrompt := options.SelectPrompt
-	if selectPrompt == "" {
-		selectPrompt = "Please select (enter number, or 'q' to cancel): "
-	}
-
-	selectedIndex := options.OnSelect(len(matches), selectPrompt)
-	if selectedIndex < 0 {
-		return nil, errors.New("cancelled")
-	}
-
-	// 验证索引有效性
-	if selectedIndex >= len(matches) {
-		return nil, fmt.Errorf("invalid selection index: %d", selectedIndex)
-	}
-
-	return &matches[selectedIndex], nil
+	return fmt.Sprintf(lang.T("msg.llm.link.provider_format")+"%s",
+		index, provider.Name, provider.Provider, provider.Model, status)
 }
 
-// FormatProviderInfo 格式化单个 Provider 信息（用于显示）
-// 返回格式化的字符串，不直接打印，保持核心层无副作用
-func FormatProviderInfo(provider cfg.LLMProvider) string {
-	return fmt.Sprintf("ID: %s, Name: %s, Provider: %s, Model: %s",
-		provider.ID, provider.Name, provider.Provider, provider.Model)
+// formatProviderSimple 简单的格式化显示（用于 model 匹配场景）
+func formatProviderSimple(index int, provider *cfg.LLMProvider) string {
+	return fmt.Sprintf(lang.T("msg.llm.link.provider_format_simple"),
+		index, provider.Name, provider.ID[:8]+"...", provider.Provider)
 }
 
-// FormatProviderList 格式化多个 Provider 为列表（用于选择菜单）
-// 返回格式化的字符串列表，每个元素包含索引和 Provider 信息
-func FormatProviderList(providers []cfg.LLMProvider) []string {
-	formatted := make([]string, len(providers))
+// SelectAndUnlinkProviders 通用的 Provider 选择和取消连接函数
+// providers: 要显示的 Provider 列表
+// title: 显示标题（例如："模型 'xxx' 匹配到多个 LLM" 或 "已注册的 LLM Provider"）
+// formatter: 格式化每个 Provider 显示的函数，如果为 nil 则使用默认格式
+func SelectAndUnlinkProviders(providers []*cfg.LLMProvider, title string, formatter ProviderFormatter) {
+	if len(providers) == 0 {
+		fmt.Println(lang.T("msg.llm.link.no_available"))
+		return
+	}
+
+	// 显示标题
+	fmt.Printf("\n%s：\n\n", title)
+
+	// 显示列表
 	for i, p := range providers {
-		formatted[i] = fmt.Sprintf("[%d] %s (ID: %s, Provider: %s, Model: %s)",
-			i+1, p.Name, p.ID, p.Provider, p.Model)
+		if formatter != nil {
+			fmt.Println(formatter(i+1, p))
+		} else {
+			// 默认格式
+			fmt.Printf(lang.T("msg.llm.link.provider_format")+"\n",
+				i+1, p.Name, p.Provider, p.Model)
+		}
 	}
-	return formatted
+
+	// 显示选择提示
+	fmt.Println("\n" + lang.T("msg.llm.unlink.select_prompt"))
+	fmt.Printf(lang.T("msg.llm.unlink.select_number")+"\n", len(providers))
+	fmt.Println(lang.T("msg.llm.unlink.select_all"))
+	fmt.Println(lang.T("msg.llm.unlink.select_cancel"))
+	fmt.Print("\n" + lang.T("msg.llm.unlink.select_input"))
+
+	// 读取用户输入
+	reader := bufio.NewReader(os.Stdin)
+	input, err := reader.ReadString('\n')
+	if err != nil {
+		fmt.Printf(lang.T("msg.llm.link.read_input_failed")+"\n", err)
+		return
+	}
+
+	input = strings.TrimSpace(strings.ToLower(input))
+
+	// 处理取消
+	if input == "q" || input == "quit" {
+		fmt.Println(lang.T("msg.llm.cancelled"))
+		return
+	}
+
+	// 处理全选
+	if input == "a" || input == "all" {
+		unlinkAllProviders(providers)
+		return
+	}
+
+	// 处理数字选择
+	choice, err := strconv.Atoi(input)
+	if err != nil || choice < 1 || choice > len(providers) {
+		fmt.Printf(lang.T("msg.llm.link.invalid_choice")+"\n", input)
+		return
+	}
+
+	// 取消连接选中的 Provider
+	selectedProvider := providers[choice-1]
+	unlinkSingleProvider(selectedProvider)
 }
 
-// ExtractProviderID 从匹配列表中提取指定索引的 Provider ID
-// 用于用户选择后获取对应的 ID
-func ExtractProviderID(providers []cfg.LLMProvider, index int) string {
-	if index < 0 || index >= len(providers) {
-		return ""
+// unlinkAllProviders 取消连接所有 Provider
+func unlinkAllProviders(providers []*cfg.LLMProvider) {
+	unlinkedCount := 0
+
+	for _, p := range providers {
+		if err := cfg.UnsetActiveLLMByID(p.ID); err != nil {
+			fmt.Printf(lang.T("msg.llm.unlink.unlink_failed")+"\n", p.Name, err)
+		} else {
+			fmt.Printf(lang.T("msg.llm.unlink.unlink_success")+"\n", p.Name)
+			unlinkedCount++
+		}
 	}
-	return providers[index].ID
+
+	fmt.Printf("\n"+lang.T("msg.llm.unlink.unlink_all_count")+"\n", unlinkedCount)
+}
+
+// unlinkSingleProvider 取消连接单个 Provider
+func unlinkSingleProvider(provider *cfg.LLMProvider) {
+	// 取消连接选中的 Provider
+	if err := cfg.UnsetActiveLLMByID(provider.ID); err != nil {
+		fmt.Printf(lang.T("msg.llm.unlink.unlink_failed")+"\n", err)
+		return
+	}
+	fmt.Printf(lang.T("msg.llm.unlink.unlink_success")+"\n", provider.Name)
+}
+
+// SelectAndSwitchProvider 通用的 Provider 选择和切换前台函数
+// providers: 要显示的 Provider 列表（只包含已激活的）
+// title: 显示标题
+// formatter: 格式化每个 Provider 显示的函数，如果为 nil 则使用默认格式
+func SelectAndSwitchProvider(providers []*cfg.LLMProvider, title string, formatter ProviderFormatter) {
+	if len(providers) == 0 {
+		fmt.Println(lang.T("msg.llm.switch.no_active"))
+		return
+	}
+
+	// 显示标题
+	fmt.Printf("\n%s：\n\n", title)
+
+	// 显示列表
+	for i, p := range providers {
+		if formatter != nil {
+			fmt.Println(formatter(i+1, p))
+		} else {
+			// 默认格式
+			fmt.Printf(lang.T("msg.llm.link.provider_format")+"\n",
+				i+1, p.Name, p.Provider, p.Model)
+		}
+	}
+
+	// 显示选择提示
+	fmt.Println("\n" + lang.T("msg.llm.switch.select_prompt"))
+	fmt.Printf(lang.T("msg.llm.switch.select_number")+"\n", len(providers))
+	fmt.Println(lang.T("msg.llm.switch.select_cancel"))
+	fmt.Print("\n" + lang.T("msg.llm.switch.select_input"))
+
+	// 读取用户输入
+	reader := bufio.NewReader(os.Stdin)
+	input, err := reader.ReadString('\n')
+	if err != nil {
+		fmt.Printf(lang.T("msg.llm.link.read_input_failed")+"\n", err)
+		return
+	}
+
+	input = strings.TrimSpace(strings.ToLower(input))
+
+	// 处理取消
+	if input == "q" || input == "quit" {
+		fmt.Println(lang.T("msg.llm.cancelled"))
+		return
+	}
+
+	// 处理数字选择
+	choice, err := strconv.Atoi(input)
+	if err != nil || choice < 1 || choice > len(providers) {
+		fmt.Printf(lang.T("msg.llm.link.invalid_choice")+"\n", input)
+		return
+	}
+
+	// 切换到选中的 Provider
+	selectedProvider := providers[choice-1]
+	switchToProvider(selectedProvider)
+}
+
+// switchToProvider 切换到指定的 Provider（设为前台）
+func switchToProvider(provider *cfg.LLMProvider) {
+	// 检查是否已经是当前前台
+	config := cfg.LoadConfig()
+	if config.CurrentLLM == provider.ID {
+		fmt.Printf(lang.T("msg.llm.switch.already_current")+"\n", provider.Name)
+		return
+	}
+
+	// 设置为前台
+	if err := cfg.SetCurrentLLM(provider.ID); err != nil {
+		fmt.Printf(lang.T("msg.llm.switch.failed")+"\n", err)
+		return
+	}
+	fmt.Printf(lang.T("msg.llm.switch.success")+"\n", provider.Name)
 }
