@@ -19,8 +19,17 @@ import (
 
 // TestLLMProvider 测试 LLM Provider 的核心业务逻辑
 func TestLLMProvider(llmProviderIDOrNameOrModel []string) {
-	// 如果没有参数，列出所有已注册的 Provider 供选择测试
+	// 如果没有参数，优先测试当前前台的 Provider
 	if len(llmProviderIDOrNameOrModel) == 0 {
+		// 优先尝试测试当前前台的 Provider
+		currentLLM, err := cfg.GetCurrentLLM()
+		if err == nil && currentLLM != nil {
+			// 有当前前台，直接测试
+			testProvider(currentLLM)
+			return
+		}
+
+		// 没有当前前台，列出所有已注册的 Provider 供选择
 		listAndTestProviders()
 		return
 	}
