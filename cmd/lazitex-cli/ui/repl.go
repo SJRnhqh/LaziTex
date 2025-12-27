@@ -329,7 +329,7 @@ func handleREPLCommand(input string) bool {
 		case "test":
 			tasks.TestLLM(sub)
 		case "remove":
-			tasks.RemoveLLM()
+			tasks.RemoveLLM(sub)
 		case "list":
 			tasks.ListLLM()
 		case "ask": // 严格组合使用

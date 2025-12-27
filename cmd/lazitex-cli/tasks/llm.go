@@ -29,8 +29,8 @@ func TestLLM(sub []string) {
 	llm.TestLLMProvider(sub[1:])
 }
 
-func RemoveLLM() {
-	// Mock 移除LLM注册的业务逻辑
+func RemoveLLM(sub []string) {
+	llm.RemoveLLMProvider(sub[1:])
 }
 
 func ListLLM() {

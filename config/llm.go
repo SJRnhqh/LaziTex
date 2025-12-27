@@ -135,6 +135,11 @@ func RemoveLLMProvider(PID string) (bool, error) {
 	}
 	config.ActiveLLMs = newActiveLLMs
 
+	// 如果当前前台 LLM 是被删除的，清空当前前台
+	if config.CurrentLLM == removedID {
+		config.CurrentLLM = ""
+	}
+
 	// 保存配置
 	return true, SaveConfig(config)
 }
