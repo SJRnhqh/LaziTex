@@ -22,7 +22,7 @@ func UnlinkLLM(sub []string) {
 }
 
 func SwitchLLM(sub []string) {
-	
+	llm.SwitchLLM(sub[1:])
 }
 
 func TestLLM() {

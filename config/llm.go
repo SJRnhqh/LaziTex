@@ -343,6 +343,33 @@ func GetCurrentLLM() (*LLMProvider, error) {
 	return FindLLMProvider(config.CurrentLLM)
 }
 
+// GetAllLLMProviders 获取所有 LLM Providers
+func GetAllLLMProviders() []*LLMProvider {
+	config := LoadConfig()
+	allProviders := make([]*LLMProvider, len(config.LLMProviders))
+	for i := range config.LLMProviders {
+		allProviders[i] = &config.LLMProviders[i]
+	}
+	return allProviders
+}
+
+// GetActiveLLMProviders 获取所有已激活的 LLM Providers
+func GetActiveLLMProviders() []*LLMProvider {
+	config := LoadConfig()
+	var activeProviders []*LLMProvider
+
+	for _, activeID := range config.ActiveLLMs {
+		for i := range config.LLMProviders {
+			if config.LLMProviders[i].ID == activeID {
+				activeProviders = append(activeProviders, &config.LLMProviders[i])
+				break
+			}
+		}
+	}
+
+	return activeProviders
+}
+
 // FindAllMatchingProviders 查找所有匹配的 LLM Providers（导出供外部使用）
 // 返回匹配的 providers 和匹配类型 ("id", "name", "model")
 func FindAllMatchingProviders(idOrNameOrModel string) ([]*LLMProvider, string) {

@@ -240,3 +240,78 @@ func unlinkSingleProvider(provider *cfg.LLMProvider) {
 	}
 	fmt.Printf(lang.T("msg.llm.unlink.unlink_success")+"\n", provider.Name)
 }
+
+// SelectAndSwitchProvider 通用的 Provider 选择和切换前台函数
+// providers: 要显示的 Provider 列表（只包含已激活的）
+// title: 显示标题
+// formatter: 格式化每个 Provider 显示的函数，如果为 nil 则使用默认格式
+func SelectAndSwitchProvider(providers []*cfg.LLMProvider, title string, formatter ProviderFormatter) {
+	if len(providers) == 0 {
+		fmt.Println(lang.T("msg.llm.switch.no_active"))
+		return
+	}
+
+	// 显示标题
+	fmt.Printf("\n%s：\n\n", title)
+
+	// 显示列表
+	for i, p := range providers {
+		if formatter != nil {
+			fmt.Println(formatter(i+1, p))
+		} else {
+			// 默认格式
+			fmt.Printf(lang.T("msg.llm.link.provider_format")+"\n",
+				i+1, p.Name, p.Provider, p.Model)
+		}
+	}
+
+	// 显示选择提示
+	fmt.Println("\n" + lang.T("msg.llm.switch.select_prompt"))
+	fmt.Printf(lang.T("msg.llm.switch.select_number")+"\n", len(providers))
+	fmt.Println(lang.T("msg.llm.switch.select_cancel"))
+	fmt.Print("\n" + lang.T("msg.llm.switch.select_input"))
+
+	// 读取用户输入
+	reader := bufio.NewReader(os.Stdin)
+	input, err := reader.ReadString('\n')
+	if err != nil {
+		fmt.Printf(lang.T("msg.llm.link.read_input_failed")+"\n", err)
+		return
+	}
+
+	input = strings.TrimSpace(strings.ToLower(input))
+
+	// 处理取消
+	if input == "q" || input == "quit" {
+		fmt.Println(lang.T("msg.llm.cancelled"))
+		return
+	}
+
+	// 处理数字选择
+	choice, err := strconv.Atoi(input)
+	if err != nil || choice < 1 || choice > len(providers) {
+		fmt.Printf(lang.T("msg.llm.link.invalid_choice")+"\n", input)
+		return
+	}
+
+	// 切换到选中的 Provider
+	selectedProvider := providers[choice-1]
+	switchToProvider(selectedProvider)
+}
+
+// switchToProvider 切换到指定的 Provider（设为前台）
+func switchToProvider(provider *cfg.LLMProvider) {
+	// 检查是否已经是当前前台
+	config := cfg.LoadConfig()
+	if config.CurrentLLM == provider.ID {
+		fmt.Printf(lang.T("msg.llm.switch.already_current")+"\n", provider.Name)
+		return
+	}
+
+	// 设置为前台
+	if err := cfg.SetCurrentLLM(provider.ID); err != nil {
+		fmt.Printf(lang.T("msg.llm.switch.failed")+"\n", err)
+		return
+	}
+	fmt.Printf(lang.T("msg.llm.switch.success")+"\n", provider.Name)
+}
