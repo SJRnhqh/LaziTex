@@ -3,12 +3,17 @@
 
 package tasks
 
+import (
+	// 内部包
+	llm "github.com/SJRnhqh/lazitex/core/ai/llm"
+)
+
 func LinkLLM(sub []string) {
 	switch len(sub) {
 	case 1:
-		// TODO:新注册的业务逻辑
+		llm.RegisterLLMProvider()
 	default:
-		// TODO:处理单个或者多个已经注册LLM的连接 -> 确定连接个数 -> 单个连接 -> 错误处理
+		llm.LinkLLMProvider(sub[1:])
 	}
 }
 

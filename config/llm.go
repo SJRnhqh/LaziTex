@@ -13,17 +13,21 @@ import (
 // LLMProvider LLM Provider 配置
 type LLMProvider struct {
 	ID         string            `json:"id"`         // 唯一标识
-	Provider   string            `json:"provider"`   // 提供商类型: "ollama", "openai" 等
+	Provider   string            `json:"provider"`   // 供应商类型: "ollama", "openai" 等
 	Name       string            `json:"name"`       // 用户自定义名称
 	Model      string            `json:"model"`      // 模型名称
 	Enabled    bool              `json:"enabled"`    // 是否启用
 	Verified   bool              `json:"verified"`   // 是否已验证
 	VerifiedAt string            `json:"verifiedAt"` // 验证时间
-	Config     map[string]string `json:"config"`     // 提供商特定配置（baseURL, timeout 等）
+	Config     LLMProviderConfig `json:"config"`     // 供应商特定配置（baseURL, timeout 等）
+}
+
+type LLMProviderConfig struct {
+	BaseURL string `json:"baseURL"` // 服务器基础URL
 }
 
 // 创建新的 LLM Provider
-func NewLLMProvider(provider, name, model string) *LLMProvider {
+func NewLLMProvider(provider, name, model, baseURL string) *LLMProvider {
 	return &LLMProvider{
 		ID:         generateLLMID(provider, name, model),
 		Provider:   provider,
@@ -32,7 +36,9 @@ func NewLLMProvider(provider, name, model string) *LLMProvider {
 		Enabled:    true,  // 默认注册时启用的状态（主要用于未来web端的启用与禁用，cli默认启用，但是先不加命令控制启用禁用的功能）
 		Verified:   false, // TODO: 未来添加验证机制
 		VerifiedAt: "",    // TODO: 未来添加验证时间
-		Config:     map[string]string{},
+		Config: LLMProviderConfig{
+			BaseURL: baseURL,
+		},
 	}
 }
 
@@ -134,42 +140,71 @@ func RemoveLLMProvider(PID string) (bool, error) {
 }
 
 // FindLLMProvider 根据ID、名称或模型查找 LLM Provider
+// 如果通过 Model 匹配到多个，返回第一个匹配项（保持向后兼容）
 func FindLLMProvider(idOrNameOrModel string) (*LLMProvider, error) {
-	config := LoadConfig()
-
-	for i := range config.LLMProviders {
-		if config.LLMProviders[i].ID == idOrNameOrModel || config.LLMProviders[i].Name == idOrNameOrModel || config.LLMProviders[i].Model == idOrNameOrModel {
-			return &config.LLMProviders[i], nil
-		}
+	matches, _ := FindAllMatchingProviders(idOrNameOrModel)
+	if len(matches) == 0 {
+		return nil, nil
 	}
-
-	return nil, nil // 未找到，返回 nil
+	return matches[0], nil
 }
 
 // SetActiveLLM 添加 LLM Provider 到激活列表（如果已存在则不重复添加）
 func SetActiveLLM(idOrNameOrModel string) error {
-	// 验证 LLM Provider 是否存在
-	provider, err := FindLLMProvider(idOrNameOrModel)
-	if err != nil {
-		return err
-	}
-	if provider == nil {
+	// 查找所有匹配的 providers
+	matches, matchType := FindAllMatchingProviders(idOrNameOrModel)
+
+	if len(matches) == 0 {
 		return fmt.Errorf("LLM Provider '%s' 不存在", idOrNameOrModel)
 	}
 
-	// 加载配置
+	// 如果通过 Model 匹配到多个，返回特殊错误
+	if matchType == "model" && len(matches) > 1 {
+		return fmt.Errorf("MULTIPLE_MATCHES") // 特殊标记，由调用方处理交互
+	}
+
+	// 唯一匹配，添加到激活列表
+	provider := matches[0]
 	config := LoadConfig()
 
 	// 检查是否已在激活列表中
 	for _, activeID := range config.ActiveLLMs {
 		if activeID == provider.ID {
-			// 已在列表中，直接返回成功
-			return nil
+			return nil // 已在列表中
 		}
 	}
 
 	// 添加到激活列表
 	config.ActiveLLMs = append(config.ActiveLLMs, provider.ID)
+	return SaveConfig(config)
+}
+
+// SetActiveLLMByID 通过 ID 直接添加到激活列表（内部使用，不做查找）
+func SetActiveLLMByID(providerID string) error {
+	config := LoadConfig()
+	
+	// 验证 ID 是否存在
+	found := false
+	for _, p := range config.LLMProviders {
+		if p.ID == providerID {
+			found = true
+			break
+		}
+	}
+	
+	if !found {
+		return fmt.Errorf("LLM Provider ID '%s' 不存在", providerID)
+	}
+	
+	// 检查是否已在激活列表中
+	for _, activeID := range config.ActiveLLMs {
+		if activeID == providerID {
+			return nil // 已在列表中
+		}
+	}
+	
+	// 添加到激活列表
+	config.ActiveLLMs = append(config.ActiveLLMs, providerID)
 	return SaveConfig(config)
 }
 
@@ -211,22 +246,90 @@ func UnsetActiveLLM(idOrNameOrModel string) error {
 	return SaveConfig(config)
 }
 
-// generateLLMID 根据 provider、model 和可选的 name 生成唯一的 ID
-// 如果提供了 name，使用 name+provider+model 生成哈希
-// 如果没有提供 name，使用 provider+model 生成哈希
+// SetCurrentLLM 设置当前前台使用的 LLM Provider
+func SetCurrentLLM(idOrName string) error {
+	// 验证 LLM Provider 是否存在
+	provider, err := FindLLMProvider(idOrName)
+	if err != nil {
+		return err
+	}
+	if provider == nil {
+		return fmt.Errorf("LLM Provider '%s' 不存在", idOrName)
+	}
+
+	// 检查是否在激活列表中
+	config := LoadConfig()
+	found := false
+	for _, activeID := range config.ActiveLLMs {
+		if activeID == provider.ID {
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		return fmt.Errorf("LLM Provider '%s' 未激活，请先使用 link 命令", idOrName)
+	}
+
+	// 设置当前 LLM
+	config.CurrentLLM = provider.ID
+	return SaveConfig(config)
+}
+
+// GetCurrentLLM 获取当前前台使用的 LLM Provider
+func GetCurrentLLM() (*LLMProvider, error) {
+	config := LoadConfig()
+	if config.CurrentLLM == "" {
+		return nil, nil // 没有设置当前 LLM
+	}
+
+	return FindLLMProvider(config.CurrentLLM)
+}
+
+// FindAllMatchingProviders 查找所有匹配的 LLM Providers（导出供外部使用）
+// 返回匹配的 providers 和匹配类型 ("id", "name", "model")
+func FindAllMatchingProviders(idOrNameOrModel string) ([]*LLMProvider, string) {
+	config := LoadConfig()
+	var matches []*LLMProvider
+
+	// 优先匹配 ID（唯一）
+	for i := range config.LLMProviders {
+		if config.LLMProviders[i].ID == idOrNameOrModel {
+			return []*LLMProvider{&config.LLMProviders[i]}, "id"
+		}
+	}
+
+	// 然后匹配 Name（唯一）
+	for i := range config.LLMProviders {
+		if config.LLMProviders[i].Name == idOrNameOrModel {
+			return []*LLMProvider{&config.LLMProviders[i]}, "name"
+		}
+	}
+
+	// 最后匹配 Model（可能多个）
+	for i := range config.LLMProviders {
+		if config.LLMProviders[i].Model == idOrNameOrModel {
+			matches = append(matches, &config.LLMProviders[i])
+		}
+	}
+
+	if len(matches) > 0 {
+		return matches, "model"
+	}
+
+	return nil, ""
+}
+
+// generateLLMID 根据 provider、name 和 model 生成唯一的 ID
 // 返回前 16 个字符的十六进制哈希值作为 ID
 func generateLLMID(provider, name, model string) string {
 	var input string
-	if name != "" {
-		// 使用 name + provider + model 确保唯一性
-		input = fmt.Sprintf("%s:%s:%s", provider, name, model)
-	} else {
-		// 使用 provider + model 生成 ID
-		input = fmt.Sprintf("%s:%s", provider, model)
-	}
+	// 使用 name + provider + model 确保唯一性
+	input = fmt.Sprintf("%s:%s:%s", provider, name, model)
 
 	// 生成 SHA256 哈希
 	hash := sha256.Sum256([]byte(input))
 	// 返回前 16 个字符的十六进制字符串作为 ID
 	return hex.EncodeToString(hash[:])[:16]
 }
+
