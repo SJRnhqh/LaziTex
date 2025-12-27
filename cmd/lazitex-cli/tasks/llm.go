@@ -33,8 +33,8 @@ func RemoveLLM(sub []string) {
 	llm.RemoveLLMProvider(sub[1:])
 }
 
-func ListLLM() {
-	// Mock 列出所有注册的LLM的业务逻辑
+func ListLLM(sub []string) {
+	llm.ListLLMProviders(sub[1:])
 }
 
 func AskLLM() {

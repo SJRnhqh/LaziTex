@@ -304,11 +304,9 @@ func handleREPLCommand(input string) bool {
 
 	case "llm":
 		// 单独使用：
-		// - remove: 移除指定的LLM注册 -> 询问用户是否确认移除 -> 确认移除后执行移除操作(注意会区分id/name/model，如果model存在重复会提示用户选择)
 		// - list: 列出所有注册的LLM
 		// - chat: 与前台llm进行持续性对话交互
 		// 组合使用：
-		// - remove <id/name/model>: 移除指定的LLM注册 -> 询问用户是否确认移除 -> 确认移除后执行移除操作(注意会区分id/name/model，如果model存在重复会提示用户选择)
 		// - list <id/name/model>: 列出指定的LLM注册
 		// - ask <message>: 单次与前台llm进行对话交互
 		if len(parts) < 2 {
@@ -331,7 +329,7 @@ func handleREPLCommand(input string) bool {
 		case "remove":
 			tasks.RemoveLLM(sub)
 		case "list":
-			tasks.ListLLM()
+			tasks.ListLLM(sub)
 		case "ask": // 严格组合使用
 			if len(sub) < 2 {
 				fmt.Println(lang.T("repl.llm_usage"))

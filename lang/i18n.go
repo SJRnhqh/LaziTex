@@ -226,6 +226,13 @@ func init() {
 		"msg.llm.list_header_verified":    "已验证",
 		"msg.llm.list_header_verified_at": "验证时间",
 		"msg.llm.list_header_active":      "当前",
+		"msg.llm.list.yes":                "是",
+		"msg.llm.list.no":                 "否",
+		"msg.llm.list.never":              "从未",
+		"msg.llm.list.status_current":     "当前前台",
+		"msg.llm.list.status_active":      "已激活",
+		"msg.llm.list.status_inactive":    "未激活",
+		"msg.llm.list.no_providers":       "当前没有已注册的 LLM Provider",
 		"msg.llm.date_format":             "2006-01-02", // 日期格式（Go time 格式字符串）
 		// 测试
 		"msg.llm.test.test_failed":                     "😢 %s 测试失败: %v",
@@ -735,6 +742,13 @@ func init() {
 		"msg.llm.list_header_verified":    "Verified",
 		"msg.llm.list_header_verified_at": "VerifiedAt",
 		"msg.llm.list_header_active":      "Active",
+		"msg.llm.list.yes":                "Yes",
+		"msg.llm.list.no":                 "No",
+		"msg.llm.list.never":              "Never",
+		"msg.llm.list.status_current":     "Current",
+		"msg.llm.list.status_active":      "Active",
+		"msg.llm.list.status_inactive":    "Inactive",
+		"msg.llm.list.no_providers":       "No registered LLM Providers",
 		"msg.llm.date_format":             "2006-01-02", // Date format (Go time format string)
 		// Test
 		"msg.llm.test.test_failed":                     "😢 %s test failed: %v",
