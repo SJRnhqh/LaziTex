@@ -11,13 +11,14 @@ import (
 	"strconv"
 	"strings"
 
+	lipgloss "github.com/charmbracelet/lipgloss"
+	readline "github.com/chzyer/readline"
+	figure "github.com/common-nighthawk/go-figure"
+
 	// 内部包
 	internal "github.com/SJRnhqh/lazitex/cmd/lazitex-cli/internal"
 	tasks "github.com/SJRnhqh/lazitex/cmd/lazitex-cli/tasks"
 	lang "github.com/SJRnhqh/lazitex/lang"
-	lipgloss "github.com/charmbracelet/lipgloss"
-	readline "github.com/chzyer/readline"
-	figure "github.com/common-nighthawk/go-figure"
 )
 
 // 创建补全器
@@ -298,15 +299,63 @@ func handleREPLCommand(input string) bool {
 		internal.HandleOllamaCommand(parts[1:], internal.I18nModeRepl, "repl.ollama_usage")
 		return false
 
-	// case "llm":
-	// 	// LLM 管理命令组织：
-	// 	// - list: 单独使用，无需参数
-	// 	// - add: 需要 -p <provider> 和 -n <name>，model 作为位置参数
-	// 	// - remove/link/unlink/test: 都可以对 id/name/model 进行直接操作
-	// 	if len(parts) < 2 {
-	// 		fmt.Println(lang.T("repl.llm_usage"))
-	// 		return false
-	// 	}
+	case "llm":
+		// 单独使用：
+		// - link：询问用户是否接入注册新的LLM -> y接入注册/n列出已经注册的LLM让用户tab上下选择然后执行link <id/name/model>的逻辑
+		// - unlink: 断掉当前台前llm的连接
+		// - switch: 会根据当前所有连接状态的LLM让用户选择一个切换为前台llm
+		// - test: 测试当前前台llm是否可以正常工作
+		// - remove: 移除指定的LLM注册 -> 询问用户是否确认移除 -> 确认移除后执行移除操作(注意会区分id/name/model，如果model存在重复会提示用户选择)
+		// - list: 列出所有注册的LLM
+		// - chat: 与前台llm进行持续性对话交互
+		// 组合使用：
+		// - link <id/name/model>: 直接连接指定的已经注册的LLM
+		// - unlink <id/name/model>: 断开指定的LLM连接
+		// - switch <id/name/model>: 切换当前前台llm为指定的连接状态的LLM
+		// - test <id/name/model>: 测试指定的LLM是否可以正常工作
+		// - remove <id/name/model>: 移除指定的LLM注册 -> 询问用户是否确认移除 -> 确认移除后执行移除操作(注意会区分id/name/model，如果model存在重复会提示用户选择)
+		// - list <id/name/model>: 列出指定的LLM注册
+		// - ask <message>: 单次与前台llm进行对话交互
+		if len(parts) < 2 {
+			fmt.Println(lang.T("repl.llm_usage"))
+			return false
+		}
+
+		sub := parts[1:]
+		action := sub[0]
+
+		switch action {
+		case "link":
+			tasks.LinkLLM(sub)
+		case "unlink":
+			tasks.UnlinkLLM()
+		case "switch":
+			tasks.SwitchLLM()
+		case "test":
+			tasks.TestLLM()
+		case "remove":
+			tasks.RemoveLLM()
+		case "list":
+			tasks.ListLLM()
+		case "ask": // 严格组合使用
+			if len(sub) < 2 {
+				fmt.Println(lang.T("repl.llm_usage"))
+				return false
+			}
+			tasks.AskLLM()
+			return false
+		case "chat": // 严格单独使用
+			if len(sub) != 1 {
+				fmt.Println(lang.T("repl.llm_usage"))
+				return false
+			}
+			tasks.ChatLLM()
+			return false
+		default:
+			fmt.Printf(lang.T("repl.unknown_command")+"\n", action)
+			fmt.Println(lang.T("repl.llm_usage"))
+			return false
+		}
 
 	// 	sub := parts[1:]
 	// 	action := strings.ToLower(sub[0])
