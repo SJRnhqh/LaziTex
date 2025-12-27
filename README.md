@@ -23,7 +23,7 @@ Instant LaTeX compilation across platforms — powered by Go with local AI to he
 - 📦 **Auto Package Management** - Automatically detects and installs missing packages
 - 🌐 **Web Preview Mode** - Web real-time preview
 - 🦙 **Ollama Management** - One-click Ollama management
-- 🤖 **LLM Management** - Complete LLM provider management (register, link, switch, test, remove, list)
+- 🤖 **LLM Management** - Complete LLM provider management with AI interaction (register, link, switch, test, remove, list, ask, chat)
 - ⚙️ **Configuration Management** - Cross-platform configuration file management
 - 🎨 **Multiple Modes** - Supports TUI and REPL modes
 
@@ -177,10 +177,10 @@ lazitex> ollama -u     # Uninstall
 
 ### LLM Management
 
-Complete LLM provider management with registration, activation, switching, testing, and removal. Supports interactive selection and multi-activation.
+Complete LLM provider management with registration, activation, switching, testing, and removal. Supports interactive selection, batch operations, and AI interactions.
 
 ```bash
-# REPL Mode
+# REPL Mode - Provider Management
 lazitex> llm link              # Register new LLM provider
 lazitex> llm link <name>       # Activate LLM provider
 lazitex> llm unlink            # Deactivate current LLM
@@ -192,6 +192,10 @@ lazitex> llm test <name>       # Test specific LLM
 lazitex> llm remove            # Remove LLM provider (interactive)
 lazitex> llm list              # List all registered LLMs
 lazitex> llm list <name>       # List specific LLM
+
+# REPL Mode - AI Interaction
+lazitex> llm ask <message>     # Single-turn conversation
+lazitex> llm chat              # Multi-turn conversation (type 'quit' to exit)
 ```
 
 ### Build & Preview
@@ -284,7 +288,10 @@ lazitex/
 │           ├── test.go             # LLM connection testing
 │           ├── remove.go           # LLM provider removal
 │           ├── list.go             # LLM provider listing (table format)
-│           └── select.go           # Interactive selection utilities
+│           ├── select.go           # Interactive selection utilities
+│           ├── client.go          # LLM client interface & factory (ChatModelClient)
+│           ├── ask.go              # Single-turn AI interaction
+│           └── chat.go             # Multi-turn AI conversation
 │
 ├── 📚 lang/                       # Internationalization module
 │   └── i18n.go                    # Multi-language support (English/Chinese)
@@ -382,6 +389,8 @@ lazitex/
 - **Tool Priority System** - 23 LaTeX tools categorized by priority (⭐ Core, 🔹 Important, 🔸 Optional), helping users quickly identify critical tools and optimize installation recommendations
 
 - **Unified Management Architecture** - Consistent architecture pattern for LaTeX and Ollama management: unified manager interface (LaTeXManager/OllamaManager) with platform-specific implementations, following the same flow from command parsing to task execution to core logic to platform implementation
+
+- **Extensible LLM Integration** - Abstract LLM client interface (ChatModelClient) with factory pattern, enabling easy integration of new providers (Ollama, OpenAI, etc.) without modifying core ask/chat logic
 
 ---
 

@@ -44,5 +44,5 @@ func AskLLM(sub []string) {
 }
 
 func ChatLLM() {
-	// Mock 与LLM进行持续性对话交互的业务逻辑
+	llm.ChatLLMProvider()
 }

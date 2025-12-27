@@ -23,7 +23,7 @@
 - 📦 **自动包管理** - 自动检测并安装缺失的包
 - 🌐 **Web 预览模式** - Web 实时预览
 - 🦙 **Ollama 管理** - 一键管理 Ollama
-- 🤖 **LLM 管理** - 完整的 LLM 提供商管理（注册、激活、切换、测试、删除、列表）
+- 🤖 **LLM 管理** - 完整的 LLM 提供商管理与 AI 交互（注册、激活、切换、测试、删除、列表、单次对话、持续对话）
 - ⚙️ **配置管理** - 跨平台配置文件管理
 - 🎨 **多种模式** - 支持 TUI 和 REPL 模式
 
@@ -177,10 +177,10 @@ lazitex> ollama -u     # 卸载
 
 ### LLM 管理
 
-完整的 LLM 提供商管理功能，支持注册、激活、切换、测试和删除。支持交互式选择和多激活。
+完整的 LLM 提供商管理功能，支持注册、激活、切换、测试和删除。支持交互式选择、批量操作和 AI 交互。
 
 ```bash
-# REPL 模式
+# REPL 模式 - 提供商管理
 lazitex> llm link              # 注册新的 LLM 提供商
 lazitex> llm link <name>       # 激活 LLM 提供商
 lazitex> llm unlink           # 取消激活当前 LLM
@@ -192,6 +192,10 @@ lazitex> llm test <name>      # 测试指定 LLM
 lazitex> llm remove          # 删除 LLM 提供商（交互式）
 lazitex> llm list            # 列出所有已注册的 LLM
 lazitex> llm list <name>     # 列出指定 LLM
+
+# REPL 模式 - AI 交互
+lazitex> llm ask <message>    # 单次对话
+lazitex> llm chat             # 持续对话（输入 'quit' 退出）
 ```
 
 ### 构建与预览
@@ -284,7 +288,10 @@ lazitex/
 │           ├── test.go              # LLM 连接测试
 │           ├── remove.go           # LLM 提供商删除
 │           ├── list.go             # LLM 提供商列表（表格格式）
-│           └── select.go           # 交互式选择工具
+│           ├── select.go           # 交互式选择工具
+│           ├── client.go          # LLM 客户端接口与工厂（ChatModelClient）
+│           ├── ask.go              # 单次 AI 交互
+│           └── chat.go             # 多轮 AI 对话
 │
 ├── 📚 lang/                       # 国际化模块
 │   └── i18n.go                    # 多语言支持（中英文）
@@ -382,6 +389,8 @@ lazitex/
 - **工具优先级系统** - 23 个 LaTeX 工具按优先级分类（⭐ 核心、🔹 重要、🔸 可选），帮助用户快速识别关键工具，优化安装建议
 
 - **统一管理架构** - LaTeX 和 Ollama 管理采用一致的架构模式：统一管理器接口（LaTeXManager/OllamaManager）配合平台特定实现，遵循相同的调用流程：命令解析 → 任务执行 → 核心逻辑 → 平台实现
+
+- **可扩展的 LLM 集成** - 抽象的 LLM 客户端接口（ChatModelClient）配合工厂模式，支持轻松集成新的提供商（Ollama、OpenAI 等），无需修改核心 ask/chat 逻辑
 
 ---
 
