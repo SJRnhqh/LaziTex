@@ -55,132 +55,132 @@ func main() {
 		internal.HandleOllamaCommand(args[1:], internal.I18nModeMsg, "msg.ollama_usage")
 		return
 
-	case "-m", "--llm":
-		// LLM 管理命令组织：
-		// - list: 单独使用，无需参数
-		// - add: 需要 -p <provider> 和 -n <name>，model 作为位置参数
-		// - remove/link/unlink/test: 都可以对 id/name/model 进行直接操作
-		if len(args) < 2 {
-			fmt.Println(lang.T("msg.llm.cli_usage"))
-			return
-		}
+	// case "-m", "--llm":
+	// 	// LLM 管理命令组织：
+	// 	// - list: 单独使用，无需参数
+	// 	// - add: 需要 -p <provider> 和 -n <name>，model 作为位置参数
+	// 	// - remove/link/unlink/test: 都可以对 id/name/model 进行直接操作
+	// 	if len(args) < 2 {
+	// 		fmt.Println(lang.T("msg.llm.cli_usage"))
+	// 		return
+	// 	}
 
-		sub := args[1:]
-		action := sub[0]
+	// 	sub := args[1:]
+	// 	action := sub[0]
 
-		// list: 单独使用，无需参数
-		if action == "list" {
-			tasks.ListLLM()
-			return
-		}
+	// 	// list: 单独使用，无需参数
+	// 	if action == "list" {
+	// 		tasks.ListLLM()
+	// 		return
+	// 	}
 
-		// add: 需要 -p <provider> 和 -n <name>，model 作为位置参数
-		if action == "add" {
-			if len(sub) < 2 {
-				fmt.Println(lang.T("msg.llm.cli_usage"))
-				return
-			}
-			// 解析参数：-m add <model> -p <provider> -n <name>
-			var provider string
-			var name string
-			var model string
+	// 	// add: 需要 -p <provider> 和 -n <name>，model 作为位置参数
+	// 	if action == "add" {
+	// 		if len(sub) < 2 {
+	// 			fmt.Println(lang.T("msg.llm.cli_usage"))
+	// 			return
+	// 		}
+	// 		// 解析参数：-m add <model> -p <provider> -n <name>
+	// 		var provider string
+	// 		var name string
+	// 		var model string
 
-			// sub[1] 是 model（位置参数）
-			if strings.HasPrefix(sub[1], "-") {
-				fmt.Println(lang.T("msg.llm.add.model_required"))
-				fmt.Println(lang.T("msg.llm.cli_usage"))
-				return
-			}
-			model = sub[1]
+	// 		// sub[1] 是 model（位置参数）
+	// 		if strings.HasPrefix(sub[1], "-") {
+	// 			fmt.Println(lang.T("msg.llm.add.model_required"))
+	// 			fmt.Println(lang.T("msg.llm.cli_usage"))
+	// 			return
+	// 		}
+	// 		model = sub[1]
 
-			// 从 sub[2] 开始解析必要参数 -p <provider> 和 -n <name>（顺序任意）
-			i := 2
-			for i < len(sub) {
-				arg := sub[i]
+	// 		// 从 sub[2] 开始解析必要参数 -p <provider> 和 -n <name>（顺序任意）
+	// 		i := 2
+	// 		for i < len(sub) {
+	// 			arg := sub[i]
 
-				if arg == "-p" || arg == "--provider" {
-					// 检查是否有下一个参数
-					if i+1 >= len(sub) {
-						fmt.Println(lang.T("msg.llm.add.provider_required"))
-						fmt.Println(lang.T("msg.llm.cli_usage"))
-						return
-					}
-					if strings.HasPrefix(sub[i+1], "-") {
-						fmt.Println(lang.T("msg.llm.add.provider_required"))
-						fmt.Println(lang.T("msg.llm.cli_usage"))
-						return
-					}
-					provider = sub[i+1]
-					i += 2
-					continue
-				} else if arg == "-n" || arg == "--name" {
-					// 检查是否有下一个参数
-					if i+1 >= len(sub) {
-						fmt.Println(lang.T("msg.llm.add.name_required"))
-						fmt.Println(lang.T("msg.llm.cli_usage"))
-						return
-					}
-					if strings.HasPrefix(sub[i+1], "-") {
-						fmt.Println(lang.T("msg.llm.add.name_required"))
-						fmt.Println(lang.T("msg.llm.cli_usage"))
-						return
-					}
-					name = sub[i+1]
-					i += 2
-					continue
-				}
+	// 			if arg == "-p" || arg == "--provider" {
+	// 				// 检查是否有下一个参数
+	// 				if i+1 >= len(sub) {
+	// 					fmt.Println(lang.T("msg.llm.add.provider_required"))
+	// 					fmt.Println(lang.T("msg.llm.cli_usage"))
+	// 					return
+	// 				}
+	// 				if strings.HasPrefix(sub[i+1], "-") {
+	// 					fmt.Println(lang.T("msg.llm.add.provider_required"))
+	// 					fmt.Println(lang.T("msg.llm.cli_usage"))
+	// 					return
+	// 				}
+	// 				provider = sub[i+1]
+	// 				i += 2
+	// 				continue
+	// 			} else if arg == "-n" || arg == "--name" {
+	// 				// 检查是否有下一个参数
+	// 				if i+1 >= len(sub) {
+	// 					fmt.Println(lang.T("msg.llm.add.name_required"))
+	// 					fmt.Println(lang.T("msg.llm.cli_usage"))
+	// 					return
+	// 				}
+	// 				if strings.HasPrefix(sub[i+1], "-") {
+	// 					fmt.Println(lang.T("msg.llm.add.name_required"))
+	// 					fmt.Println(lang.T("msg.llm.cli_usage"))
+	// 					return
+	// 				}
+	// 				name = sub[i+1]
+	// 				i += 2
+	// 				continue
+	// 			}
 
-				if strings.HasPrefix(arg, "-") {
-					fmt.Printf(lang.T("msg.unknown_command")+"\n", arg)
-					fmt.Println(lang.T("msg.llm.cli_usage"))
-					return
-				}
+	// 			if strings.HasPrefix(arg, "-") {
+	// 				fmt.Printf(lang.T("msg.unknown_command")+"\n", arg)
+	// 				fmt.Println(lang.T("msg.llm.cli_usage"))
+	// 				return
+	// 			}
 
-				// 非flag参数，不应该出现在这里
-				fmt.Printf(lang.T("msg.llm.add.unexpected_nonflag")+"\n", arg)
-				fmt.Println(lang.T("msg.llm.cli_usage"))
-				return
-			}
+	// 			// 非flag参数，不应该出现在这里
+	// 			fmt.Printf(lang.T("msg.llm.add.unexpected_nonflag")+"\n", arg)
+	// 			fmt.Println(lang.T("msg.llm.cli_usage"))
+	// 			return
+	// 		}
 
-			if provider == "" {
-				fmt.Println(lang.T("msg.llm.add.provider_missing"))
-				fmt.Println(lang.T("msg.llm.cli_usage"))
-				return
-			}
+	// 		if provider == "" {
+	// 			fmt.Println(lang.T("msg.llm.add.provider_missing"))
+	// 			fmt.Println(lang.T("msg.llm.cli_usage"))
+	// 			return
+	// 		}
 
-			if name == "" {
-				fmt.Println(lang.T("msg.llm.add.name_required"))
-				fmt.Println(lang.T("msg.llm.cli_usage"))
-				return
-			}
+	// 		if name == "" {
+	// 			fmt.Println(lang.T("msg.llm.add.name_required"))
+	// 			fmt.Println(lang.T("msg.llm.cli_usage"))
+	// 			return
+	// 		}
 
-			tasks.AddLLM(provider, name, model)
-			return
-		}
+	// 		tasks.AddLLM(provider, name, model)
+	// 		return
+	// 	}
 
-		// remove/link/unlink/test: 都可以对 id/name/model 进行直接操作
-		if len(sub) < 2 {
-			fmt.Println(lang.T("msg.llm.cli_usage"))
-			return
-		}
+	// 	// remove/link/unlink/test: 都可以对 id/name/model 进行直接操作
+	// 	if len(sub) < 2 {
+	// 		fmt.Println(lang.T("msg.llm.cli_usage"))
+	// 		return
+	// 	}
 
-		identifier := sub[1]
-		switch action {
-		case "remove":
-			tasks.RemoveLLM(identifier)
-		case "link":
-			tasks.LinkLLM(identifier)
-		case "unlink":
-			tasks.UnlinkLLM(identifier)
-		case "test":
-			tasks.TestLLM(identifier)
-		case "switch":
-			tasks.SwitchLLM(identifier)
-		default:
-			// 未知命令
-			fmt.Printf(lang.T("msg.llm.unknown_action")+"\n", action)
-			fmt.Println(lang.T("msg.llm.cli_usage"))
-		}
+	// 	identifier := sub[1]
+	// 	switch action {
+	// 	case "remove":
+	// 		tasks.RemoveLLM(identifier)
+	// 	case "link":
+	// 		tasks.LinkLLM(identifier)
+	// 	case "unlink":
+	// 		tasks.UnlinkLLM(identifier)
+	// 	case "test":
+	// 		tasks.TestLLM(identifier)
+	// 	case "switch":
+	// 		tasks.SwitchLLM(identifier)
+	// 	default:
+	// 		// 未知命令
+	// 		fmt.Printf(lang.T("msg.llm.unknown_action")+"\n", action)
+	// 		fmt.Println(lang.T("msg.llm.cli_usage"))
+	// 	}
 
 	case "-b", "--build":
 		if len(args) < 2 {

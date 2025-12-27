@@ -16,7 +16,7 @@ type Config struct {
 	DisplayMode string `json:"displayMode"` // 显示模式: "virtual" 或 "pagination"
 
 	// LLM 配置
-	LLMProviders []LLMProvider `json:"llmProviders,omitempty"` // LLM Provider列表
+	LLMProviders []LLMProvider `json:"llmProviders,omitempty"` // LLMProvider列表
 	ActiveLLMs   []string      `json:"activeLLMs,omitempty"`   // 当前连接的 LLM Provider ID 列表（支持多激活）
 	CurrentLLM   string        `json:"currentLLM,omitempty"`   // 当前激活的 LLM Provider ID（用于 ask/chat）
 }

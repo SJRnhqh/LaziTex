@@ -23,9 +23,7 @@ Instant LaTeX compilation across platforms — powered by Go with local AI to he
 - 📦 **Auto Package Management** - Automatically detects and installs missing packages
 - 🌐 **Web Preview Mode** - Web real-time preview
 - 🦙 **Ollama Management** - One-click Ollama management
-- 🤖 **LLM Management** - Complete LLM provider registration, connection, testing, and management
 - ⚙️ **Configuration Management** - Cross-platform configuration file management
-- 🧠 **AI Architecture** - Modular AI agent and tool system (In Development)
 - 🎨 **Multiple Modes** - Supports TUI and REPL modes
 
 ---
@@ -106,7 +104,6 @@ Download pre-built binaries from [Releases](https://github.com/SJRnhqh/lazitex/r
 | `-o, --ollama` | Ollama management (use `-c/-i/-u` flags) | `lazitex -o -c` |
 | `-b, --build` | Build LaTeX document (supports `-o` output, `-s` show, `-q` quiet, `-t` tidy) | `lazitex -b main.tex [-o out/] [-s] [-q] [-t]` |
 | `-p, --preview` | Live preview PDF (supports `-q` quiet mode, `-t` tidy mode, `:port` custom port) | `lazitex -p main.tex [-q] [-t] [:port]` |
-| `-m, --llm` | LLM management | `lazitex -m list` or `lazitex -m add llama3 -p ollama -n my-llm` |
 | `config` | Open configuration file | `lazitex config` |
 | `-l, --lang` | Set language (zh/en) | `lazitex -l zh` |
 
@@ -176,38 +173,6 @@ lazitex> ollama -c     # Check
 lazitex> ollama -i     # Install
 lazitex> ollama -u     # Uninstall
 ```
-
-### LLM Management
-
-Complete LLM provider management with registration, connection, testing, and removal.
-
-```bash
-# CLI Mode
-$ lazitex -m add <model> -p <provider> -n <name>  # Register LLM
-$ lazitex -m remove <id/name/model>              # Remove LLM (interactive selection)
-$ lazitex -m link <id/name/model>                # Connect and activate LLM
-$ lazitex -m unlink <id/name/model>              # Disconnect LLM
-$ lazitex -m switch <id/name/model>              # Switch between linked LLMs
-$ lazitex -m test <id/name/model>                # Test LLM connectivity
-$ lazitex -m list                                 # List all registered LLMs
-
-# REPL Mode
-lazitex> llm add <model> -p <provider> -n <name>  # Register LLM
-lazitex> llm remove <id/name/model>              # Remove LLM
-lazitex> llm link <id/name/model>                # Connect LLM
-lazitex> llm unlink <id/name/model>              # Disconnect LLM
-lazitex> llm switch <id/name/model>              # Switch between linked LLMs
-lazitex> llm test <id/name/model>                # Test LLM
-lazitex> llm list                                 # List LLMs
-```
-
-**Features:**
-
-- **Flexible matching**: Supports ID, Name, or Model matching with interactive selection for multiple matches
-- **Current LLM management**: Link automatically sets as current, switch between linked LLMs
-- **Dynamic prompt**: REPL mode shows current active LLM in prompt: `(name:m)lazitex>`
-- **Auto verification**: Registration and connection automatically test connectivity
-- **Safe deletion**: Confirmation prompt before removal
 
 ### Build & Preview
 
@@ -292,25 +257,12 @@ lazitex/
 │   ├── ⚡ performance/             # Compilation performance optimization module
 │   │   ├── concurrent.go          # Concurrent optimization (parallel execution of intermediate tools)
 │   │   └── lock.go                # Compilation lock & task management (task preemption, timeout control)
-│   └── 🤖 ai/                     # AI architecture module (modular design)
-│       ├── agent/                 # AI agent management
-│       │   └── registry.go        # Agent registration and management
-│       ├── llm/                   # LLM provider abstraction
-│       │   ├── registry.go        # Provider registration and LLM registration logic
-│       │   ├── connectivity.go    # LLM connectivity testing
-│       │   ├── list.go            # LLM list building logic
-│       │   └── select.go          # Provider matching and interactive selection
-│       ├── providers/             # LLM provider implementations
-│       │   └── ollama.go          # Ollama provider implementation
-│       └── tools/                 # AI tool system
-│           └── registry.go        # Tool registration and management
 │
 ├── 📚 lang/                       # Internationalization module
 │   └── i18n.go                    # Multi-language support (English/Chinese)
 │
 ├── ⚙️  config/                     # Configuration management
-│   ├── common.go                  # Application configuration management
-│   └── llm.go                     # LLM provider configuration management
+│   └── common.go                  # Application configuration management
 │
 ├── 🗄️  backend/                    # Web server backend
 │   ├── server.go                  # HTTP server core (with mode configuration)
@@ -376,7 +328,6 @@ lazitex/
 │       │   ├── preview.go         # Live preview functionality
 │       │   ├── ollama.go          # Ollama management functionality
 │       │   ├── latex.go           # LaTeX environment management
-│       │   ├── llm.go             # LLM management (registration, connection, testing, removal with interactive selection)
 │       │   ├── config.go          # Configuration file management
 │       │   └── help.go            # Help information
 │       ├── 🧠 internal/           # Internal command processing (unified action handlers)
@@ -401,10 +352,6 @@ lazitex/
 - **Tool Priority System** - 23 LaTeX tools categorized by priority (⭐ Core, 🔹 Important, 🔸 Optional), helping users quickly identify critical tools and optimize installation recommendations
 
 - **Unified Management Architecture** - Consistent architecture pattern for LaTeX and Ollama management: unified manager interface (LaTeXManager/OllamaManager) with platform-specific implementations, following the same flow from command parsing to task execution to core logic to platform implementation
-
-- **Modular AI Architecture** - Clean separation of AI agents, LLM providers, and tools with extensible registry system for seamless integration
-
-- **Complete LLM Management** - Full provider lifecycle management: registration with verification, smart matching (ID/Name/Model), connection/disconnection, testing, and safe removal with confirmation
 
 ---
 

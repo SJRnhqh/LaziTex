@@ -14,7 +14,6 @@ import (
 	// 内部包
 	internal "github.com/SJRnhqh/lazitex/cmd/lazitex-cli/internal"
 	tasks "github.com/SJRnhqh/lazitex/cmd/lazitex-cli/tasks"
-	llm "github.com/SJRnhqh/lazitex/core/ai/llm"
 	lang "github.com/SJRnhqh/lazitex/lang"
 	lipgloss "github.com/charmbracelet/lipgloss"
 	readline "github.com/chzyer/readline"
@@ -142,11 +141,11 @@ func (c *LaTeXCompleter) Do(line []rune, pos int) (newLine [][]rune, length int)
 
 // getREPLPrompt 动态生成 REPL prompt，显示当前激活的 LLM
 func getREPLPrompt() string {
-	provider, _ := llm.GetCurrentLLM()
-	if provider != nil {
-		activeMark := llm.FormatActivePrompt(provider, "m")
-		return fmt.Sprintf("%slazitex> ", activeMark)
-	}
+	// provider, _ := llm.GetCurrentLLM()
+	// if provider != nil {
+	// 	activeMark := llm.FormatActivePrompt(provider, "m")
+	// 	return fmt.Sprintf("%slazitex> ", activeMark)
+	// }
 	return lang.T("repl.prompt")
 }
 
@@ -194,7 +193,7 @@ func StartREPL() {
 		}
 
 		// 每次命令执行后更新 prompt（因为可能切换了 LLM）
-		rl.SetPrompt(getREPLPrompt())
+		// rl.SetPrompt(getREPLPrompt())
 	}
 	fmt.Println(lang.T("repl.goodbye"))
 }
@@ -299,133 +298,138 @@ func handleREPLCommand(input string) bool {
 		internal.HandleOllamaCommand(parts[1:], internal.I18nModeRepl, "repl.ollama_usage")
 		return false
 
-	case "llm":
-		// LLM 管理命令组织：
-		// - list: 单独使用，无需参数
-		// - add: 需要 -p <provider> 和 -n <name>，model 作为位置参数
-		// - remove/link/unlink/test: 都可以对 id/name/model 进行直接操作
-		if len(parts) < 2 {
-			fmt.Println(lang.T("repl.llm_usage"))
-			return false
-		}
+	// case "llm":
+	// 	// LLM 管理命令组织：
+	// 	// - list: 单独使用，无需参数
+	// 	// - add: 需要 -p <provider> 和 -n <name>，model 作为位置参数
+	// 	// - remove/link/unlink/test: 都可以对 id/name/model 进行直接操作
+	// 	if len(parts) < 2 {
+	// 		fmt.Println(lang.T("repl.llm_usage"))
+	// 		return false
+	// 	}
 
-		sub := parts[1:]
-		action := strings.ToLower(sub[0])
+	// 	sub := parts[1:]
+	// 	action := strings.ToLower(sub[0])
 
-		// list: 单独使用，无需参数
-		if action == "list" {
-			tasks.ListLLM()
-			return false
-		}
+	// 	// list: 单独使用，无需参数
+	// 	if action == "list" {
+	// 		tasks.ListLLM()
+	// 		return false
+	// 	}
 
-		// add: 需要 -p <provider> 和 -n <name>，model 作为位置参数
-		if action == "add" {
-			if len(sub) < 2 {
-				fmt.Println(lang.T("repl.llm_usage"))
-				return false
-			}
-			// 解析参数：llm add <model> -p <provider> -n <name>
-			var provider string
-			var name string
-			var model string
+	// 	if action == "chat" {
+	// 		tasks.AskEinoLLM()
+	// 		return false
+	// 	}
 
-			// sub[1] 是 model（位置参数）
-			if strings.HasPrefix(sub[1], "-") {
-				fmt.Println(lang.T("msg.llm.add.model_required"))
-				fmt.Println(lang.T("repl.llm_usage"))
-				return false
-			}
-			model = sub[1]
+	// 	// add: 需要 -p <provider> 和 -n <name>，model 作为位置参数
+	// 	if action == "add" {
+	// 		if len(sub) < 2 {
+	// 			fmt.Println(lang.T("repl.llm_usage"))
+	// 			return false
+	// 		}
+	// 		// 解析参数：llm add <model> -p <provider> -n <name>
+	// 		var provider string
+	// 		var name string
+	// 		var model string
 
-			// 从 sub[2] 开始解析必要参数 -p <provider> 和 -n <name>（顺序任意）
-			i := 2
-			for i < len(sub) {
-				arg := sub[i]
+	// 		// sub[1] 是 model（位置参数）
+	// 		if strings.HasPrefix(sub[1], "-") {
+	// 			fmt.Println(lang.T("msg.llm.add.model_required"))
+	// 			fmt.Println(lang.T("repl.llm_usage"))
+	// 			return false
+	// 		}
+	// 		model = sub[1]
 
-				if arg == "-p" || arg == "--provider" {
-					// 检查是否有下一个参数
-					if i+1 >= len(sub) {
-						fmt.Println(lang.T("msg.llm.add.provider_required"))
-						fmt.Println(lang.T("repl.llm_usage"))
-						return false
-					}
-					if strings.HasPrefix(sub[i+1], "-") {
-						fmt.Println(lang.T("msg.llm.add.provider_required"))
-						fmt.Println(lang.T("repl.llm_usage"))
-						return false
-					}
-					provider = sub[i+1]
-					i += 2
-					continue
-				} else if arg == "-n" || arg == "--name" {
-					// 检查是否有下一个参数
-					if i+1 >= len(sub) {
-						fmt.Println(lang.T("msg.llm.add.name_required"))
-						fmt.Println(lang.T("repl.llm_usage"))
-						return false
-					}
-					if strings.HasPrefix(sub[i+1], "-") {
-						fmt.Println(lang.T("msg.llm.add.name_required"))
-						fmt.Println(lang.T("repl.llm_usage"))
-						return false
-					}
-					name = sub[i+1]
-					i += 2
-					continue
-				}
+	// 		// 从 sub[2] 开始解析必要参数 -p <provider> 和 -n <name>（顺序任意）
+	// 		i := 2
+	// 		for i < len(sub) {
+	// 			arg := sub[i]
 
-				if strings.HasPrefix(arg, "-") {
-					fmt.Printf(lang.T("msg.unknown_command")+"\n", arg)
-					fmt.Println(lang.T("repl.llm_usage"))
-					return false
-				}
+	// 			if arg == "-p" || arg == "--provider" {
+	// 				// 检查是否有下一个参数
+	// 				if i+1 >= len(sub) {
+	// 					fmt.Println(lang.T("msg.llm.add.provider_required"))
+	// 					fmt.Println(lang.T("repl.llm_usage"))
+	// 					return false
+	// 				}
+	// 				if strings.HasPrefix(sub[i+1], "-") {
+	// 					fmt.Println(lang.T("msg.llm.add.provider_required"))
+	// 					fmt.Println(lang.T("repl.llm_usage"))
+	// 					return false
+	// 				}
+	// 				provider = sub[i+1]
+	// 				i += 2
+	// 				continue
+	// 			} else if arg == "-n" || arg == "--name" {
+	// 				// 检查是否有下一个参数
+	// 				if i+1 >= len(sub) {
+	// 					fmt.Println(lang.T("msg.llm.add.name_required"))
+	// 					fmt.Println(lang.T("repl.llm_usage"))
+	// 					return false
+	// 				}
+	// 				if strings.HasPrefix(sub[i+1], "-") {
+	// 					fmt.Println(lang.T("msg.llm.add.name_required"))
+	// 					fmt.Println(lang.T("repl.llm_usage"))
+	// 					return false
+	// 				}
+	// 				name = sub[i+1]
+	// 				i += 2
+	// 				continue
+	// 			}
 
-				// 非flag参数，不应该出现在这里
-				fmt.Printf(lang.T("msg.llm.add.unexpected_nonflag")+"\n", arg)
-				fmt.Println(lang.T("repl.llm_usage"))
-				return false
-			}
+	// 			if strings.HasPrefix(arg, "-") {
+	// 				fmt.Printf(lang.T("msg.unknown_command")+"\n", arg)
+	// 				fmt.Println(lang.T("repl.llm_usage"))
+	// 				return false
+	// 			}
 
-			if provider == "" {
-				fmt.Println(lang.T("msg.llm.add.provider_missing"))
-				fmt.Println(lang.T("repl.llm_usage"))
-				return false
-			}
-			if name == "" {
-				fmt.Println(lang.T("msg.llm.add.name_required"))
-				fmt.Println(lang.T("repl.llm_usage"))
-				return false
-			}
-			tasks.AddLLM(provider, name, model)
-			return false
-		}
+	// 			// 非flag参数，不应该出现在这里
+	// 			fmt.Printf(lang.T("msg.llm.add.unexpected_nonflag")+"\n", arg)
+	// 			fmt.Println(lang.T("repl.llm_usage"))
+	// 			return false
+	// 		}
 
-		// remove/link/unlink/test: 都可以对 id/name/model 进行直接操作
-		if len(sub) < 2 {
-			fmt.Println(lang.T("repl.llm_usage"))
-			return false
-		}
+	// 		if provider == "" {
+	// 			fmt.Println(lang.T("msg.llm.add.provider_missing"))
+	// 			fmt.Println(lang.T("repl.llm_usage"))
+	// 			return false
+	// 		}
+	// 		if name == "" {
+	// 			fmt.Println(lang.T("msg.llm.add.name_required"))
+	// 			fmt.Println(lang.T("repl.llm_usage"))
+	// 			return false
+	// 		}
+	// 		tasks.AddLLM(provider, name, model)
+	// 		return false
+	// 	}
 
-		identifier := sub[1]
-		switch action {
-		case "remove":
-			tasks.RemoveLLM(identifier)
-		case "link":
-			tasks.LinkLLM(identifier)
-		case "unlink":
-			tasks.UnlinkLLM(identifier)
-		case "test":
-			tasks.TestLLM(identifier)
-		case "switch":
-			tasks.SwitchLLM(identifier)
-		case "ask":
-			prompt := strings.Join(sub[1:], " ")
-			tasks.AskLLM(prompt)
-		default:
-			// 未知命令
-			fmt.Printf(lang.T("repl.unknown_command")+"\n", action)
-			fmt.Println(lang.T("repl.llm_usage"))
-		}
+	// 	// remove/link/unlink/test: 都可以对 id/name/model 进行直接操作
+	// 	if len(sub) < 2 {
+	// 		fmt.Println(lang.T("repl.llm_usage"))
+	// 		return false
+	// 	}
+
+	// 	identifier := sub[1]
+	// 	switch action {
+	// 	case "remove":
+	// 		tasks.RemoveLLM(identifier)
+	// 	case "link":
+	// 		tasks.LinkLLM(identifier)
+	// 	case "unlink":
+	// 		tasks.UnlinkLLM(identifier)
+	// 	case "test":
+	// 		tasks.TestLLM(identifier)
+	// 	case "switch":
+	// 		tasks.SwitchLLM(identifier)
+	// 	case "ask":
+	// 		prompt := strings.Join(sub[1:], " ")
+	// 		tasks.AskLLM(prompt)
+	// 	default:
+	// 		// 未知命令
+	// 		fmt.Printf(lang.T("repl.unknown_command")+"\n", action)
+	// 		fmt.Println(lang.T("repl.llm_usage"))
+	// 	}
 
 	case "build":
 		if len(parts) < 2 {
