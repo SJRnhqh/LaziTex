@@ -17,12 +17,12 @@ func LinkLLM(sub []string) {
 	}
 }
 
-func UnlinkLLM() {
-	// Mock 断掉LLM连接的业务逻辑
+func UnlinkLLM(sub []string) {
+	llm.UnlinkLLMProvider(sub[1:])
 }
 
-func SwitchLLM() {
-	// Mock 切换LLM的业务逻辑
+func SwitchLLM(sub []string) {
+	
 }
 
 func TestLLM() {

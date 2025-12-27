@@ -149,3 +149,94 @@ func formatProviderSimple(index int, provider *cfg.LLMProvider) string {
 	return fmt.Sprintf(lang.T("msg.llm.link.provider_format_simple"),
 		index, provider.Name, provider.ID[:8]+"...", provider.Provider)
 }
+
+// SelectAndUnlinkProviders 通用的 Provider 选择和取消连接函数
+// providers: 要显示的 Provider 列表
+// title: 显示标题（例如："模型 'xxx' 匹配到多个 LLM" 或 "已注册的 LLM Provider"）
+// formatter: 格式化每个 Provider 显示的函数，如果为 nil 则使用默认格式
+func SelectAndUnlinkProviders(providers []*cfg.LLMProvider, title string, formatter ProviderFormatter) {
+	if len(providers) == 0 {
+		fmt.Println(lang.T("msg.llm.link.no_available"))
+		return
+	}
+
+	// 显示标题
+	fmt.Printf("\n%s：\n\n", title)
+
+	// 显示列表
+	for i, p := range providers {
+		if formatter != nil {
+			fmt.Println(formatter(i+1, p))
+		} else {
+			// 默认格式
+			fmt.Printf(lang.T("msg.llm.link.provider_format")+"\n",
+				i+1, p.Name, p.Provider, p.Model)
+		}
+	}
+
+	// 显示选择提示
+	fmt.Println("\n" + lang.T("msg.llm.unlink.select_prompt"))
+	fmt.Printf(lang.T("msg.llm.unlink.select_number")+"\n", len(providers))
+	fmt.Println(lang.T("msg.llm.unlink.select_all"))
+	fmt.Println(lang.T("msg.llm.unlink.select_cancel"))
+	fmt.Print("\n" + lang.T("msg.llm.unlink.select_input"))
+
+	// 读取用户输入
+	reader := bufio.NewReader(os.Stdin)
+	input, err := reader.ReadString('\n')
+	if err != nil {
+		fmt.Printf(lang.T("msg.llm.link.read_input_failed")+"\n", err)
+		return
+	}
+
+	input = strings.TrimSpace(strings.ToLower(input))
+
+	// 处理取消
+	if input == "q" || input == "quit" {
+		fmt.Println(lang.T("msg.llm.cancelled"))
+		return
+	}
+
+	// 处理全选
+	if input == "a" || input == "all" {
+		unlinkAllProviders(providers)
+		return
+	}
+
+	// 处理数字选择
+	choice, err := strconv.Atoi(input)
+	if err != nil || choice < 1 || choice > len(providers) {
+		fmt.Printf(lang.T("msg.llm.link.invalid_choice")+"\n", input)
+		return
+	}
+
+	// 取消连接选中的 Provider
+	selectedProvider := providers[choice-1]
+	unlinkSingleProvider(selectedProvider)
+}
+
+// unlinkAllProviders 取消连接所有 Provider
+func unlinkAllProviders(providers []*cfg.LLMProvider) {
+	unlinkedCount := 0
+
+	for _, p := range providers {
+		if err := cfg.UnsetActiveLLMByID(p.ID); err != nil {
+			fmt.Printf(lang.T("msg.llm.unlink.unlink_failed")+"\n", p.Name, err)
+		} else {
+			fmt.Printf(lang.T("msg.llm.unlink.unlink_success")+"\n", p.Name)
+			unlinkedCount++
+		}
+	}
+
+	fmt.Printf("\n"+lang.T("msg.llm.unlink.unlink_all_count")+"\n", unlinkedCount)
+}
+
+// unlinkSingleProvider 取消连接单个 Provider
+func unlinkSingleProvider(provider *cfg.LLMProvider) {
+	// 取消连接选中的 Provider
+	if err := cfg.UnsetActiveLLMByID(provider.ID); err != nil {
+		fmt.Printf(lang.T("msg.llm.unlink.unlink_failed")+"\n", err)
+		return
+	}
+	fmt.Printf(lang.T("msg.llm.unlink.unlink_success")+"\n", provider.Name)
+}

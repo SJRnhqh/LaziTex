@@ -182,7 +182,7 @@ func SetActiveLLM(idOrNameOrModel string) error {
 // SetActiveLLMByID 通过 ID 直接添加到激活列表（内部使用，不做查找）
 func SetActiveLLMByID(providerID string) error {
 	config := LoadConfig()
-	
+
 	// 验证 ID 是否存在
 	found := false
 	for _, p := range config.LLMProviders {
@@ -191,35 +191,86 @@ func SetActiveLLMByID(providerID string) error {
 			break
 		}
 	}
-	
+
 	if !found {
 		return fmt.Errorf("LLM Provider ID '%s' 不存在", providerID)
 	}
-	
+
 	// 检查是否已在激活列表中
 	for _, activeID := range config.ActiveLLMs {
 		if activeID == providerID {
 			return nil // 已在列表中
 		}
 	}
-	
+
 	// 添加到激活列表
 	config.ActiveLLMs = append(config.ActiveLLMs, providerID)
 	return SaveConfig(config)
 }
 
+// UnsetActiveLLMByID 通过 ID 直接从激活列表中移除（内部使用，不做查找）
+func UnsetActiveLLMByID(providerID string) error {
+	config := LoadConfig()
+
+	// 验证 ID 是否存在
+	found := false
+	for _, p := range config.LLMProviders {
+		if p.ID == providerID {
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		return fmt.Errorf("LLM Provider ID '%s' 不存在", providerID)
+	}
+
+	// 检查是否在激活列表中
+	inActiveList := false
+	for _, activeID := range config.ActiveLLMs {
+		if activeID == providerID {
+			inActiveList = true
+			break
+		}
+	}
+
+	if !inActiveList {
+		return fmt.Errorf("LLM Provider ID '%s' 不在激活列表中", providerID)
+	}
+
+	// 从激活列表中移除
+	newActiveLLMs := []string{}
+	for _, activeID := range config.ActiveLLMs {
+		if activeID != providerID {
+			newActiveLLMs = append(newActiveLLMs, activeID)
+		}
+	}
+	config.ActiveLLMs = newActiveLLMs
+
+	// 如果当前前台 LLM 是被取消连接的，清空当前前台
+	if config.CurrentLLM == providerID {
+		config.CurrentLLM = ""
+	}
+
+	return SaveConfig(config)
+}
+
 // UnsetActiveLLM 从激活列表中移除指定的 LLM Provider（需要验证）
 func UnsetActiveLLM(idOrNameOrModel string) error {
-	// 验证 LLM Provider 是否存在
-	provider, err := FindLLMProvider(idOrNameOrModel)
-	if err != nil {
-		return err
-	}
-	if provider == nil {
+	// 查找所有匹配的 providers
+	matches, matchType := FindAllMatchingProviders(idOrNameOrModel)
+
+	if len(matches) == 0 {
 		return fmt.Errorf("LLM Provider '%s' 不存在", idOrNameOrModel)
 	}
 
-	// 加载配置检查当前激活状态
+	// 如果通过 Model 匹配到多个，返回特殊错误
+	if matchType == "model" && len(matches) > 1 {
+		return fmt.Errorf("MULTIPLE_MATCHES") // 特殊标记，由调用方处理交互
+	}
+
+	// 唯一匹配，从激活列表中移除
+	provider := matches[0]
 	config := LoadConfig()
 
 	// 验证指定的 LLM 是否在激活列表中
@@ -243,6 +294,12 @@ func UnsetActiveLLM(idOrNameOrModel string) error {
 		}
 	}
 	config.ActiveLLMs = newActiveLLMs
+
+	// 如果当前前台 LLM 是被取消连接的，清空当前前台
+	if config.CurrentLLM == provider.ID {
+		config.CurrentLLM = ""
+	}
+
 	return SaveConfig(config)
 }
 
@@ -332,4 +389,3 @@ func generateLLMID(provider, name, model string) string {
 	// 返回前 16 个字符的十六进制字符串作为 ID
 	return hex.EncodeToString(hash[:])[:16]
 }
-

@@ -331,9 +331,9 @@ func handleREPLCommand(input string) bool {
 		case "link":
 			tasks.LinkLLM(sub)
 		case "unlink":
-			tasks.UnlinkLLM()
+			tasks.UnlinkLLM(sub)
 		case "switch":
-			tasks.SwitchLLM()
+			tasks.SwitchLLM(sub)
 		case "test":
 			tasks.TestLLM()
 		case "remove":
