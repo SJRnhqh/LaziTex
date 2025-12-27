@@ -4,7 +4,8 @@
 package tasks
 
 import (
-	// 内部包
+	"strings"
+
 	llm "github.com/SJRnhqh/lazitex/core/ai/llm"
 )
 
@@ -37,8 +38,9 @@ func ListLLM(sub []string) {
 	llm.ListLLMProviders(sub[1:])
 }
 
-func AskLLM() {
-	// Mock 与LLM进行交互的业务逻辑
+func AskLLM(sub []string) {
+	query := strings.Join(sub[1:], " ")
+	llm.AskLLMProvider(query)
 }
 
 func ChatLLM() {

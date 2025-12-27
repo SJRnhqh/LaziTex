@@ -335,7 +335,7 @@ func handleREPLCommand(input string) bool {
 				fmt.Println(lang.T("repl.llm_usage"))
 				return false
 			}
-			tasks.AskLLM()
+			tasks.AskLLM(sub)
 			return false
 		case "chat": // 严格单独使用
 			if len(sub) != 1 {

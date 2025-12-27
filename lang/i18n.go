@@ -234,6 +234,15 @@ func init() {
 		"msg.llm.list.status_inactive":    "未激活",
 		"msg.llm.list.no_providers":       "当前没有已注册的 LLM Provider",
 		"msg.llm.date_format":             "2006-01-02", // 日期格式（Go time 格式字符串）
+		// 询问
+		"msg.llm.ask.empty_query":          "😢 查询内容不能为空",
+		"msg.llm.ask.get_current_failed":   "😢 获取当前 LLM 失败: %v",
+		"msg.llm.ask.no_current_llm":       "😢 当前没有激活的 LLM",
+		"msg.llm.ask.create_model_failed":  "😢 创建模型失败: %v",
+		"msg.llm.ask.stream_failed":        "😢 调用模型失败: %v",
+		"msg.llm.ask.timeout":              "😢 请求超时，请稍后重试",
+		"msg.llm.ask.receive_error":        "😢 接收响应时出错: %v",
+		"msg.llm.ask.unsupported_provider": "😢 不支持的 LLM 提供程序: %s",
 		// 测试
 		"msg.llm.test.test_failed":                     "😢 %s 测试失败: %v",
 		"msg.llm.test.test_success":                    "✨ %s 测试成功: %s",
@@ -750,6 +759,15 @@ func init() {
 		"msg.llm.list.status_inactive":    "Inactive",
 		"msg.llm.list.no_providers":       "No registered LLM Providers",
 		"msg.llm.date_format":             "2006-01-02", // Date format (Go time format string)
+		// Ask
+		"msg.llm.ask.empty_query":          "😢 Query cannot be empty",
+		"msg.llm.ask.get_current_failed":   "😢 Failed to get current LLM: %v",
+		"msg.llm.ask.no_current_llm":       "😢 No active LLM currently",
+		"msg.llm.ask.create_model_failed":  "😢 Failed to create model: %v",
+		"msg.llm.ask.stream_failed":        "😢 Failed to call model: %v",
+		"msg.llm.ask.timeout":              "😢 Request timeout, please try again later",
+		"msg.llm.ask.receive_error":        "😢 Error receiving response: %v",
+		"msg.llm.ask.unsupported_provider": "😢 Unsupported LLM provider: %s",
 		// Test
 		"msg.llm.test.test_failed":                     "😢 %s test failed: %v",
 		"msg.llm.test.test_success":                    "✨ %s test successful: %s",
