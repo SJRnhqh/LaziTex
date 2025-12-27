@@ -304,18 +304,10 @@ func handleREPLCommand(input string) bool {
 
 	case "llm":
 		// 单独使用：
-		// - link：询问用户是否接入注册新的LLM -> y接入注册/n列出已经注册的LLM让用户tab上下选择然后执行link <id/name/model>的逻辑
-		// - unlink: 断掉当前台前llm的连接
-		// - switch: 会根据当前所有连接状态的LLM让用户选择一个切换为前台llm
-		// - test: 测试当前前台llm是否可以正常工作
 		// - remove: 移除指定的LLM注册 -> 询问用户是否确认移除 -> 确认移除后执行移除操作(注意会区分id/name/model，如果model存在重复会提示用户选择)
 		// - list: 列出所有注册的LLM
 		// - chat: 与前台llm进行持续性对话交互
 		// 组合使用：
-		// - link <id/name/model>: 直接连接指定的已经注册的LLM
-		// - unlink <id/name/model>: 断开指定的LLM连接
-		// - switch <id/name/model>: 切换当前前台llm为指定的连接状态的LLM
-		// - test <id/name/model>: 测试指定的LLM是否可以正常工作
 		// - remove <id/name/model>: 移除指定的LLM注册 -> 询问用户是否确认移除 -> 确认移除后执行移除操作(注意会区分id/name/model，如果model存在重复会提示用户选择)
 		// - list <id/name/model>: 列出指定的LLM注册
 		// - ask <message>: 单次与前台llm进行对话交互

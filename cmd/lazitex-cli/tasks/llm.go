@@ -29,12 +29,12 @@ func TestLLM(sub []string) {
 	llm.TestLLMProvider(sub[1:])
 }
 
-func ListLLM() {
-	// Mock 列出所有注册的LLM的业务逻辑
-}
-
 func RemoveLLM() {
 	// Mock 移除LLM注册的业务逻辑
+}
+
+func ListLLM() {
+	// Mock 列出所有注册的LLM的业务逻辑
 }
 
 func AskLLM() {
