@@ -192,8 +192,8 @@ func listAndUnlinkProviders() {
 	SelectAndUnlinkProviders(activeProviders, lang.T("msg.llm.unlink.active_title"), formatProviderWithStatus)
 }
 
-// SwitchLLM 切换当前前台的 LLM Provider
-func SwitchLLM(llmProviderIDOrNameOrModel []string) {
+// SwitchLLMProvider 切换当前前台的 LLM Provider
+func SwitchLLMProvider(llmProviderIDOrNameOrModel []string) {
 	// 如果没有参数，列出所有已激活的 Provider 供选择
 	if len(llmProviderIDOrNameOrModel) == 0 {
 		listAndSwitchProviders()

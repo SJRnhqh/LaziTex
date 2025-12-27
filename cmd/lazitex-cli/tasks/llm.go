@@ -22,11 +22,11 @@ func UnlinkLLM(sub []string) {
 }
 
 func SwitchLLM(sub []string) {
-	llm.SwitchLLM(sub[1:])
+	llm.SwitchLLMProvider(sub[1:])
 }
 
-func TestLLM() {
-	// Mock 测试LLM是否正常工作的业务逻辑
+func TestLLM(sub []string) {
+	llm.TestLLMProvider(sub[1:])
 }
 
 func ListLLM() {

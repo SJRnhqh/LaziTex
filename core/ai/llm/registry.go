@@ -66,6 +66,9 @@ func RegisterLLMProvider() {
 			}
 			return
 		}
+		// 测试成功，更新验证状态
+		newLLMProvider.Verified = true
+		newLLMProvider.VerifiedAt = time.Now().Format("2006-01-02 15:04:05")
 		fmt.Printf(lang.T("msg.llm.register.test_success")+"\n", resp)
 	default:
 		fmt.Println(lang.T("msg.llm.register.unsupported_provider"))
@@ -220,10 +223,7 @@ func TestOllamaConnection(llmprovider *cfg.LLMProvider) (string, error) {
 			llmprovider.Model, llmprovider.Model)
 	}
 
-	// ✨ 测试成功，更新验证状态
-	llmprovider.Verified = true
-	llmprovider.VerifiedAt = time.Now().Format("2006-01-02 15:04:05")
-
+	// 测试成功，返回成功消息（不在这里更新状态，由调用方统一处理）
 	return fmt.Sprintf(lang.T("msg.llm.register.ollama.test_success"), llmprovider.Model), nil
 }
 
