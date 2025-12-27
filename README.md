@@ -23,6 +23,7 @@ Instant LaTeX compilation across platforms — powered by Go with local AI to he
 - 📦 **Auto Package Management** - Automatically detects and installs missing packages
 - 🌐 **Web Preview Mode** - Web real-time preview
 - 🦙 **Ollama Management** - One-click Ollama management
+- 🤖 **LLM Management** - Complete LLM provider management (register, link, switch, test, remove, list)
 - ⚙️ **Configuration Management** - Cross-platform configuration file management
 - 🎨 **Multiple Modes** - Supports TUI and REPL modes
 
@@ -174,6 +175,25 @@ lazitex> ollama -i     # Install
 lazitex> ollama -u     # Uninstall
 ```
 
+### LLM Management
+
+Complete LLM provider management with registration, activation, switching, testing, and removal. Supports interactive selection and multi-activation.
+
+```bash
+# REPL Mode
+lazitex> llm link              # Register new LLM provider
+lazitex> llm link <name>       # Activate LLM provider
+lazitex> llm unlink            # Deactivate current LLM
+lazitex> llm unlink <name>     # Deactivate specific LLM
+lazitex> llm switch            # Switch foreground LLM (interactive)
+lazitex> llm switch <name>     # Switch to specific LLM
+lazitex> llm test              # Test current LLM
+lazitex> llm test <name>       # Test specific LLM
+lazitex> llm remove            # Remove LLM provider (interactive)
+lazitex> llm list              # List all registered LLMs
+lazitex> llm list <name>       # List specific LLM
+```
+
 ### Build & Preview
 
 One-click LaTeX document compilation with auto package detection & installation, adaptive multi-pass compilation, smart preview, and web real-time preview. Supports quiet mode (`-q`) and tidy mode (`-t`).
@@ -257,12 +277,23 @@ lazitex/
 │   ├── ⚡ performance/             # Compilation performance optimization module
 │   │   ├── concurrent.go          # Concurrent optimization (parallel execution of intermediate tools)
 │   │   └── lock.go                # Compilation lock & task management (task preemption, timeout control)
+│   └── 🤖 ai/                      # AI & LLM management module
+│       └── llm/                    # LLM provider management
+│           ├── registry.go         # LLM provider registration
+│           ├── link.go             # LLM activation & linking
+│           ├── unlink.go           # LLM deactivation
+│           ├── switch.go           # Foreground LLM switching
+│           ├── test.go             # LLM connection testing
+│           ├── remove.go           # LLM provider removal
+│           ├── list.go             # LLM provider listing (table format)
+│           └── select.go           # Interactive selection utilities
 │
 ├── 📚 lang/                       # Internationalization module
 │   └── i18n.go                    # Multi-language support (English/Chinese)
 │
 ├── ⚙️  config/                     # Configuration management
-│   └── common.go                  # Application configuration management
+│   ├── common.go                   # Application configuration management
+│   └── llm.go                      # LLM provider configuration management
 │
 ├── 🗄️  backend/                    # Web server backend
 │   ├── server.go                  # HTTP server core (with mode configuration)
@@ -328,6 +359,7 @@ lazitex/
 │       │   ├── preview.go         # Live preview functionality
 │       │   ├── ollama.go          # Ollama management functionality
 │       │   ├── latex.go           # LaTeX environment management
+│       │   ├── llm.go             # LLM management functionality
 │       │   ├── config.go          # Configuration file management
 │       │   └── help.go            # Help information
 │       ├── 🧠 internal/           # Internal command processing (unified action handlers)
@@ -359,26 +391,24 @@ lazitex/
 
 ### Completed ✅
 
-- [x] **Cross-Platform Environment Detection & Management** - Windows, Linux, macOS detection, macOS auto install/update/uninstall
-- [x] **Build System** - One-click compilation, smart preview, auto package detection & installation, adaptive multi-pass compilation, performance optimization
-- [x] **Web Preview Frontend** - Vue 3 frontend, SSE real-time refresh, PDF virtual scrolling, dual-mode architecture
-- [x] **Ollama Management** - Cross-platform check, install, and uninstall
-- [x] **LLM Management** - Complete provider registration, connection, testing, removal, and multi-activation support
-- [x] **AI Architecture Foundation** - Modular architecture for LLM providers and agents
-- [x] **Interactive Modes** - REPL mode with command history, Tab completion, i18n support
+- [x] Cross-platform environment detection & management (macOS auto install/update/uninstall)
+- [x] Build system with adaptive multi-pass compilation & auto package management
+- [x] Web preview frontend (Vue 3, SSE real-time refresh, PDF virtual scrolling)
+- [x] Ollama management (cross-platform check, install, uninstall)
+- [x] LLM management (register, link, switch, test, remove, list with full i18n support)
+- [x] Interactive REPL mode (command history, Tab completion, i18n)
 
 ### In Progress 🚧
 
-- [ ] **AI Application Features** - LLM-powered error diagnosis, code generation, smart completion
-- [ ] **Agent System** - AI agent construction and orchestration framework
-- [ ] **Live Preview Optimization** - Enhanced error feedback
-- [ ] **Linux Environment Management** - Auto install/update/uninstall
+- [ ] AI application features (error diagnosis, code generation, smart completion)
+- [ ] Agent system framework
+- [ ] Linux environment auto management
 
 ### Planned 📋
 
-- [ ] **Web Workspace** - File management, code editor, terminal integration, AI chat
-- [ ] **Project Features** - Project initialization, multi-document support, custom configurations
-- [ ] **Platform Extension** - Windows environment management, TUI enhancement, GUI support
+- [ ] Web workspace (file management, editor, terminal, AI chat)
+- [ ] Project features (initialization, multi-document support)
+- [ ] Windows environment auto management
 
 ---
 

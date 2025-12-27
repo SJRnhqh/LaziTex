@@ -23,6 +23,7 @@
 - 📦 **自动包管理** - 自动检测并安装缺失的包
 - 🌐 **Web 预览模式** - Web 实时预览
 - 🦙 **Ollama 管理** - 一键管理 Ollama
+- 🤖 **LLM 管理** - 完整的 LLM 提供商管理（注册、激活、切换、测试、删除、列表）
 - ⚙️ **配置管理** - 跨平台配置文件管理
 - 🎨 **多种模式** - 支持 TUI 和 REPL 模式
 
@@ -174,6 +175,25 @@ lazitex> ollama -i     # 安装
 lazitex> ollama -u     # 卸载
 ```
 
+### LLM 管理
+
+完整的 LLM 提供商管理功能，支持注册、激活、切换、测试和删除。支持交互式选择和多激活。
+
+```bash
+# REPL 模式
+lazitex> llm link              # 注册新的 LLM 提供商
+lazitex> llm link <name>       # 激活 LLM 提供商
+lazitex> llm unlink           # 取消激活当前 LLM
+lazitex> llm unlink <name>    # 取消激活指定 LLM
+lazitex> llm switch           # 切换前台 LLM（交互式）
+lazitex> llm switch <name>    # 切换到指定 LLM
+lazitex> llm test            # 测试当前 LLM
+lazitex> llm test <name>      # 测试指定 LLM
+lazitex> llm remove          # 删除 LLM 提供商（交互式）
+lazitex> llm list            # 列出所有已注册的 LLM
+lazitex> llm list <name>     # 列出指定 LLM
+```
+
 ### 构建与预览
 
 一键构建 LaTeX 文档，支持自动包检测与安装、自适应多轮编译、智能预览和 Web 实时预览。支持静默模式（`-q`）和清理模式（`-t`）。
@@ -257,12 +277,23 @@ lazitex/
 │   ├── ⚡ performance/             # 编译性能优化模块
 │   │   ├── concurrent.go           # 并发优化（中间工具并发执行）
 │   │   └── lock.go                 # 编译锁与任务管理（任务抢占、超时控制）
+│   └── 🤖 ai/                      # AI & LLM 管理模块
+│       └── llm/                     # LLM 提供商管理
+│           ├── registry.go          # LLM 提供商注册
+│           ├── link.go              # LLM 激活与链接
+│           ├── unlink.go           # LLM 取消激活
+│           ├── switch.go           # 前台 LLM 切换
+│           ├── test.go              # LLM 连接测试
+│           ├── remove.go           # LLM 提供商删除
+│           ├── list.go             # LLM 提供商列表（表格格式）
+│           └── select.go           # 交互式选择工具
 │
 ├── 📚 lang/                       # 国际化模块
 │   └── i18n.go                    # 多语言支持（中英文）
 │
 ├── ⚙️  config/                     # 配置管理
-│   └── common.go                  # 应用配置管理
+│   ├── common.go                   # 应用配置管理
+│   └── llm.go                      # LLM 提供商配置管理
 │
 ├── 🗄️  backend/                    # Web 服务器后端
 │   ├── server.go                  # HTTP 服务器核心（支持模式配置）
@@ -359,26 +390,24 @@ lazitex/
 
 ### 已完成 ✅
 
-- [x] **跨平台环境检测与管理** - Windows、Linux、macOS 环境检测，macOS 自动安装/更新/卸载
-- [x] **编译系统** - 一键编译、智能预览、自动包检测与安装、自适应多轮编译、性能优化
-- [x] **Web 预览前端** - Vue 3 前端、SSE 实时刷新、PDF 虚拟滚动、双模式架构
-- [x] **Ollama 管理** - 跨平台检查、安装、卸载
-- [x] **LLM 管理** - 完整的提供商注册、连接、测试、删除和多激活支持
-- [x] **AI 架构基础** - LLM 提供商和智能体的模块化架构
-- [x] **交互模式** - REPL 交互模式（历史记录、Tab 补全、国际化）
+- [x] 跨平台环境检测与管理（macOS 自动安装/更新/卸载）
+- [x] 编译系统（自适应多轮编译、自动包管理）
+- [x] Web 预览前端（Vue 3、SSE 实时刷新、PDF 虚拟滚动）
+- [x] Ollama 管理（跨平台检查、安装、卸载）
+- [x] LLM 管理（注册、激活、切换、测试、删除、列表，完整国际化支持）
+- [x] 交互式 REPL 模式（命令历史、Tab 补全、国际化）
 
 ### 进行中 🚧
 
-- [ ] **AI 应用功能** - LLM 驱动的错误诊断、代码生成、智能补全
-- [ ] **智能体系统** - AI 智能体构建和编排框架
-- [ ] **实时预览优化** - 错误反馈增强
-- [ ] **Linux 环境管理** - 自动安装/更新/卸载
+- [ ] AI 应用功能（错误诊断、代码生成、智能补全）
+- [ ] 智能体系统框架
+- [ ] Linux 环境自动管理
 
 ### 计划中 📋
 
-- [ ] **Web 工作区** - 文件管理、代码编辑器、终端集成、AI 聊天
-- [ ] **项目功能** - 项目初始化、多文档支持、自定义配置
-- [ ] **平台扩展** - Windows 环境管理、TUI 完善、GUI 支持
+- [ ] Web 工作区（文件管理、编辑器、终端、AI 聊天）
+- [ ] 项目功能（初始化、多文档支持）
+- [ ] Windows 环境自动管理
 
 ---
 
