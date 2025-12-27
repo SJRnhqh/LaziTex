@@ -280,9 +280,7 @@ lazitex/
 │   └── 🤖 ai/                      # AI & LLM management module
 │       └── llm/                    # LLM provider management
 │           ├── registry.go         # LLM provider registration
-│           ├── link.go             # LLM activation & linking
-│           ├── unlink.go           # LLM deactivation
-│           ├── switch.go           # Foreground LLM switching
+│           ├── link.go             # LLM activation, deactivation & switching
 │           ├── test.go             # LLM connection testing
 │           ├── remove.go           # LLM provider removal
 │           ├── list.go             # LLM provider listing (table format)

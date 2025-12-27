@@ -280,9 +280,7 @@ lazitex/
 │   └── 🤖 ai/                      # AI & LLM 管理模块
 │       └── llm/                     # LLM 提供商管理
 │           ├── registry.go          # LLM 提供商注册
-│           ├── link.go              # LLM 激活与链接
-│           ├── unlink.go           # LLM 取消激活
-│           ├── switch.go           # 前台 LLM 切换
+│           ├── link.go              # LLM 激活、取消激活与切换
 │           ├── test.go              # LLM 连接测试
 │           ├── remove.go           # LLM 提供商删除
 │           ├── list.go             # LLM 提供商列表（表格格式）
@@ -359,8 +357,9 @@ lazitex/
 │       │   ├── preview.go         # 实时预览功能
 │       │   ├── ollama.go          # Ollama 管理功能
 │       │   ├── latex.go           # LaTeX 环境管理功能
+│       │   ├── llm.go             # LLM 管理功能
 │       │   ├── config.go          # 配置文件管理功能
-│       │   └── help.go            # 帮助信息
+│       │   └── help.go           # 帮助信息
 │       ├── 🧠 internal/           # 内部命令处理（统一动作处理器）
 │       │   ├── common.go          # 通用工具和动作处理器
 │       │   ├── latex.go           # LaTeX 命令处理逻辑
