@@ -180,18 +180,9 @@ lazitex> ollama -u     # Uninstall
 Complete LLM provider management with registration, activation, switching, testing, and removal. Supports interactive selection, batch operations, and AI interactions.
 
 ```bash
-# REPL Mode - Provider Management
-lazitex> llm link              # Register new LLM provider
-lazitex> llm link <name>       # Activate LLM provider
-lazitex> llm unlink            # Deactivate current LLM
-lazitex> llm unlink <name>     # Deactivate specific LLM
-lazitex> llm switch            # Switch foreground LLM (interactive)
-lazitex> llm switch <name>     # Switch to specific LLM
-lazitex> llm test              # Test current LLM
-lazitex> llm test <name>       # Test specific LLM
-lazitex> llm remove            # Remove LLM provider (interactive)
-lazitex> llm list              # List all registered LLMs
-lazitex> llm list <name>       # List specific LLM
+# REPL Mode - Provider Management (supports multiple names)
+lazitex> llm link|unlink|test|remove|list [name...]   # register/unlink/test/remove/list
+lazitex> llm switch [name]                            # switch foreground LLM (interactive or specified)
 
 # REPL Mode - AI Interaction
 lazitex> llm ask <message>     # Single-turn conversation

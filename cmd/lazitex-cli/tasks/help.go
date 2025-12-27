@@ -41,7 +41,7 @@ func ShowREPLHelp() {
 	fmt.Printf("  %-100s - %s\n", "version", lang.T("repl.version_desc"))
 	fmt.Printf("  %-100s - %s\n", "latex <-c|--check|-i|--install|-u|--uninstall>", lang.T("repl.latex"))
 	fmt.Printf("  %-100s - %s\n", "ollama <-c|--check|-i|--install|-u|--uninstall|-s|--status>", lang.T("repl.ollama"))
-	// fmt.Printf("  %-100s - %s\n", "llm add <model> -p <provider> -n <name> | remove/link/unlink/test/switch <id/name/model> | list", lang.T("repl.llm_desc"))
+	fmt.Printf("  %-100s - %s\n", "llm [list|link|unlink|switch|test|remove|ask|chat] ...", lang.T("repl.llm_usage"))
 	fmt.Printf("  %-100s - %s\n", "build <file> [-o|--output path] [-s|--show] [-q|--quiet] [-t|--tidy]", lang.T("repl.build_desc"))
 	fmt.Printf("  %-100s - %s\n", "preview <file>", lang.T("repl.preview_desc"))
 	fmt.Printf("  %-100s - %s\n", "lang <zh|en>", lang.T("repl.lang_desc"))

@@ -180,18 +180,9 @@ lazitex> ollama -u     # 卸载
 完整的 LLM 提供商管理功能，支持注册、激活、切换、测试和删除。支持交互式选择、批量操作和 AI 交互。
 
 ```bash
-# REPL 模式 - 提供商管理
-lazitex> llm link              # 注册新的 LLM 提供商
-lazitex> llm link <name>       # 激活 LLM 提供商
-lazitex> llm unlink           # 取消激活当前 LLM
-lazitex> llm unlink <name>    # 取消激活指定 LLM
-lazitex> llm switch           # 切换前台 LLM（交互式）
-lazitex> llm switch <name>    # 切换到指定 LLM
-lazitex> llm test            # 测试当前 LLM
-lazitex> llm test <name>      # 测试指定 LLM
-lazitex> llm remove          # 删除 LLM 提供商（交互式）
-lazitex> llm list            # 列出所有已注册的 LLM
-lazitex> llm list <name>     # 列出指定 LLM
+# REPL 模式 - 提供商管理（支持批量 name）
+lazitex> llm link|unlink|test|remove|list [name...]   # 注册/解绑/测试/删除/查看
+lazitex> llm switch [name]                            # 切换前台 LLM（交互式或指定）
 
 # REPL 模式 - AI 交互
 lazitex> llm ask <message>    # 单次对话
