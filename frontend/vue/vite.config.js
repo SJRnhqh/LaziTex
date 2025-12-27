@@ -15,7 +15,8 @@ export default defineConfig({
   
   // 优化配置（确保 PDF.js worker 正确加载）
   optimizeDeps: {
-    include: ['pdfjs-dist'],
+    include: ['pdfjs-dist', 'monaco-editor'],
+    exclude: ['@monaco-editor/loader']
   },
   
   // 开发服务器配置

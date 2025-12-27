@@ -5,9 +5,13 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import DynamicPDFViewer from '../components/DynamicPDFViewer.vue'
 import ModeSwitcher from '../components/ModeSwitcher.vue'
+import MonacoEditor from '../components/MonacoEditor.vue'
 
 // 左侧代码区域宽度百分比（默认50%）
 const codeWidthPercent = ref(50)
+
+// 添加：编辑器内容的状态
+const editorContent = ref('\\documentclass{article}\n\\begin{document}\nHello World\n\\end{document}')
 
 // 拖拽状态
 const isResizing = ref(false)
@@ -85,7 +89,8 @@ onUnmounted(() => {
         <div class="workspace">
         <!-- 左侧：代码编辑器区域 -->
         <div class="code" :style="{ width: codeWidthPercent + '%' }">
-            <!-- 代码编辑器将在这里 -->
+            <!-- 替换原来的注释，使用 MonacoEditor 组件 -->
+            <MonacoEditor v-model="editorContent" />
         </div>
         
         <!-- 可调整的分隔条 -->
