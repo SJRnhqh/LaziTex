@@ -253,6 +253,69 @@ LaziTex 支持 Windows、Linux 和 macOS 三大平台：
 
 LaziTex 采用清晰的模块化架构设计，易于扩展和维护。
 
+```mermaid
+%%{init: {"theme": "default", "flowchart": {"useMaxWidth": false}} }%%
+graph LR
+    %% 系统标识
+    lazitex["<b>🧪 LaziTex</b><br><small>本地 LaTeX-cli 工具</small>"]
+
+    %% 用户交互层
+    cli["💬 用户交互层<br><small>CLI / REPL / TUI</small>"]
+    tasks["🧩 任务编排层"]
+
+    subgraph core_sub["核心逻辑层"]
+        direction TB
+        classDef coreModule fill:#f9f0ff,stroke:#722ed1,stroke-width:1px;
+        classDef narrow text-align:center,width:150px;
+
+        build["🛠️ 智能构建"]
+        watcher["👁️‍🗨️ 实时预览"]
+        ai["🤖 LLM/Agent 管理<br><small>🚧 开发中</small>"]
+
+        class build,watcher,ai narrow,coreModule
+    end
+
+    platform_api["🖥️ 平台适配接口<br><small>LaTeX / Ollama 管理</small>"]
+
+    subgraph platfrom_sub["平台抽象层"]
+        direction LR
+        win["🪟 Windows"]
+        mac["🍎 macOS"]
+        linux["🐧 Linux"]
+    end
+
+    %% 技术栈
+    subgraph tech_sub["⚙️ 技术栈"]
+        direction TB
+        go["📦 Go 1.25<br><small>静态编译 · 单二进制</small>"]
+        vue["🌐 Vue3 Vite<br><small>嵌入式 Web 前端</small>"]
+    end
+
+    %% 主数据流
+    lazitex --> cli
+    cli --> tasks
+    tasks --> build
+    tasks --> watcher
+    tasks --> ai
+    tasks --> platform_api
+    platform_api --> platfrom_sub
+
+    %% 技术栈支撑
+    lazitex -.-> tech_sub
+
+    %% 样式
+    classDef system fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000;
+    classDef layer fill:#e6f7ff,stroke:#1890ff;
+    classDef platform fill:#fff7e6,stroke:#fa8c16;
+    classDef techStack fill:#f6ffed,stroke:#52c41a;
+
+    class lazitex system
+    class cli,tasks layer
+    class win,mac,linux platform
+    class go,vue techStack
+
+```
+
 ```txt
 lazitex/
 ├── 🐹 go.mod                      # Go 模块定义
